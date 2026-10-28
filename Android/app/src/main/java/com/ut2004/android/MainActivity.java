@@ -76,7 +76,7 @@ public class MainActivity extends Activity {
     private static final String PREF_MOVE_FULL_TILT = "moveFullTiltDp";
     private static final String PREF_MOVE_DEAD_ZONE = "moveDeadZoneDp";
     // The game's own settings and saves, relative to the game folder.
-    private static final String[] SETTINGS_AND_SAVES = { "System/UT2004.ini", "System/User.ini", "Save" };
+    private static final String[] SETTINGS_AND_SAVES = { "System/" + BuildConfig.GAME_INI, "System/User.ini", BuildConfig.SAVE_FOLDER };
 
     private boolean launcherShown = false;
     private boolean opRunning = false;
@@ -210,7 +210,7 @@ public class MainActivity extends Activity {
         progressBar.setVisibility(View.GONE);
         col.addView(progressBar, wide(dp(12)));
 
-        pickButton = mkButton(col, "Choose the UT2004 folder…");
+        pickButton = mkButton(col, "Choose the " + BuildConfig.GAME_FOLDER + " folder…");
         pickButton.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) { pickFolder(); }
         });
@@ -225,7 +225,7 @@ public class MainActivity extends Activity {
             @Override public void onClick(View v) { doClearInternal(); }
         });
 
-        exportButton = mkButton(col, "Copy settings and saves to the UT2004 folder");
+        exportButton = mkButton(col, "Copy settings and saves to the " + BuildConfig.GAME_FOLDER + " folder");
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) { doExportSettings(); }
         });
@@ -237,8 +237,8 @@ public class MainActivity extends Activity {
         hint.setTextColor(0xFF6E747C);
         hint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f);
         hint.setPadding(0, dp(26), 0, 0);
-        hint.setText("Choose the UT2004 folder (on the device or an SD card) and copy it to internal storage for the "
-                + "fastest loading. Playing from the UT2004 folder directly needs access to all files.");
+        hint.setText("Choose the " + BuildConfig.GAME_FOLDER + " folder (on the device or an SD card) and copy it to internal storage for the "
+                + "fastest loading. Playing from that folder directly needs access to all files.");
         col.addView(hint);
 
         setContentView(scroll);
@@ -274,7 +274,7 @@ public class MainActivity extends Activity {
     }
 
     private void applyStorageSwitchText() {
-        storageSwitch.setText(storageSwitch.isChecked() ? "UT2004 folder (slower)" : "Internal storage (fast)");
+        storageSwitch.setText(storageSwitch.isChecked() ? BuildConfig.GAME_FOLDER + " folder (slower)" : "Internal storage (fast)");
     }
 
     // ---- the touch move stick -------------------------------------------------------------------

@@ -386,6 +386,47 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  # The Shrek 2 flavour of the same Android build (-Pshrek2): the engine for KnowWonder's mainline
+  # packages under the com.shrek2.android id, with the android-shrek2 inis baked in.
+  shrek2-android:
+    name: shrek2-android (APK)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+
+      - name: Install the NDK + CMake and point the build at this runner's SDK
+        run: |
+          sdkmanager --install "ndk;28.2.13676358" "cmake;4.1.2" >/dev/null
+          printf 'sdk.dir=%s\nndk.dir=%s/ndk/28.2.13676358\n' "$ANDROID_HOME" "$ANDROID_HOME" > Android/local.properties
+
+      - name: Build the Shrek 2 APK
+        run: ./gradlew -Pshrek2 assembleDebug --console=plain
+        working-directory: Android
+
+      - name: Assert every ABI is packaged
+        run: |
+          set -euo pipefail
+          apk=Android/app/build/outputs/apk/debug/app-debug.apk
+          for abi in armeabi-v7a arm64-v8a; do
+            unzip -l "$apk" | grep -q "lib/$abi/libUT2004.so" || { echo "::error::missing $abi"; exit 1; }
+          done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shrek2-android
+          path: Android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
+
   # ---------------------------------------------------------------------------
   # The rolling "latest" release: the newest build of a tracked branch, kept until the next one
   # replaces it. Artifact retention cannot express "keep the latest" (GitHub expires artifacts purely

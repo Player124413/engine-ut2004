@@ -1134,8 +1134,12 @@ int main(int argc, char **argv)
 	INT ErrorLevel = 0;
 	GIsStarted     = 1;
 
-    // Initialize GModule.
+    // Initialize GModule (the Game.ini-facing name for Shrek 2, so existing installs keep working).
+#if UE_SHREK2
+	strcpy( GModule, appToAnsi(TEXT("Game")) );
+#else
 	strcpy( GModule, appToAnsi(TEXT("UT2004")) );
+#endif
 	appStrcpy( GPackage, appPackage() );
 
 	// Begin guarded code.

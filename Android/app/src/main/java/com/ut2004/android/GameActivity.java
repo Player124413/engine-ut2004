@@ -82,7 +82,7 @@ public class GameActivity extends SDLActivity {
     }
 
     /** App-private fast game root: {@code getFilesDir()/UT2004} (same path in both processes). */
-    static File internalRoot(Context ctx) { return new File(ctx.getFilesDir(), "UT2004"); }
+    static File internalRoot(Context ctx) { return new File(ctx.getFilesDir(), BuildConfig.GAME_FOLDER); }
 
     /**
      * A dir is a usable game root iff its {@code System/} holds the engine's first package. A file, not
@@ -234,7 +234,7 @@ public class GameActivity extends SDLActivity {
      * launcher uses the exact same source for copy-to-internal and the external-size readout.
      */
     static File resolveExternalRoot(Context ctx) {
-        File primary = new File(Environment.getExternalStorageDirectory(), "UT2004");
+        File primary = new File(Environment.getExternalStorageDirectory(), BuildConfig.GAME_FOLDER);
         if (hasGameTree(primary)) {
             Log.i(TAG, "external root (internal primary): " + primary);
             return primary;
@@ -246,13 +246,13 @@ public class GameActivity extends SDLActivity {
                 File vol = appDir;
                 for (int i = 0; i < 4 && vol != null; i++) vol = vol.getParentFile();
                 if (vol != null) {
-                    File atRoot = new File(vol, "UT2004");
+                    File atRoot = new File(vol, BuildConfig.GAME_FOLDER);
                     if (hasGameTree(atRoot)) {
                         Log.i(TAG, "external root (secondary volume): " + atRoot);
                         return atRoot;
                     }
                 }
-                File inApp = new File(appDir, "UT2004");
+                File inApp = new File(appDir, BuildConfig.GAME_FOLDER);
                 if (hasGameTree(inApp)) {
                     Log.i(TAG, "external root (app-specific dir): " + inApp);
                     return inApp;
@@ -261,7 +261,7 @@ public class GameActivity extends SDLActivity {
         } catch (Throwable t) {
             Log.w(TAG, "secondary-volume data-root scan failed", t);
         }
-        Log.w(TAG, "no UT2004/System found on any volume; defaulting to " + primary);
+        Log.w(TAG, "no game System found on any volume; defaulting to " + primary);
         return primary;
     }
 

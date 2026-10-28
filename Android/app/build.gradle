@@ -60,6 +60,10 @@ android {
                 // parity); with neither, FetchContent clones the pinned SDL2 itself.
                 def sdl2Dir = project.findProperty('sdl2Dir') ?: System.getenv('SDL2_SOURCE_DIR')
                 def cmakeArgs = ['-DANDROID_STL=c++_shared']
+                // `-Pshrek2`: build the engine for Shrek 2's mainline packages and class layout.
+                if (ueShrek2) {
+                    cmakeArgs += '-DUE_GAME_SHREK2=ON'
+                }
                 // The recovered Karma is FetchContent'd from its own repository at `main`;
                 // `-PkarmaDir=/abs/path` (or KARMA_DECOMP_DIR) passes
                 // FETCHCONTENT_SOURCE_DIR_METOOLKITKARMADECOMP, so a change to the recovered sources can
