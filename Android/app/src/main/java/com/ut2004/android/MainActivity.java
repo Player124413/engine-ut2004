@@ -3,6 +3,8 @@ package com.ut2004.android;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -41,6 +43,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -55,7 +65,8 @@ import java.util.Locale;
  * All files access (Android 11 and later; the storage permission before that): starting from there
  * without it asks to allow it or to copy the game to internal storage instead. "Clear internal storage"
  * deletes the internal copy; "Copy settings and saves" writes the internal copy's inis and saves back to
- * the chosen folder.
+ * the chosen folder. "Copy last log" puts the newest game log on the clipboard for a bug report
+ * (a long press shares it as text instead).
  *
  * The storage choice is conveyed to the separate ":game" process via an Intent extra
  * ({@link GameActivity#EXTRA_STORAGE_MODE}); default-mode SharedPreferences would not be multi-process
@@ -77,6 +88,8 @@ public class MainActivity extends Activity {
     private static final String PREF_MOVE_DEAD_ZONE = "moveDeadZoneDp";
     // The game's own settings and saves, relative to the game folder.
     private static final String[] SETTINGS_AND_SAVES = { "System/" + BuildConfig.GAME_INI, "System/User.ini", BuildConfig.SAVE_FOLDER };
+    // How much of the game log Copy last log carries: enough for a crash tail, small enough for the clipboard.
+    private static final int LOG_TAIL_BYTES = 192 * 1024;
 
     private boolean launcherShown = false;
     private boolean opRunning = false;
@@ -85,7 +98,7 @@ public class MainActivity extends Activity {
     private boolean copyAfterPick = false;     // a folder picked for a copy: copy it
 
     private Switch storageSwitch;
-    private Button startButton, pickButton, copyButton, clearButton, exportButton;
+    private Button startButton, pickButton, copyButton, clearButton, exportButton, logButton;
     private TextView statusText, progressText;
     private ProgressBar progressBar;
 
@@ -230,6 +243,14 @@ public class MainActivity extends Activity {
             @Override public void onClick(View v) { doExportSettings(); }
         });
 
+        logButton = mkButton(col, "Copy last log");
+        logButton.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { copyOrShareLastLog(false); }
+        });
+        logButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override public boolean onLongClick(View v) { copyOrShareLastLog(true); return true; }
+        });
+
         buildMoveStickRows(col);
         buildRendererRow(col);
 
@@ -238,7 +259,8 @@ public class MainActivity extends Activity {
         hint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f);
         hint.setPadding(0, dp(26), 0, 0);
         hint.setText("Choose the " + BuildConfig.GAME_FOLDER + " folder (on the device or an SD card) and copy it to internal storage for the "
-                + "fastest loading. Playing from that folder directly needs access to all files.");
+                + "fastest loading. Playing from that folder directly needs access to all files. If the game crashes, tap "
+                + "Copy last log before starting again (each start overwrites the log) and paste it into a message.");
         col.addView(hint);
 
         setContentView(scroll);
@@ -720,6 +742,227 @@ public class MainActivity extends Activity {
         }, "ut2004-export").start();
     }
 
+    // ---- the last game log, for bug reports -------------------------------------------------------
+
+    /** The engine's log file name: the game package's name (the ini's base name) plus ".log". */
+    private static String gameLogName() {
+        String ini = BuildConfig.GAME_INI;
+        String base = ini.toLowerCase(Locale.US).endsWith(".ini") ? ini.substring(0, ini.length() - 4) : ini;
+        return base + ".log";
+    }
+
+    /** One loaded log tail: where it came from, the file's full size and the tail's text. */
+    private static final class LoadedLog {
+        final String source;
+        final long totalBytes;
+        final long modifiedMs;
+        final boolean truncated;
+        final String text;
+
+        LoadedLog(String source, long totalBytes, long modifiedMs, byte[] data) {
+            this.source = source;
+            this.totalBytes = totalBytes;
+            this.modifiedMs = modifiedMs;
+            this.truncated = totalBytes > data.length;
+            // The engine writes its log in the ANSI code page; a tail cut starts clean at a line start.
+            String decoded = new String(data, StandardCharsets.ISO_8859_1);
+            if (truncated) {
+                int firstLine = decoded.indexOf('\n');
+                if (firstLine >= 0 && firstLine + 1 < decoded.length()) decoded = decoded.substring(firstLine + 1);
+            }
+            this.text = decoded;
+        }
+    }
+
+    /** Reads the last {@link #LOG_TAIL_BYTES} of a log at a file path. */
+    private static LoadedLog readLogTail(File file) throws IOException {
+        long total = file.length();
+        int len = (int) Math.min(total, LOG_TAIL_BYTES);
+        byte[] data = new byte[len];
+        RandomAccessFile raf = new RandomAccessFile(file, "r");
+        try {
+            raf.seek(total - len);
+            raf.readFully(data);
+        } finally {
+            raf.close();
+        }
+        return new LoadedLog(file.getAbsolutePath(), total, file.lastModified(), data);
+    }
+
+    /** The same read from a stream (a picked folder), keeping only the tail in memory. */
+    private static LoadedLog readLogTail(InputStream in, String source) throws IOException {
+        byte[] ring = new byte[LOG_TAIL_BYTES];
+        byte[] buf = new byte[16 * 1024];
+        long total = 0L;
+        int write = 0;
+        int n;
+        while ((n = in.read(buf)) > 0) {
+            total += n;
+            int offset = 0;
+            while (offset < n) {
+                int count = Math.min(n - offset, ring.length - write);
+                System.arraycopy(buf, offset, ring, write, count);
+                write = (write + count) % ring.length;
+                offset += count;
+            }
+        }
+        int len = (int) Math.min(total, ring.length);
+        byte[] data = new byte[len];
+        int start = total > ring.length ? write : 0;
+        int first = Math.min(len, ring.length - start);
+        System.arraycopy(ring, start, data, 0, first);
+        if (len > first) System.arraycopy(ring, 0, data, first, len - first);
+        return new LoadedLog(source, total, 0L, data);
+    }
+
+    /** The log tail from the picked folder's System, or null when it holds no log. */
+    private LoadedLog readPickedLogTail(Uri tree) throws IOException {
+        String rootId = DocumentsContract.getTreeDocumentId(tree);
+        Storage.Doc system = Storage.child(getContentResolver(), tree, rootId, "System");
+        if (system == null || !system.dir) return null;
+        Storage.Doc log = Storage.child(getContentResolver(), tree, system.id, gameLogName());
+        if (log == null || log.dir) return null;
+        InputStream in = getContentResolver().openInputStream(
+                DocumentsContract.buildDocumentUriUsingTree(tree, log.id));
+        if (in == null) throw new IOException("cannot read System/" + log.name);
+        try {
+            return readLogTail(in, folderName(tree) + " / System/" + log.name);
+        } finally {
+            try { in.close(); } catch (IOException ignored) {}
+        }
+    }
+
+    private static void addLogCandidate(List<File> out, HashSet<String> seen, File root) {
+        if (root == null) return;
+        File log = new File(new File(root, "System"), gameLogName());
+        if (seen.add(log.getAbsolutePath())) out.add(log);
+    }
+
+    /**
+     * The newest game log among the places the game can have run from (the internal copy, the picked
+     * folder, the auto-detected folder), or null when none exists yet.
+     */
+    private LoadedLog loadLastLog(boolean externalMode) throws IOException {
+        Uri tree = chosenFolder();
+        List<File> candidates = new ArrayList<File>();
+        HashSet<String> seen = new HashSet<String>();
+        addLogCandidate(candidates, seen, GameActivity.internalRoot(this));
+        addLogCandidate(candidates, seen, Storage.treeFile(tree));
+        addLogCandidate(candidates, seen, GameActivity.resolveExternalRoot(this));
+        File newest = null;
+        for (File f : candidates)
+            if (f.isFile() && (newest == null || f.lastModified() > newest.lastModified())) newest = f;
+
+        IOException error = null;
+        // A picked folder with no file path (a documents provider) can only be read through the picker
+        // grant; in external mode it is the folder the game just ran from, so it wins over an older log.
+        boolean preferPicked = externalMode && tree != null && Storage.treeFile(tree) == null;
+        if (preferPicked) {
+            try {
+                LoadedLog picked = readPickedLogTail(tree);
+                if (picked != null) return picked;
+            } catch (Exception e) {
+                error = new IOException(e.getMessage() == null ? e.toString() : e.getMessage());
+            }
+        }
+        if (newest != null) {
+            try {
+                return readLogTail(newest);
+            } catch (IOException e) {
+                error = e;
+            }
+        }
+        if (!preferPicked && tree != null) {
+            try {
+                LoadedLog picked = readPickedLogTail(tree);
+                if (picked != null) return picked;
+            } catch (Exception e) {
+                if (error == null) error = new IOException(e.getMessage() == null ? e.toString() : e.getMessage());
+            }
+        }
+        if (error != null) throw error;
+        return null;
+    }
+
+    /** The log as it goes out: a short header (app, device, source) over the log text. */
+    private String formatLogForSending(LoadedLog log) {
+        String version = "?";
+        try {
+            String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            if (v != null) version = v;
+        } catch (Exception ignored) {}
+        String abi = Build.SUPPORTED_ABIS != null && Build.SUPPORTED_ABIS.length > 0 ? Build.SUPPORTED_ABIS[0] : "?";
+        StringBuilder b = new StringBuilder();
+        b.append(BuildConfig.APP_TITLE).append(" Android log\n");
+        b.append("App version: ").append(version).append('\n');
+        b.append("Device: ").append(Build.MANUFACTURER).append(' ').append(Build.MODEL)
+                .append(" (Android ").append(Build.VERSION.RELEASE).append(", ").append(abi).append(")\n");
+        b.append("Log: ").append(log.source).append(" (").append(Storage.human(log.totalBytes));
+        if (log.modifiedMs > 0)
+            b.append(", ").append(android.text.format.DateFormat.format("yyyy-MM-dd HH:mm:ss", new Date(log.modifiedMs)));
+        if (log.truncated) b.append(", copied the last ").append(Storage.human(LOG_TAIL_BYTES));
+        b.append(")\n\n");
+        b.append(log.text);
+        if (!log.text.endsWith("\n")) b.append('\n');
+        return b.toString();
+    }
+
+    /** Copy last log (share as text on a long press): the newest game log, ready to paste into a message. */
+    private void copyOrShareLastLog(final boolean share) {
+        if (opRunning) return;
+        cancelCountdown(true);
+        final boolean externalMode = storageSwitch != null && storageSwitch.isChecked();
+        startOp(share ? "Preparing the last log…" : "Copying the last log…");
+        new Thread(new Runnable() {
+            @Override public void run() {
+                LoadedLog loaded = null;
+                String error = null;
+                try {
+                    loaded = loadLastLog(externalMode);
+                } catch (Exception e) {
+                    error = e.getMessage() == null ? e.toString() : e.getMessage();
+                }
+                final LoadedLog result = loaded;
+                final String err = error;
+                ui.post(new Runnable() { @Override public void run() {
+                    if (result == null) {
+                        finishOp(err != null ? "Could not read the game log (" + err + ")."
+                                : "No game log yet (System/" + gameLogName() + "). Start the game once, then copy it before starting again.");
+                        return;
+                    }
+                    String text = formatLogForSending(result);
+                    if (share) {
+                        finishOp("Sharing the last log: " + result.source);
+                        Intent send = new Intent(Intent.ACTION_SEND);
+                        send.setType("text/plain");
+                        send.putExtra(Intent.EXTRA_SUBJECT, BuildConfig.APP_TITLE + " Android log");
+                        send.putExtra(Intent.EXTRA_TEXT, text);
+                        try {
+                            startActivity(Intent.createChooser(send, "Share the last log"));
+                        } catch (Exception e) {
+                            showMessage("No app can share text.");
+                        }
+                        return;
+                    }
+                    ClipboardManager clipboard = getSystemService(ClipboardManager.class);
+                    if (clipboard == null) {
+                        finishOp("The clipboard is unavailable.");
+                        return;
+                    }
+                    try {
+                        clipboard.setPrimaryClip(ClipData.newPlainText(BuildConfig.APP_TITLE + " game log", text));
+                    } catch (RuntimeException e) {
+                        finishOp("Could not copy the log. Long-press Copy last log to share it instead.");
+                        return;
+                    }
+                    finishOp("Last log copied: " + result.source
+                            + (result.truncated ? " (the last " + Storage.human(LOG_TAIL_BYTES) + ")" : "")
+                            + ". Paste it into a message; long-press Copy last log to share it.");
+                } });
+            }
+        }, "ut2004-log").start();
+    }
+
     private Storage.Listener throttledListener() {
         return new Storage.Listener() {
             long lastMs = 0L;
@@ -766,6 +1009,7 @@ public class MainActivity extends Activity {
         copyButton.setEnabled(enabled);
         clearButton.setEnabled(enabled);
         exportButton.setEnabled(enabled);
+        logButton.setEnabled(enabled);
         storageSwitch.setEnabled(enabled);
     }
 
