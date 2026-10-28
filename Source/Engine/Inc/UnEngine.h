@@ -22,7 +22,18 @@ class ENGINE_API UEngine : public USubsystem
 	DECLARE_ABSTRACT_CLASS(UEngine,USubsystem,CLASS_Config|CLASS_Transient,Engine)
 
 	// Variables.
+	#if UE_SHREK2
+	class UClass*			AudioDevice;
+	class UClass*			Console;
+	class UClass*			DefaultMenu;
+	class UClass*			DefaultPlayerMenu;
+	class UClass*			NetworkDevice;
+	class UClass*			Language;
+#endif
 	class UPrimitive*		Cylinder;
+#if UE_SHREK2
+	class UPrimitive*		CollBox;
+#endif
 	class UClient*			Client;
 	class UAudioSubsystem*	Audio;
 	class URenderDevice*	GRenDev;
@@ -36,7 +47,9 @@ class ENGINE_API UEngine : public USubsystem
 	UBOOL					bShowAnimStats;		 // Show animation statistics.
 
 	// ifdef WITH_LIPSinc not here since this needs to be in Engine.uc as well.
+#if !UE_SHREK2
 	UBOOL					bShowLIPSincStats;   // Show LIPSinc statistics.
+#endif
 	// endif
 
 	UBOOL					bShowHistograph;
@@ -44,6 +57,10 @@ class ENGINE_API UEngine : public USubsystem
 	UBOOL					bShowMatineeStats;	// Show Matinee specific information
 	UBOOL					bShowAudioStats;
 	UBOOL					bShowLightStats;    // Show dynamic lighting statistics.
+#if UE_SHREK2
+	UBOOL					bShowKWStats;
+	UBOOL					bLogFrameRate;
+#endif
 
 	INT					TickCycles GCC_PACK(4);
 	INT					GameCycles, ClientCycles;
@@ -51,10 +68,19 @@ class ENGINE_API UEngine : public USubsystem
 
 	BITFIELD				UseSound:1 GCC_PACK(4);
 	BITFIELD				UseStaticMeshBatching:1;
+#if !UE_SHREK2
 	BITFIELD				ServerReadsStdin:1;
+#endif
+#if !UE_SHREK2
 	BITFIELD				bSlowRefChecking:1;
+#endif
 	FLOAT					CurrentTickRate GCC_PACK(4);
+#if UE_SHREK2
+	INT						ActiveControllerId;
+#endif
+#if !UE_SHREK2
 	INT						DetectedVideoMemory;
+#endif
 
 	// Color preferences.
 	FColor
@@ -91,6 +117,13 @@ class ENGINE_API UEngine : public USubsystem
 		C_ConstraintLine,
 		C_AnimMesh,
 		C_TerrainWire;
+#if UE_SHREK2
+	FColor C_TerrainWireAlt;
+	UBOOL bShowLIPSincStats;
+	INT DetectedVideoMemory;
+	BITFIELD ServerReadsStdin:1;
+	BITFIELD bSlowRefChecking:1;
+#endif
 
 	// Constructors.
 	UEngine();

@@ -1104,6 +1104,15 @@ void USound::Serialize( FArchive& Ar )
 	}
 	else Ar.CountBytes( OriginalSize, OriginalSize );
 
+	// Mainline packages append a trailing int from file version 127, plus a second one from 129.
+	if( Ar.LicenseeVer() == 0 && Ar.Ver() >= 127 )
+	{
+		INT Dummy;
+		Ar << Dummy;
+		if( Ar.Ver() >= 129 )
+			Ar << Dummy;
+	}
+
     if( Ar.IsLoading() )
 	{
 		Flags = 0;

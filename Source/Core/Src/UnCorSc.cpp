@@ -337,9 +337,59 @@ void UObject::execUndefined( FFrame& Stack, RESULT_DECL  )
 {
 	guardSlow(UObject::execUndefined);
 
+#if UE_SHREK2
+	if( Stack.Node && Stack.Code )
+	{
+		INT Off = (INT)(Stack.Code - &Stack.Node->Script(0)) - 1;
+		BYTE* Base = &Stack.Node->Script(0);
+		debugf(TEXT("SHREKDBG BADTOK node=%s obj=%s off=%i scriptsize=%i prev=[%02X %02X %02X %02X %02X %02X %02X %02X] here=[%02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X]"),
+			Stack.Node->GetFullName(), Stack.Object ? Stack.Object->GetFullName() : TEXT("None"), Off, Stack.Node->Script.Num(),
+			Off>=8?Base[Off-8]:0, Off>=7?Base[Off-7]:0, Off>=6?Base[Off-6]:0, Off>=5?Base[Off-5]:0, Off>=4?Base[Off-4]:0, Off>=3?Base[Off-3]:0, Off>=2?Base[Off-2]:0, Off>=1?Base[Off-1]:0,
+			Base[Off],Base[Off+1],Base[Off+2],Base[Off+3],Base[Off+4],Base[Off+5],Base[Off+6],Base[Off+7],Base[Off+8],Base[Off+9],Base[Off+10],Base[Off+11]);
+	}
+#endif
 	ExecutingBadStateCode(Stack);
 	unguardexecSlow;
 }
+
+#if UE_SHREK2
+// Stand-in bound to declared native functions with no C++ implementation in
+// this codebase: evaluates and discards the arguments, returns zero defaults.
+void UObject::execMissingNative( FFrame& Stack, RESULT_DECL )
+{
+	guardSlow(UObject::execMissingNative);
+	BYTE Buffer[1024];
+	while( *Stack.Code != EX_EndFunctionParms )
+	{
+		appMemzero( Buffer, sizeof(Buffer) );
+		Stack.Step( Stack.Object, Buffer );
+	}
+	P_FINISH;
+	unguardexecSlow;
+}
+// Unimplemented KnowWonder natives, kept callable so script state machines keep running.
+#define SHREK_STUB_NATIVE(num) \
+	static BYTE KWStubReg##num = GRegisterNative( num, (Native)&UObject::execMissingNative );
+SHREK_STUB_NATIVE(2000)
+SHREK_STUB_NATIVE(2001)
+SHREK_STUB_NATIVE(2002)
+SHREK_STUB_NATIVE(2003)
+SHREK_STUB_NATIVE(2004)
+SHREK_STUB_NATIVE(2005)
+SHREK_STUB_NATIVE(2006)
+SHREK_STUB_NATIVE(3972)
+#undef SHREK_STUB_NATIVE
+
+// Mainline Object.GetLastStateName (native 285).
+void UObject::execGetLastStateName( FFrame& Stack, RESULT_DECL )
+{
+	guardSlow(UObject::execGetLastStateName);
+	P_FINISH;
+	*(FName*)Result = LastStateName;
+	unguardexecSlow;
+}
+IMPLEMENT_FUNCTION( UObject, 285, execGetLastStateName );
+#endif
 
 ///////////////
 // Variables //
@@ -4271,8 +4321,9 @@ void UObject::execNew( FFrame& Stack, RESULT_DECL )
     *(UObject**)Result = obj;
 
     // amb ---
-    if (obj)
-        obj->eventCreated(); 
+    // Mainline Core.Object declares no Created event; only dispatch it when present.
+    if (obj && obj->FindFunction(FName(TEXT("Created"))))
+        obj->eventCreated();
     // --- amb
 
 	unguardexecSlow;

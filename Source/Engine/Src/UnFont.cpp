@@ -64,7 +64,9 @@ void UFont::Serialize( FArchive& Ar )
 	GLazyLoad = 1;
 #endif
 
-	if( Ar.LicenseeVer() < 0x1d )
+	// UE2 mainline packages (licensee 0, version 129 and up) already use the
+	// Characters/Textures layout despite their low licensee number.
+	if( Ar.LicenseeVer() < 0x1d && !(Ar.LicenseeVer()==0 && Ar.Ver()>=129) )
 	{
 		TArray<FOLDFontPage> OldPages;
 		INT CharactersPerPage;

@@ -28,7 +28,9 @@ public:
 
 	// Variables.
 	UFont*			Font;
+#if !UE_SHREK2
     FLOAT           FontScaleX, FontScaleY; // gam
+#endif
 	FLOAT			SpaceX, SpaceY;
 	FLOAT			OrgX, OrgY;
 	FLOAT			ClipX, ClipY;
@@ -40,14 +42,23 @@ public:
 	BITFIELD		bCenter:1 GCC_PACK(4);
 	BITFIELD		bNoSmooth:1;
 	INT				SizeX, SizeY;
+#if !UE_SHREK2
     FPlane          ColorModulate;  // sjs - modulate all colors by this before rendering
 	BITFIELD		bForceAlpha;
 	FLOAT			ForcedAlpha;
     BITFIELD        bRenderLevel:1 GCC_PACK(4);   // gam - Will render the level if enabled.
+#endif
 	UFont			*TinyFont, *SmallFont, *MedFont;
 	FStringNoInit	TinyFontName, SmallFontName, MedFontName;
 	UViewport*		Viewport;
     FCanvasUtil*    pCanvasUtil; // sjs - shared canvas util for batching successive canvas rendering funcs
+#if UE_SHREK2
+    FLOAT           FontScaleX, FontScaleY; // gam
+    FPlane          ColorModulate;  // sjs - modulate all colors by this before rendering
+	BITFIELD		bForceAlpha GCC_PACK(4);
+	FLOAT			ForcedAlpha;
+    BITFIELD        bRenderLevel:1 GCC_PACK(4);   // gam - Will render the level if enabled.
+#endif
 
 	// UCanvas interface.
 	virtual void Init( UViewport* InViewport );

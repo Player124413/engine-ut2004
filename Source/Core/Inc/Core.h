@@ -125,6 +125,12 @@ public:
 	#define UE_FAIL_SOFT_LOAD 0
 #endif
 
+// UE_SHREK2: this build runs Shrek 2 (a UE2 mainline licensee game), whose native classes
+// carry layout the UT2004 classes do not. Set by the UE_GAME_SHREK2 CMake option.
+#ifndef UE_SHREK2
+	#define UE_SHREK2 0
+#endif
+
 #if ((PLATFORM_64BITS) && (!SUPPORTS_PRAGMA_PACK))
 #error You really need SUPPORTS_PRAGMA_PACK on 64-bit systems.
 #endif

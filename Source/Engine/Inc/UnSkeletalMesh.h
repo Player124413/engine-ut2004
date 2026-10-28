@@ -583,7 +583,14 @@ public:
 
 	friend FArchive &operator<<( FArchive& Ar, MotionChunk& M)
 	{
-		return Ar << M.RootSpeed3D << M.TrackTime << M.StartBone << M.Flags << M.BoneIndices << M.AnimTracks << M.RootTrack;
+		Ar << M.RootSpeed3D << M.TrackTime << M.StartBone << M.Flags << M.BoneIndices << M.AnimTracks << M.RootTrack;
+		// UE2 mainline packages write one extra reserved byte per chunk from file version 129 up.
+		if( Ar.LicenseeVer()==0 && Ar.Ver()>=129 )
+		{
+			BYTE Dummy=0;
+			Ar << Dummy;
+		}
+		return Ar;
 	}
 
 	MotionChunk& operator=( const MotionChunk& Other )

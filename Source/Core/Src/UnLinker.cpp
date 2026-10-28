@@ -845,6 +845,20 @@ UObject* ULinkerLoad::CreateExport( INT Index )
 			return Export._Object;
 
 		// Create the export object.
+#if UE_SHREK2
+		// UE2 mainline games ship some native classes in a different package than
+		// this codebase does (e.g. GUI vs XInterface); reuse the native class.
+		if( LoadClass==UClass::StaticClass() && (Export.ObjectFlags & RF_Native) )
+		{
+			UClass* Existing = (UClass*)StaticFindObject( UClass::StaticClass(), ANY_PACKAGE, *Export.ObjectName, 1 );
+			if( Existing && (Existing->GetFlags() & RF_Native) && !Existing->GetLinker() )
+			{
+				Export._Object = Existing;
+				Existing->SetFlags( (Export.ObjectFlags & RF_Load) | RF_NeedLoad | RF_NeedPostLoad );
+			}
+		}
+		if( !Export._Object )
+#endif
 		Export._Object = StaticConstructObject
 		(
 			LoadClass,

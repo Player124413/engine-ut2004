@@ -94,7 +94,9 @@ ENGINE_API FArchive& operator<<( FArchive& Ar, FBspNode& N )
 	if(Ar.Ver() >= 70)
 	{
 		Ar << N.ExclusiveSphereBound;
-		if(Ar.Ver() < 123)
+		// UE2 mainline packages (licensee 0, version 129 and up) still store the
+		// inclusive bound that this branch dropped at version 123.
+		if(Ar.Ver() < 123 || (Ar.LicenseeVer()==0 && Ar.Ver()>=129))
 		{
 			FSphere InclusiveSphereBound;
 			Ar << InclusiveSphereBound;

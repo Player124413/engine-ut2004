@@ -980,6 +980,10 @@ UBOOL USDL2Viewport::ResizeViewport( DWORD NewBlitFlags, INT InNewX, INT InNewY,
                 NewX, NewY, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE );
         }
 #endif
+        // Without a GL library (headless CI), fall back to a plain window; devices that need no context run on it.
+        if( !Window )
+            Window = SDL_CreateWindow( "Unreal Tournament 2004", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                NewX, NewY, SDL_WINDOW_RESIZABLE );
         if( !Window )
         {
             appErrorf( TEXT("SDL_CreateWindow failed: %s"), appFromAnsi(SDL_GetError()) );
@@ -1037,7 +1041,12 @@ UBOOL USDL2Viewport::ResizeViewport( DWORD NewBlitFlags, INT InNewX, INT InNewY,
     // GL context creation.
     // GL4ESDrv: GLES 2.0 context for GL4ES output.
     // OpenGLDrv: Compatibility profile for fixed-function pipeline.
-    if( !GLContext )
+    // The null device never touches GL, so it needs no context outside the web canvas path.
+    UBOOL bNullDevice = appStrfind( GConfig->GetStr(TEXT("Engine.Engine"), TEXT("RenderDevice"), TEXT("System")), TEXT("NullRenderDevice") ) != NULL;
+#if defined(__EMSCRIPTEN__)
+    bNullDevice = 0;
+#endif
+    if( !GLContext && !bNullDevice )
     {
 #if defined(__EMSCRIPTEN__) && defined(__EMSCRIPTEN_PTHREADS__)
         // Create the WebGL context directly, not through SDL2: SDL2's Emscripten GL path is EGL, which

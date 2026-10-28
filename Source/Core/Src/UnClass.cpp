@@ -363,6 +363,9 @@ void UStruct::Link( FArchive& Ar, UBOOL Props )
 	guard(LinkProperties);
 	if( Props )
 	{
+		// A native class's pre-link PropertiesSize is its C++ sizeof; keep it so
+		// the script below cannot shrink objects under their C++ footprint.
+		INT NativeSize = (Cast<UClass>(this) && (GetFlags() & RF_Native)) ? PropertiesSize : 0;
 		PropertiesSize = 0;
 		if( GetInheritanceSuper() )
 		{
@@ -400,6 +403,18 @@ void UStruct::Link( FArchive& Ar, UBOOL Props )
 					Property->ArrayDim = 48; // sizeof(FSoundData) on LP64
 				}
 #endif
+				// UE2 mainline packages declare Object's ObjectInternal as int[6], the six
+				// 32-bit internal slots of that build's UObject; this UObject has seven
+				// pointer-sized slots, so link the placeholder at their size.
+				if( Ar.LicenseeVer()==0 && Ar.Ver()>=129
+					&& (Property->PropertyFlags & CPF_Native)
+					&& appStricmp( GetName(), TEXT("Object") )==0
+					&& appStricmp( Property->GetName(), TEXT("ObjectInternal") )==0
+					&& Property->ElementSize>0
+					&& Property->GetSize() < (INT)(7*sizeof(PTRINT)) )
+				{
+					Property->ArrayDim = (INT)(7*sizeof(PTRINT)) / Property->ElementSize;
+				}
 				PropertiesSize = Property->Offset + Property->GetSize();
 				Prev = Property;
 			}
@@ -408,6 +423,11 @@ void UStruct::Link( FArchive& Ar, UBOOL Props )
 		#if !FORCE_EXTREME_PACKING
 			PropertiesSize = Align(PropertiesSize,4);
 		#endif
+		// UE2 mainline packages were linked for 32-bit C++ layouts; a native
+		// class's C++ footprint can exceed its mainline script size, so link no
+		// smaller than that (its size already carries the C++ alignment).
+		if( Ar.LicenseeVer()==0 && Ar.Ver()>=129 && Cast<UClass>(this) && (GetFlags() & RF_Native) && NativeSize > PropertiesSize )
+			PropertiesSize = NativeSize;
 	}
 	else
 	{
@@ -621,7 +641,9 @@ void UStruct::SerializeTaggedProperties( FArchive& Ar, BYTE* Data, UClass* Defau
 				INT StartPos = Ar.Tell();							
 				Tag.SerializeTaggedProperty( Ar, Property, Data + Property->Offset + Tag.ArrayIndex*Property->ElementSize, Tag.Size );
 
-				if( Ar.LicenseeVer() < 0x1C )
+				// UE2 mainline packages (licensee 0, file version 129+) use tagged
+				// struct serialization like licensee 0x1C+ content.
+				if( Ar.LicenseeVer() < 0x1C && !(Ar.LicenseeVer()==0 && Ar.Ver()>=129) )
 				{
 					// As of Ar.LicenseeVer()==0x1C, structs are serialized as tagged properties, so this backwards compatible
 					// code only applies to content saved before this.
@@ -712,6 +734,10 @@ void UStruct::Serialize( FArchive& Ar )
     if( Ar.LicenseeVer() >= 0x1A )
         Ar << StructFlags;
     // --- gam
+    // UE2 mainline packages (licensee 0, file version 129 and up) carry a CppText
+    // reference here instead of StructFlags.
+    else if( Ar.LicenseeVer() == 0 && Ar.Ver() >= 129 )
+        Ar << CppText;
 
 	// Compiler info.
 	Ar << Line << TextPos;
@@ -913,7 +939,13 @@ void UClass::Bind()
 		}
 		else if( !GIsEditor )
 		{
+#if UE_SHREK2
+			// Mainline games declare native classes this codebase has no C++ for;
+			// the superclass constructor chase below stands in for them.
+			debugf( NAME_Warning, TEXT("No native implementation for class %s; using superclass constructor"), GetPathName() );
+#else
 			appErrorf( TEXT("Can't bind to native class %s"), GetPathName() );
+#endif
 		}
 	}
 	if( !ClassConstructor && GetSuperClass() )
@@ -1658,9 +1690,21 @@ void UFunction::Bind()
 		TCHAR Proc[256];
 		appSprintf( Proc, TEXT("int%sexec%s"), GetOwnerClass()->GetNameCPP(), GetName() );
 		UPackage* ClassPackage = GetOwnerClass()->GetOuterUPackage();
+#if UE_SHREK2
+		Native* Ptr = (Native*)ClassPackage->GetDllExport( Proc, 0 );
+		if( Ptr )
+			Func = *Ptr;
+		else
+		{
+			// Mainline games declare natives this codebase never implemented.
+			debugf( NAME_Warning, TEXT("Stubbing missing native function %s"), GetFullName() );
+			Func = &UObject::execMissingNative;
+		}
+#else
 		Native* Ptr = (Native*)ClassPackage->GetDllExport( Proc, 1 );
 		if( Ptr )
 			Func = *Ptr;
+#endif
 	}
 	unguard;
 }

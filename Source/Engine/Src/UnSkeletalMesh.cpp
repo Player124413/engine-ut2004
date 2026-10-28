@@ -292,7 +292,7 @@ void UMeshAnimation::Serialize( FArchive& Ar )
 	guard(UMeshAnimation::Serialize);
 	Super::Serialize(Ar);
 	Ar << InternalVersion;
-	Ar << RefBones;	
+	Ar << RefBones;
 	Ar << Moves;
 	Ar << AnimSeqs;
 	if( !Ar.IsPersistent())
@@ -422,7 +422,7 @@ void USkeletalMesh::Serialize( FArchive& Ar )
 	// Mesh specific data - fully floating point UV and vertex vectors.
 	Ar << Points;
 	// Skeletal specific data
-	Ar << RefSkeleton;    //  Reference skeleton	
+	Ar << RefSkeleton;    //  Reference skeleton
 	Ar << DefaultAnim;    //
 	Ar << SkeletalDepth;  //
 	Ar << MultiBlends;    // Always...
@@ -487,7 +487,8 @@ void USkeletalMesh::Serialize( FArchive& Ar )
 		Ar << BoneCollisionBoxModels;
 	}
 
-    if ( Ar.Ver() >= 127 )
+    // UE2 mainline packages (licensee 0, file version 129+) have no per-mesh collision static mesh.
+    if ( Ar.Ver() >= 127 && !(Ar.LicenseeVer() == 0 && Ar.Ver() >= 129) )
 		Ar << CollisionStaticMesh;
 
 	unguardobj;

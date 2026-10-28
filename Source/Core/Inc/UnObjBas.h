@@ -603,7 +603,11 @@ private:
 	UObject*				Outer;				// Object this object resides in.
 	DWORD					ObjectFlags;		// Private EObjectFlags used by object manager.
 	FName					Name;				// Name of the object.
-	UClass*					Class;	  			// Class the object belongs to.
+	UClass*						Class;	  			// Class the object belongs to.
+#if UE_SHREK2
+	FName					LastStateName;		// Shrek 2's Object script declares this name after Class.
+	DWORD					LastStatePad;		// Keeps sizeof(UObject) pointer-aligned in pack(4) generated headers too.
+#endif
 
 
 	// Private systemwide variables.
@@ -856,6 +860,10 @@ public:
 	// UnrealScript intrinsics.
 	#define DECLARE_FUNCTION(func) void func( FFrame& TheStack, RESULT_DECL );
 	DECLARE_FUNCTION(execUndefined)
+#if UE_SHREK2
+	DECLARE_FUNCTION(execMissingNative)
+	DECLARE_FUNCTION(execGetLastStateName)
+#endif
 	DECLARE_FUNCTION(execLocalVariable)
 	DECLARE_FUNCTION(execInstanceVariable)
 	DECLARE_FUNCTION(execDefaultVariable)

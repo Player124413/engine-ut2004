@@ -435,6 +435,37 @@ void UIntProperty::Link( FArchive& Ar, UProperty* Prev )
 	Super::Link( Ar, Prev );
 	ElementSize = sizeof(INT);
 
+#if UE_SHREK2
+	// UE2 mainline script declares some native C++ pointers as ints (they match on
+	// 32-bit); on LP64 such properties must occupy a full pointer-sized slot so the
+	// script layout stays in step with the C++ layout.
+	if( Ar.LicenseeVer()==0 && Ar.Ver()>=129 )
+	{
+		const TCHAR* OuterName = GetOuter() ? GetOuter()->GetName() : TEXT("");
+		const TCHAR* MyName    = GetName();
+		static const TCHAR* PtrStructs[] =
+			{ TEXT("ActorRenderDataPtr"), TEXT("LightRenderDataPtr"),
+			  TEXT("ProjectorRenderInfoPtr"), TEXT("StaticMeshProjectorRenderInfoPtr") };
+		static const TCHAR* PtrMembers[][2] =
+			{ { TEXT("FileLog"),             TEXT("LogAr") },
+			  { TEXT("KConstraint"),         TEXT("KConstraintData") },
+			  { TEXT("KRepulsor"),           TEXT("KContact") },
+			  { TEXT("KarmaParams"),         TEXT("KAng3") },
+			  { TEXT("KarmaParams"),         TEXT("KTriList") },
+			  { TEXT("KarmaParamsCollision"),TEXT("KarmaData") },
+			  { TEXT("SVehicleWheel"),       TEXT("KContact") },
+			  { TEXT("ScriptedTexture"),     TEXT("RenderTarget") } };
+		UBOOL bPtr = 0;
+		if( !appStrcmp(MyName, TEXT("Ptr")) )
+			for( INT i=0; i<ARRAY_COUNT(PtrStructs) && !bPtr; i++ )
+				bPtr = !appStrcmp(OuterName, PtrStructs[i]);
+		for( INT i=0; i<ARRAY_COUNT(PtrMembers) && !bPtr; i++ )
+			bPtr = !appStrcmp(OuterName, PtrMembers[i][0]) && !appStrcmp(MyName, PtrMembers[i][1]);
+		if( bPtr )
+			ElementSize = sizeof(PTRINT);
+	}
+#endif
+
 #if FORCE_EXTREME_PACKING
 	Offset      = GetOuterUField()->GetPropertiesSize();
 #else
@@ -2265,8 +2296,10 @@ UBOOL UStructProperty::Identical( const void* A, const void* B ) const
 void UStructProperty::SerializeItem( FArchive& Ar, void* Value, INT MaxReadBytes ) const
 {
 	guardSlow(UStructProperty::SerializeItem);
-	if( !(Ar.IsLoading() || Ar.IsSaving()) || 
-		Ar.LicenseeVer() < 0x1C || 
+	if( !(Ar.IsLoading() || Ar.IsSaving()) ||
+		// UE2 mainline packages (licensee 0, file version 129+) already serialize
+		// structs as tagged properties; only older licensee content uses SerializeBin.
+		(Ar.LicenseeVer() < 0x1C && !(Ar.LicenseeVer()==0 && Ar.Ver()>=129)) ||
 		Struct->GetFName()==NAME_Vector ||
 		Struct->GetFName()==NAME_Rotator ||
 		Struct->GetFName()==NAME_Color )

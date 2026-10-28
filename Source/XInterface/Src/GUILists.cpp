@@ -1673,11 +1673,20 @@ void UGUIMultiColumnListHeader::Draw(UCanvas* Canvas)
 	FLOAT x = Bounds[0];
     for( INT i=0;i<MyList->ColumnWidths.Num();i++ )
 	{
+#if UE_SHREK2
+		// Mainline script declares ColumnHeadings as a fixed string[8].
+		if ( i >= ARRAY_COUNT(MyList->ColumnHeadings) )
+		{
+			debugf(TEXT("%s: ColumnWidths/ColumnHeadings mismatch!!  ( %i/%i )"), MyList->GetMenuPath(), MyList->ColumnWidths.Num(), (INT)ARRAY_COUNT(MyList->ColumnHeadings));
+			return;
+		}
+#else
 		if ( i >= MyList->ColumnHeadings.Num() )
 		{
 			debugf(TEXT("%s: ColumnWidths/ColumnHeadings mismatch!!  ( %i/%i )"), MyList->GetMenuPath(), MyList->ColumnWidths.Num(), MyList->ColumnHeadings.Num());
 			return;
 		}
+#endif
 
 		FLOAT y = Bounds[1];
 		FLOAT w = Min<FLOAT>( MyList->ColumnWidths(i), Bounds[2]-x );
@@ -1701,7 +1710,11 @@ void UGUIMultiColumnListHeader::Draw(UCanvas* Canvas)
 			}
 
 //			Style->Draw( Canvas, DrawState, x, Bounds[1], w, HeaderSize );
+#if UE_SHREK2
+			Style->DrawText( Canvas, DrawState, x, ClientBounds[1], w, ClientBounds[3] - ClientBounds[1], 1, *MyList->ColumnHeadings[i], FontScale );
+#else
 			Style->DrawText( Canvas, DrawState, x, ClientBounds[1], w, ClientBounds[3] - ClientBounds[1], 1, *MyList->ColumnHeadings(i), FontScale );
+#endif
 			x += w;
 		}
     }

@@ -924,10 +924,18 @@ struct UBaseGUIController_eventOnAdminReply_Parms
 class ENGINE_API UBaseGUIController : public UInteraction
 {
 public:
+#if UE_SHREK2
+    class UMaterial* DefaultPens[3];
+    BITFIELD bIsConsole:1 GCC_PACK(4);
+    FScriptDelegate __OnAdminReply__Delegate GCC_PACK(4);
+    FStringNoInit NetworkMsgMenu;
+    FStringNoInit QuestionMenuClass;
+#else
     class UMaterial* DefaultPens[3] GCC_PACK(4);
     FStringNoInit NetworkMsgMenu;
     FStringNoInit QuestionMenuClass;
     FScriptDelegate __OnAdminReply__Delegate;
+#endif
     void eventSetRequiredGameResolution(const FString& GameRes)
     {
         UBaseGUIController_eventSetRequiredGameResolution_Parms Parms;
@@ -1011,6 +1019,30 @@ struct UConsole_eventViewportInitialized_Parms
 class ENGINE_API UConsole : public UInteraction
 {
 public:
+#if UE_SHREK2
+    BYTE ConsoleKey;
+    INT HistoryTop;
+    INT HistoryBot;
+    INT HistoryCur;
+    FStringNoInit TypedStr;
+    FStringNoInit History[16];
+    BITFIELD bTyping:1 GCC_PACK(4);
+    BITFIELD bIgnoreKeys:1;
+    BYTE ConsoleHotKey;
+    INT TypedStrPos;
+    BITFIELD bRunningDemo:1;
+    BITFIELD bHoldingStart:1;
+    BITFIELD bHoldingBack:1;
+    FLOAT TimeIdle;
+    FLOAT TimeHoldingReboot;
+    FLOAT TimePerTitle;
+    FLOAT TimePerDemo;
+    FLOAT TimeTooIdle;
+    FLOAT TimeBeforeReboot;
+    FLOAT TimePerSoak;
+    FStringNoInit DemoLevels[64];
+    TArrayNoInit<FString> BufferedConsoleCommands;
+#else
     BYTE ConsoleHotKey GCC_PACK(4);
     INT HistoryTop GCC_PACK(4);
     INT HistoryBot;
@@ -1032,6 +1064,7 @@ public:
     FLOAT TimePerSoak;
     FStringNoInit DemoLevels[64];
     TArrayNoInit<FString> BufferedConsoleCommands;
+#endif
     void eventConnectFailure(const FString& FailCode, const FString& URL)
     {
         UConsole_eventConnectFailure_Parms Parms;
@@ -1110,11 +1143,19 @@ struct UInteractionMaster_eventAddInteraction_Parms
 class ENGINE_API UInteractionMaster : public UInteractions
 {
 public:
+#if UE_SHREK2
+    class UClient* Client;
+    class UInteraction* BaseMenu;
+    class UInteraction* Console;
+    TArrayNoInit<class UInteraction*> GlobalInteractions;
+    BITFIELD bRequireRawJoystick:1 GCC_PACK(4);
+#else
     class UClient* Client GCC_PACK(4);
     class UInteraction* BaseMenu;
     class UInteraction* Console;
     TArrayNoInit<class UInteraction*> GlobalInteractions;
     BITFIELD bRequireRawJoystick:1 GCC_PACK(4);
+#endif
     DECLARE_FUNCTION(execTravel);
     void eventNotifyLevelChange(TArray<class UInteraction*> InteractionArray)
     {
@@ -1700,6 +1741,306 @@ struct AActor_eventLIPSincAnimEnd_Parms
 class ENGINE_API AActor : public UObject
 {
 public:
+#if UE_SHREK2
+    BYTE LumosType;
+    BYTE MountAction;
+    BYTE MaterialType;
+    BYTE LightType;
+    BYTE LightEffect;
+    FLOAT LightBrightness;
+    FLOAT LightRadius;
+    BYTE LightHue;
+    BYTE LightSaturation;
+    BYTE LightPeriod;
+    BYTE LightPhase;
+    BYTE LightCone;
+    BYTE Physics;
+    BYTE DrawType;
+    class UStaticMesh* StaticMesh;
+    class AActor* Owner;
+    class AActor* Base;
+    FActorRenderDataPtr ActorRenderData;
+    FLightRenderDataPtr LightRenderData;
+    INT RenderRevision;
+    BYTE StaticFilterState;
+    TArrayNoInit<FBatchReference> StaticSectionBatches;
+    FName ForcedVisibilityZoneTag;
+    BITFIELD bSpecialLit:1 GCC_PACK(4);
+    BITFIELD bActorShadows:1;
+    BITFIELD bNoShadows:1;
+    BITFIELD bCorona:1;
+    BITFIELD bLightingVisibility:1;
+    BITFIELD bUseDynamicLights:1;
+    BITFIELD bLightChanged:1;
+    BITFIELD bNoLightTransitionEffect:1;
+    BITFIELD bStatic:1;
+    BITFIELD bHidden:1;
+    BITFIELD bSpecialHidden:1;
+    BITFIELD bNoDelete:1;
+    BITFIELD bDeleteMe:1;
+    BITFIELD bTicked:1;
+    BITFIELD bDynamicLight:1;
+    BITFIELD bTimerLoop:1;
+    BITFIELD bOnlyOwnerSee:1;
+    BITFIELD bHighDetail:1;
+    BITFIELD bSuperHighDetail:1;
+    BITFIELD bHideOnDetailDrop:1;
+    BITFIELD bHiddenFromDetailDrop:1;
+    BITFIELD bOnlyDrawIfAttached:1;
+    BITFIELD bStasis:1;
+    BITFIELD bTrailerAllowRotation:1;
+    BITFIELD bTrailerSameRotation:1;
+    BITFIELD bTrailerPrePivot:1;
+    BITFIELD bWorldGeometry:1;
+    BITFIELD bAcceptsProjectors:1;
+    BITFIELD bOrientOnSlope:1;
+    BITFIELD bOnlyAffectPawns:1;
+    BITFIELD bDisableSorting:1;
+    INT AlphaSortLayer GCC_PACK(4);
+    BITFIELD bIgnoreEncroachers:1 GCC_PACK(4);
+    BITFIELD bShowOctreeNodes:1;
+    BITFIELD bWasSNFiltered:1;
+    BITFIELD bNetTemporary:1;
+    BITFIELD bOnlyRelevantToOwner:1;
+    BITFIELD bNetDirty:1;
+    BITFIELD bAlwaysRelevant:1;
+    BITFIELD bReplicateInstigator:1;
+    BITFIELD bReplicateMovement:1;
+    BITFIELD bSkipActorPropertyReplication:1;
+    BITFIELD bUpdateSimulatedPosition:1;
+    BITFIELD bTearOff:1;
+    BITFIELD bOnlyDirtyReplication:1;
+    BITFIELD bReplicateAnimations:1;
+    BITFIELD bNetInitialRotation:1;
+    BITFIELD bCompressedPosition:1;
+    BITFIELD bAlwaysZeroBoneOffset:1;
+    BYTE RemoteRole GCC_PACK(4);
+    BYTE Role;
+    INT NetTag;
+    FLOAT NetUpdateTime;
+    FLOAT NetUpdateFrequency;
+    FLOAT NetPriority;
+    class APawn* Instigator;
+    class USound* AmbientSound;
+    FName AttachmentBone;
+    class ALevelInfo* Level;
+    class ULevel* XLevel;
+    FLOAT LifeSpan;
+    FPointRegion Region;
+    FLOAT TimerRate;
+    class UMesh* Mesh;
+    FLOAT LastRenderTime;
+    FName Tag;
+    TArrayNoInit<INT> Leaves;
+    FName Event;
+    class AInventory* Inventory;
+    FLOAT TimerCounter;
+    class UMeshInstance* MeshInstance;
+    FLOAT LODBias;
+    FLOAT LODBiasSW;
+    FName InitialState;
+    FName Group;
+    TArrayNoInit<class AActor*> Touching;
+    TArrayNoInit<PTRINT> OctreeNodes;
+    FBox OctreeBox;
+    FVector OctreeBoxCenter;
+    FVector OctreeBoxRadii;
+    class AActor* Deleted;
+    FLOAT LatentFloat;
+    INT CollisionTag;
+    INT JoinedTag;
+    class APhysicsVolume* PhysicsVolume;
+    FVector Location;
+    FRotator Rotation;
+    FVector Velocity;
+    FVector Acceleration;
+    FVector CachedLocation;
+    FRotator CachedRotation;
+    FMatrix CachedLocalToWorld;
+    FName AttachTag;
+    TArrayNoInit<class AActor*> Attached;
+    FVector RelativeLocation;
+    FRotator RelativeRotation;
+    BITFIELD bHardAttach:1 GCC_PACK(4);
+    FMatrix HardRelMatrix GCC_PACK(4);
+    TArrayNoInit<FProjectorRenderInfoPtr> Projectors;
+    TArrayNoInit<FStaticMeshProjectorRenderInfoPtr> StaticMeshProjectors;
+    class UMaterial* Texture;
+    class UStaticMeshInstance* StaticMeshInstance;
+    class UModel* Brush;
+    FLOAT DrawScale;
+    FVector DrawScale3D;
+    FVector PrePivot;
+    TArrayNoInit<class UMaterial*> Skins;
+    class UMaterial* RepSkin;
+    BYTE AmbientGlow;
+    BYTE MaxLights;
+    class UConvexVolume* AntiPortal;
+    FLOAT CullDistance;
+    FLOAT CullDistanceSW;
+    FLOAT ScaleGlow;
+    FVector SavedPrePivot;
+    BITFIELD bDontBatch:1 GCC_PACK(4);
+    BYTE Style GCC_PACK(4);
+    BITFIELD bUnlit:1 GCC_PACK(4);
+    BITFIELD bShadowCast:1;
+    BITFIELD bStaticLighting:1;
+    BITFIELD bUseLightingFromBase:1;
+    BITFIELD bHurtEntry:1;
+    BITFIELD bGameRelevant:1;
+    BITFIELD bCollideWhenPlacing:1;
+    BITFIELD bTravel:1;
+    BITFIELD bMovable:1;
+    BITFIELD bDestroyInPainVolume:1;
+    BITFIELD bCanBeDamaged:1;
+    BITFIELD bShouldBaseAtStartup:1;
+    BITFIELD bPendingDelete:1;
+    BITFIELD bAnimByOwner:1;
+    BITFIELD bOwnerNoSee:1;
+    BITFIELD bCanTeleport:1;
+    BITFIELD bClientAnim:1;
+    BITFIELD bDisturbFluidSurface:1;
+    BITFIELD bAlwaysTick:1;
+    FLOAT SoundRadius GCC_PACK(4);
+    BYTE SoundVolume;
+    BYTE SoundPitch;
+    BYTE SoundOcclusion;
+    BITFIELD bFullVolume:1 GCC_PACK(4);
+    FLOAT TransientSoundVolume GCC_PACK(4);
+    FLOAT TransientSoundRadius;
+    FLOAT TransientSoundPitch;
+    FLOAT CollisionRadius;
+    FLOAT CollisionWidth;
+    FLOAT CollisionHeight;
+    BYTE CollideType;
+    BITFIELD bSavedBlocksCamera:1 GCC_PACK(4);
+    BITFIELD bSavedProjTarget:1;
+    BITFIELD bCollideActors:1;
+    BITFIELD bCollideWorld:1;
+    BITFIELD bBlockActors:1;
+    BITFIELD bBlockPlayers:1;
+    BITFIELD bProjTarget:1;
+    BITFIELD bBlockZeroExtentTraces:1;
+    BITFIELD bBlockNonZeroExtentTraces:1;
+    BITFIELD bAutoAlignToTerrain:1;
+    BITFIELD bUseCylinderCollision:1;
+    BITFIELD bBlockKarma:1;
+    BITFIELD bNetNotify:1;
+    BITFIELD bCollideActorsOriginal:1;
+    BITFIELD bBlockActorsOriginal:1;
+    BITFIELD bBlockPlayersOriginal:1;
+    BITFIELD bChangedFromOriginal:1;
+    BITFIELD bIgnoreOutOfWorld:1;
+    BITFIELD bBounce:1;
+    BITFIELD bFixedRotationDir:1;
+    BITFIELD bRotateToDesired:1;
+    BITFIELD bInterpolating:1;
+    BITFIELD bJustTeleported:1;
+    BITFIELD bSmoothDesiredRot:1;
+    FRotator RotationalAcceleration GCC_PACK(4);
+    FLOAT fRotationalTightness;
+    FLOAT currentYawVelocity;
+    FLOAT currentPitchVelocity;
+    FLOAT currentRollVelocity;
+    FLOAT Mass;
+    FLOAT Buoyancy;
+    FRotator RotationRate;
+    FRotator DesiredRotation;
+    class AActor* PendingTouch;
+    FVector ColLocation;
+    class UKarmaParamsCollision* KParams;
+    INT KStepTag;
+    FAnimRep SimAnim;
+    BYTE ForceType;
+    FLOAT ForceRadius;
+    FLOAT ForceScale;
+    BITFIELD bNetInitial:1 GCC_PACK(4);
+    BITFIELD bNetOwner:1;
+    BITFIELD bNetRelevant:1;
+    BITFIELD bDemoRecording:1;
+    BITFIELD bClientDemoRecording:1;
+    BITFIELD bRepClientDemo:1;
+    BITFIELD bClientDemoNetFunc:1;
+    BITFIELD bDemoOwner:1;
+    BITFIELD bNoRepMesh:1;
+    BITFIELD bHiddenEd:1;
+    BITFIELD bHiddenEdGroup:1;
+    BITFIELD bDirectional:1;
+    BITFIELD bSelected:1;
+    BITFIELD bEdShouldSnap:1;
+    BITFIELD bEdSnap:1;
+    BITFIELD bTempEditor:1;
+    BITFIELD bObsolete:1;
+    BITFIELD bPathColliding:1;
+    BITFIELD bPathTemp:1;
+    BITFIELD bScriptInitialized:1;
+    BITFIELD bLockLocation:1;
+    class UClass* MessageClass GCC_PACK(4);
+    BITFIELD bAlignBottom:1 GCC_PACK(4);
+    BITFIELD bAlignBottomAlways:1;
+    FString Label GCC_PACK(4);
+    BITFIELD bPauseWithSpecial:1 GCC_PACK(4);
+    BITFIELD bSpecialPaused:1;
+    BITFIELD bIsMountable:1;
+    BITFIELD bBlocksCamera:1;
+    BITFIELD bUseSkinColorMod:1;
+    FColor SkinColorModifier GCC_PACK(4);
+    BITFIELD OpacityInitted:1 GCC_PACK(4);
+    TArray<FVector> EditorLinesStart GCC_PACK(4);
+    TArray<FVector> EditorLinesEnd;
+    TArray<FColor> EditorLinesColor;
+    FLOAT fDefaultAnimRate;
+    FLOAT fDefaultTweenTime;
+    INT DefaultAnimChannel;
+    TArray<class UAnimNotify*> AnimNotifys;
+    class UClass* vulnerableToClass;
+    FLOAT SizeModifier;
+    FVector CentreOffset;
+    FLOAT GestureDistance;
+    BITFIELD bGestureFaceHorizOnly:1 GCC_PACK(4);
+    BITFIELD bMustClickToTarget:1;
+    TArray<FString> ExcludeFromGameStates GCC_PACK(4);
+    BITFIELD bInCurrentGameState:1 GCC_PACK(4);
+    BITFIELD bChangeOpacityForCamera:1;
+    FLOAT DesiredOpacityForCamera GCC_PACK(4);
+    FLOAT SpeedOpacityForCamera;
+    FLOAT CurrentOpacityForCamera;
+    BITFIELD bDirectionalCorona:1;
+    BITFIELD bAttenByLife:1;
+    BITFIELD bDramaticLighting:1;
+    BITFIELD bShouldStopKarma:1;
+    BITFIELD bDetailAttachment:1;
+    BITFIELD bIgnoreVehicles:1;
+    BITFIELD bDeferRendering:1;
+    BITFIELD bBadStateCode:1;
+    class UMaterial* OverlayMaterial;
+    BYTE UV2Mode;
+    class UMaterial* UV2Texture;
+    BYTE SurfaceType;
+    FLOAT FluidSurfaceShootStrengthMod;
+    BITFIELD bNotifyLocalPlayerTeamReceived:1;
+    BITFIELD bForceSkelUpdate:1;
+    BITFIELD bClientAuthoritative:1;
+    BITFIELD bBlockProjectiles:1;
+    BITFIELD bBlocksTeleport:1;
+    BITFIELD bAlwaysFaceCamera:1;
+    BITFIELD bClientTrigger:1;
+    BITFIELD bUseCollisionStaticMesh:1;
+    BITFIELD bSmoothKarmaStateUpdates:1;
+    BITFIELD bIgnoreTerminalVelocity:1;
+    BITFIELD bOrientToVelocity:1;
+    FName ExcludeTag[8];
+    FLOAT AccumKarmaAngleError;
+    FLOAT ForceNoise;
+    BITFIELD bNotOnDedServer:1;
+    BITFIELD bAlreadyPrecachedMaterials:1;
+    BITFIELD bAlreadyPrecachedMeshes:1;
+    BITFIELD bTraceWater:1;
+    FLOAT OverlayTimer;
+    FLOAT ClientOverlayTimer;
+    FLOAT ClientOverlayCounter;
+    class UMaterial* HighDetailOverlay;
+#else
     BYTE LightType GCC_PACK(4);
     BYTE LightEffect;
     BYTE LightHue;
@@ -1941,6 +2282,7 @@ public:
     FLOAT ClientOverlayTimer;
     FLOAT ClientOverlayCounter;
     class UMaterial* HighDetailOverlay;
+#endif
     DECLARE_FUNCTION(execMultiply_ColorFloat);
     DECLARE_FUNCTION(execAdd_ColorColor);
     DECLARE_FUNCTION(execMultiply_FloatColor);
@@ -2053,6 +2395,15 @@ public:
     DECLARE_FUNCTION(execGetClosestBone);
     DECLARE_FUNCTION(execAnimIsInGroup);
     DECLARE_FUNCTION(execGetAnimParams);
+#if UE_SHREK2
+    DECLARE_FUNCTION(execGetAnimRate);
+    DECLARE_FUNCTION(execGetAnimFrame);
+    DECLARE_FUNCTION(execGetAnimTime);
+    DECLARE_FUNCTION(execGetAnimSequence);
+    DECLARE_FUNCTION(execGetAnimNumFrames);
+    DECLARE_FUNCTION(execGetAnimObjectByName);
+    DECLARE_FUNCTION(execStopSound);
+#endif
     DECLARE_FUNCTION(execSetBoneRotation);
     DECLARE_FUNCTION(execSetBoneLocation);
     DECLARE_FUNCTION(execSetBoneDirection);
@@ -2520,7 +2871,11 @@ public:
 class ENGINE_API ADecorationList : public AKeypoint
 {
 public:
+#if UE_SHREK2
+    TArrayNoInit<FDecorationType> Decorations;
+#else
     TArrayNoInit<FDecorationType> Decorations GCC_PACK(4);
+#endif
     DECLARE_CLASS(ADecorationList,AKeypoint,0,Engine)
     NO_DEFAULT_CONSTRUCTOR(ADecorationList)
 };
@@ -2537,10 +2892,17 @@ public:
 class ENGINE_API AAIScript : public AKeypoint
 {
 public:
+#if UE_SHREK2
+    class UClass* ControllerClass;
+    BITFIELD bNavigate:1 GCC_PACK(4);
+    BITFIELD bLoggingEnabled:1;
+    class AAIMarker* myMarker GCC_PACK(4);
+#else
     class UClass* ControllerClass GCC_PACK(4);
     BITFIELD bNavigate:1 GCC_PACK(4);
     BITFIELD bLoggingEnabled:1;
     class AAIMarker* myMarker GCC_PACK(4);
+#endif
     DECLARE_CLASS(AAIScript,AKeypoint,0,Engine)
 	virtual INT AddMyMarker(AActor *S);
 	virtual void ClearMarker();
@@ -2554,6 +2916,23 @@ public:
     #include "AInterpolationPoint.h"
 };
 
+#if UE_SHREK2
+struct FSavedEmitterInfo
+{
+    BITFIELD bTriggerDisable:1 GCC_PACK(4);
+    BITFIELD bTriggerReset:1;
+    BITFIELD AutomaticInitialSpawning:1;
+    BITFIELD RespawnDeadParticles:1;
+    FLOAT ParticlesPerSecond GCC_PACK(4);
+    FLOAT InitialParticlesPerSecond;
+};
+struct FSoundInfo
+{
+    FLOAT Volume;
+    FLOAT Radius;
+    FLOAT Pitch;
+};
+#endif
 struct ENGINE_API FSoundEmitter
 {
     FLOAT EmitInterval GCC_PACK(4);
@@ -2566,8 +2945,13 @@ struct ENGINE_API FSoundEmitter
 class ENGINE_API AAmbientSound : public AKeypoint
 {
 public:
+#if UE_SHREK2
+    TArrayNoInit<FSoundEmitter> SoundEmitters;
+    FLOAT AmbientVolume;
+#else
     TArrayNoInit<FSoundEmitter> SoundEmitters GCC_PACK(4);
     FLOAT AmbientVolume;
+#endif
     DECLARE_CLASS(AAmbientSound,AKeypoint,0|CLASS_Config,Engine)
     virtual void PostBeginPlay();
 	virtual UBOOL Tick( FLOAT DeltaTime, enum ELevelTick TickType );
@@ -2612,6 +2996,15 @@ struct AInfo_eventAcceptPlayInfoProperty_Parms
 class ENGINE_API AInfo : public AActor
 {
 public:
+#if UE_SHREK2
+    FStringNoInit RulesGroup;
+    FStringNoInit GameGroup;
+    FStringNoInit ServerGroup;
+    FStringNoInit ChatGroup;
+    FStringNoInit BotsGroup;
+    FStringNoInit MapVoteGroup;
+    FStringNoInit KickVoteGroup;
+#else
     FStringNoInit RulesGroup GCC_PACK(4);
     FStringNoInit GameGroup;
     FStringNoInit ServerGroup;
@@ -2619,6 +3012,7 @@ public:
     FStringNoInit BotsGroup;
     FStringNoInit MapVoteGroup;
     FStringNoInit KickVoteGroup;
+#endif
     FString eventGetDescriptionText(const FString& PropName)
     {
         AInfo_eventGetDescriptionText_Parms Parms;
@@ -2793,6 +3187,18 @@ public:
 class ENGINE_API ATeamInfo : public AReplicationInfo
 {
 public:
+#if UE_SHREK2
+    FStringNoInit TeamName;
+    INT Size;
+    FLOAT Score;
+    INT TeamIndex;
+    FColor TeamColor;
+    FColor AltTeamColor;
+    class AActor* HomeBase;
+    class UClass* DefaultPlayerClass;
+    FStringNoInit ColorNames[4];
+    class UObject* TeamIcon;
+#else
     FStringNoInit TeamName GCC_PACK(4);
     INT Size;
     FLOAT Score;
@@ -2802,6 +3208,7 @@ public:
     class AActor* HomeBase;
     class UClass* DefaultPlayerClass;
     FStringNoInit ColorNames[4];
+#endif
     DECLARE_CLASS(ATeamInfo,AReplicationInfo,0|CLASS_NativeReplication,Engine)
     #include "ATeamInfo.h"
 };
@@ -2811,6 +3218,53 @@ public:
 class ENGINE_API AGameReplicationInfo : public AReplicationInfo
 {
 public:
+#if UE_SHREK2
+    FStringNoInit GameName;
+    FStringNoInit GameClass;
+    BITFIELD bTeamGame:1 GCC_PACK(4);
+    BITFIELD bStopCountDown:1;
+    BITFIELD bMatchHasBegun:1;
+    BITFIELD bTeamSymbolsUpdated:1;
+    INT RemainingTime GCC_PACK(4);
+    INT ElapsedTime;
+    INT RemainingMinute;
+    FLOAT SecondCount;
+    INT GoalScore;
+    INT TimeLimit;
+    INT MaxLives;
+    class ATeamInfo* Teams[2];
+    FStringNoInit ServerName;
+    FStringNoInit ShortName;
+    FStringNoInit AdminName;
+    FStringNoInit AdminEmail;
+    INT ServerRegion;
+    FStringNoInit MOTDLine1;
+    FStringNoInit MOTDLine2;
+    FStringNoInit MOTDLine3;
+    FStringNoInit MOTDLine4;
+    class AActor* Winner;
+    TArrayNoInit<class APlayerReplicationInfo*> PRIArray;
+    FVector FlagPos;
+    BYTE CarriedObjectState[2];
+    INT MatchID;
+    BITFIELD bNoTeamSkins:1;
+    BITFIELD bForceTeamSkins:1;
+    BITFIELD bForceNoPlayerLights:1;
+    BITFIELD bAllowPlayerLights:1;
+    BITFIELD bFastWeaponSwitching:1;
+    BITFIELD bNoTeamChanges:1;
+    INT MinNetPlayers;
+    FLOAT WeaponBerserk;
+    FStringNoInit MessageOfTheDay;
+    class AVoiceChatReplicationInfo* VoiceReplicationInfo;
+    class UTexture* TeamSymbols[2];
+    FStringNoInit GRIPropsDisplayText[4];
+    FStringNoInit GRIPropDescText[4];
+    BYTE FlagState[2];
+    class APlayerReplicationInfo* FlagHolder[2];
+    class APlayerReplicationInfo* FlagTarget;
+    INT BotDifficulty;
+#else
     FStringNoInit GameName GCC_PACK(4);
     FStringNoInit GameClass;
     BITFIELD bTeamGame:1 GCC_PACK(4);
@@ -2855,6 +3309,7 @@ public:
     class APlayerReplicationInfo* FlagTarget;
     INT MatchID;
     INT BotDifficulty;
+#endif
     DECLARE_CLASS(AGameReplicationInfo,AReplicationInfo,0|CLASS_Config|CLASS_NativeReplication,Engine)
     #include "AGameReplicationInfo.h"
 };
@@ -2882,6 +3337,53 @@ struct APlayerReplicationInfo_eventUpdateCharacter_Parms
 class ENGINE_API APlayerReplicationInfo : public AReplicationInfo
 {
 public:
+#if UE_SHREK2
+    FLOAT Score;
+    FLOAT Deaths;
+    class ADecoration* HasFlag;
+    INT Ping;
+    class AVolume* PlayerVolume;
+    class AZoneInfo* PlayerZone;
+    INT NumLives;
+    FStringNoInit PlayerName;
+    FStringNoInit CharacterName;
+    FStringNoInit OldCharacterName;
+    FStringNoInit OldName;
+    FStringNoInit PreviousName;
+    INT PlayerID;
+    class ATeamInfo* Team;
+    INT TeamID;
+    class UClass* VoiceType;
+    BITFIELD bAdmin:1 GCC_PACK(4);
+    BITFIELD bIsFemale:1;
+    BITFIELD bIsSpectator:1;
+    BITFIELD bOnlySpectator:1;
+    BITFIELD bWaitingPlayer:1;
+    BITFIELD bReadyToPlay:1;
+    BITFIELD bOutOfLives:1;
+    BITFIELD bBot:1;
+    BITFIELD bWelcomed:1;
+    BITFIELD bReceivedPing:1;
+    BITFIELD bHasFlag:1;
+    INT StartTime GCC_PACK(4);
+    FStringNoInit StringDead;
+    FStringNoInit StringSpectating;
+    FStringNoInit StringUnknown;
+    INT GoalsScored;
+    INT Kills;
+    FStringNoInit VoiceTypeName;
+    BITFIELD bNoTeam:1;
+    BITFIELD bTeamNotified:1;
+    BYTE PacketLoss;
+    class AVehicle* CurrentVehicle;
+    class ALinkedReplicationInfo* CustomReplicationInfo;
+    class AVoiceChatReplicationInfo* VoiceInfo;
+    BITFIELD bRegisteredChatRoom:1;
+    class AVoiceChatRoom* PrivateChatRoom;
+    INT ActiveChannel;
+    INT VoiceMemberMask;
+    BYTE VoiceID;
+#else
     FLOAT Score GCC_PACK(4);
     FLOAT Deaths;
     class ADecoration* HasFlag;
@@ -2926,6 +3428,7 @@ public:
     INT ActiveChannel;
     INT VoiceMemberMask;
     BYTE VoiceID;
+#endif
     FString eventGetNameCallSign()
     {
         APlayerReplicationInfo_eventGetNameCallSign_Parms Parms;
@@ -2953,8 +3456,13 @@ struct ASecurity_eventServerCallback_Parms
 class ENGINE_API ASecurity : public AInfo
 {
 public:
+#if UE_SHREK2
+    INT LastType;
+    FStringNoInit LastParams[2];
+#else
     INT LastType GCC_PACK(4);
     FStringNoInit LastParams[2];
+#endif
     DECLARE_FUNCTION(execLocalPerform);
     DECLARE_FUNCTION(execNativePerform);
     void eventServerCallback(INT SecType, const FString& Data)
@@ -2984,6 +3492,35 @@ struct ASceneManager_eventSceneStarted_Parms
 class ENGINE_API ASceneManager : public AInfo
 {
 public:
+#if UE_SHREK2
+    TArrayNoInit<class UMatAction*> Actions;
+    BYTE Affect;
+    class AActor* AffectedActor;
+    BITFIELD bLooping:1 GCC_PACK(4);
+    BITFIELD bCinematicView:1;
+    FName PlayerScriptTag GCC_PACK(4);
+    FName NextSceneTag;
+    FLOAT PctSceneComplete;
+    class UMatAction* CurrentAction;
+    FLOAT SceneSpeed;
+    FLOAT TotalSceneTime;
+    class AActor* Viewer;
+    class APawn* OldPawn;
+    BITFIELD bIsRunning:1 GCC_PACK(4);
+    BITFIELD bIsSceneStarted:1;
+    FLOAT CurrentTime GCC_PACK(4);
+    TArrayNoInit<FVector> SampleLocations;
+    TArrayNoInit<class UMatSubAction*> SubActions;
+    FOrientation CamOrientation;
+    FOrientation PrevOrientation;
+    FInterpolator RotInterpolator;
+    FVector CameraShake;
+    FVector DollyOffset;
+    FName EventStart;
+    FName EventEnd;
+    BITFIELD bHideHUD:1;
+    BITFIELD bAbortCinematic:1;
+#else
     TArrayNoInit<class UMatAction*> Actions GCC_PACK(4);
     BYTE Affect;
     class AActor* AffectedActor GCC_PACK(4);
@@ -3011,6 +3548,7 @@ public:
     FVector CameraShake;
     FVector DollyOffset;
     BITFIELD bAbortCinematic:1 GCC_PACK(4);
+#endif
     DECLARE_FUNCTION(execAbortScene);
     DECLARE_FUNCTION(execGetTotalSceneTime);
     void eventSceneEnded()
@@ -3061,6 +3599,18 @@ struct AMutator_eventOverrideDownload_Parms
 class ENGINE_API AMutator : public AInfo
 {
 public:
+#if UE_SHREK2
+    class AMutator* NextMutator;
+    class UClass* DefaultWeapon;
+    FStringNoInit DefaultWeaponName;
+    FStringNoInit GroupName;
+    FStringNoInit FriendlyName;
+    FStringNoInit Description;
+    BITFIELD bUserAdded:1 GCC_PACK(4);
+    BITFIELD bAddToServerPackages:1;
+    FStringNoInit IconMaterialName;
+    FStringNoInit ConfigMenuClassName;
+#else
     class AMutator* NextMutator GCC_PACK(4);
     class UClass* DefaultWeapon;
     FStringNoInit DefaultWeaponName;
@@ -3071,6 +3621,7 @@ public:
     FStringNoInit GroupName;
     FStringNoInit FriendlyName;
     FStringNoInit Description;
+#endif
     BITFIELD eventOverrideDownload(const FString& PlayerIP, const FString& PlayerID, const FString& PlayerURL, FString& RedirectURL)
     {
         AMutator_eventOverrideDownload_Parms Parms;
@@ -3107,6 +3658,26 @@ public:
 class ENGINE_API ASavedMove : public AInfo
 {
 public:
+#if UE_SHREK2
+    class ASavedMove* NextMove;
+    FLOAT TimeStamp;
+    FLOAT Delta;
+    BITFIELD bRun:1 GCC_PACK(4);
+    BITFIELD bDuck:1;
+    BITFIELD bPressedJump:1;
+    BITFIELD bDoubleJump:1;
+    BYTE DoubleClickMove GCC_PACK(4);
+    BYTE SavedPhysics;
+    FVector SavedLocation;
+    FVector SavedVelocity;
+    FVector StartLocation;
+    FVector StartRelativeLocation;
+    FVector StartVelocity;
+    FVector StartFloor;
+    FVector SavedRelativeLocation;
+    class AActor* StartBase;
+    class AActor* EndBase;
+#else
     class ASavedMove* NextMove GCC_PACK(4);
     FLOAT TimeStamp;
     FLOAT Delta;
@@ -3125,6 +3696,7 @@ public:
     FVector SavedRelativeLocation;
     class AActor* StartBase;
     class AActor* EndBase;
+#endif
     DECLARE_CLASS(ASavedMove,AInfo,0,Engine)
     NO_DEFAULT_CONSTRUCTOR(ASavedMove)
 };
@@ -3141,6 +3713,45 @@ struct AZoneInfo_eventActorEntered_Parms
 class ENGINE_API AZoneInfo : public AInfo
 {
 public:
+#if UE_SHREK2
+    class ASkyZoneInfo* SkyZone;
+    FName ZoneTag;
+    FStringNoInit LocationName;
+    FLOAT KillZ;
+    BYTE KillZType;
+    BITFIELD bSoftKillZ:1 GCC_PACK(4);
+    BITFIELD bTerrainZone:1;
+    BITFIELD bDistanceFog:1;
+    BITFIELD bHWDistanceFog:1;
+    BITFIELD bSWDistanceFog:1;
+    BITFIELD bClearToFogColor:1;
+    TArrayNoInit<class ATerrainInfo*> Terrains GCC_PACK(4);
+    FVector AmbientVector;
+    BYTE AmbientBrightness;
+    BYTE AmbientHue;
+    BYTE AmbientSaturation;
+    FColor DistanceFogColor;
+    FLOAT DistanceFogStart;
+    FLOAT DistanceFogEnd;
+    FLOAT DistanceFogBlendTime;
+    FColor HWDistanceFogColor;
+    FLOAT HWDistanceFogStart;
+    FLOAT HWDistanceFogEnd;
+    FLOAT HWDistanceFogBlendTime;
+    FColor SWDistanceFogColor;
+    FLOAT SWDistanceFogStart;
+    FLOAT SWDistanceFogEnd;
+    FLOAT SWDistanceFogBlendTime;
+    class UTexture* EnvironmentMap;
+    FLOAT TexUPanSpeed;
+    FLOAT TexVPanSpeed;
+    class UI3DL2Listener* ZoneEffect;
+    BITFIELD bLonelyZone:1 GCC_PACK(4);
+    TArrayNoInit<class AZoneInfo*> ManualExcludes GCC_PACK(4);
+    FLOAT RealDistanceFogEnd;
+    FLOAT DistanceFogEndMin;
+    FLOAT DramaticLightingScale;
+#else
     class ASkyZoneInfo* SkyZone GCC_PACK(4);
     FName ZoneTag;
     FStringNoInit LocationName;
@@ -3168,6 +3779,7 @@ public:
     class UI3DL2Listener* ZoneEffect;
     BITFIELD bLonelyZone:1 GCC_PACK(4);
     TArrayNoInit<class AZoneInfo*> ManualExcludes GCC_PACK(4);
+#endif
     DECLARE_FUNCTION(execZoneActors);
     void eventActorLeaving(class AActor* Other)
     {
@@ -3199,6 +3811,17 @@ struct AWarpZoneInfo_eventGenerate_Parms
 class ENGINE_API AWarpZoneInfo : public AZoneInfo
 {
 public:
+#if UE_SHREK2
+    FStringNoInit OtherSideURL;
+    FName ThisTag;
+    BITFIELD bNoTeleFrag:1 GCC_PACK(4);
+    INT iWarpZone GCC_PACK(4);
+    FCoords WarpCoords;
+    class AWarpZoneInfo* OtherSideActor;
+    class UObject* OtherSideLevel;
+    FStringNoInit Destinations[8];
+    INT numDestinations;
+#else
     FStringNoInit OtherSideURL GCC_PACK(4);
     FName ThisTag;
     BITFIELD bNoTeleFrag:1 GCC_PACK(4);
@@ -3208,6 +3831,7 @@ public:
     class UObject* OtherSideLevel;
     FStringNoInit Destinations[8];
     INT numDestinations;
+#endif
     DECLARE_FUNCTION(execUnWarp);
     DECLARE_FUNCTION(execWarp);
     void eventForceGenerate()
@@ -3279,6 +3903,137 @@ struct ALevelInfo_eventFillPrecacheMaterialsArray_Parms
 class ENGINE_API ALevelInfo : public AZoneInfo
 {
 public:
+#if UE_SHREK2
+    FLOAT TimeDilation;
+    FLOAT TimeSeconds;
+    INT Year;
+    INT Month;
+    INT Day;
+    INT DayOfWeek;
+    INT Hour;
+    INT Minute;
+    INT Second;
+    INT Millisecond;
+    FLOAT PauseDelay;
+    FStringNoInit Title;
+    FStringNoInit Author;
+    INT RecommendedNumPlayers;
+    BYTE PhysicsDetailLevel;
+    FLOAT KarmaTimeScale;
+    FLOAT RagdollTimeScale;
+    INT MaxRagdolls;
+    FLOAT KarmaGravScale;
+    BITFIELD bKStaticFriction:1 GCC_PACK(4);
+    BITFIELD bKNoInit:1;
+    FLOAT DecalStayScale GCC_PACK(4);
+    FStringNoInit LevelEnterText;
+    FStringNoInit LocalizedPkg;
+    class APlayerReplicationInfo* Pauser;
+    class ULevelSummary* Summary;
+    FStringNoInit VisibleGroups;
+    FString SelectedGroups;
+    BITFIELD bDoneLoading:1 GCC_PACK(4);
+    BITFIELD HideFromMenus:1;
+    BITFIELD bLonePlayer:1;
+    BITFIELD bBegunPlay:1;
+    BITFIELD bPlayersOnly:1;
+    BYTE DetailMode GCC_PACK(4);
+    BITFIELD bDropDetail:1 GCC_PACK(4);
+    BITFIELD bAggressiveLOD:1;
+    BITFIELD bStartup:1;
+    BITFIELD bLowSoundDetail:1;
+    BITFIELD bPathsRebuilt:1;
+    BITFIELD bHasPathNodes:1;
+    BITFIELD bCapFramerate:1;
+    BITFIELD bLevelChange:1;
+    BITFIELD bInSpecialPauseMode:1;
+    BITFIELD bDefaultPhysicsVolumeIsWater:1;
+    FString ID GCC_PACK(4);
+    INT AutoSaveAtLevelStartSlot;
+    BITFIELD bNeverPrecache:1 GCC_PACK(4);
+    FVector CameraLocationDynamic GCC_PACK(4);
+    FVector CameraLocationTop;
+    FVector CameraLocationFront;
+    FVector CameraLocationSide;
+    FRotator CameraRotationDynamic;
+    FStringNoInit Song;
+    FLOAT PlayerDoppler;
+    FLOAT MusicVolumeOverride;
+    FLOAT Brightness;
+    class UMaterial* Screenshot;
+    class UTexture* DefaultTexture;
+    class UTexture* WireframeTexture;
+    class UTexture* WhiteSquareTexture;
+    class UTexture* LargeVertex;
+    INT HubStackLevel;
+    BYTE LevelAction;
+    class AGameReplicationInfo* GRI;
+    BYTE NetMode;
+    FStringNoInit ComputerName;
+    FStringNoInit EngineVersion;
+    FStringNoInit MinNetVersion;
+    FStringNoInit DefaultGameType;
+    FStringNoInit PreCacheGame;
+    class AGameInfo* Game;
+    FLOAT DefaultGravity;
+    class ANavigationPoint* NavigationPointList;
+    class AController* ControllerList;
+    class APawn* PawnList;
+    class APawn* SpecialPawnList;
+    FString DefaultGameState;
+    class APlayerController* LocalPlayerController;
+    FStringNoInit NextURL;
+    BITFIELD bNextItems:1 GCC_PACK(4);
+    FLOAT NextSwitchCountdown GCC_PACK(4);
+    class UObjectPool* ObjectPool;
+    TArrayNoInit<class UMaterial*> PrecacheMaterials;
+    TArrayNoInit<class UStaticMesh*> PrecacheStaticMeshes;
+    FLOAT MoveRepSize;
+    class APlayerController* ReplicationViewer;
+    class AActor* ReplicationViewTarget;
+    INT MaxRenderActorLights;
+    FString InventoryCarrierClass;
+    class APawn* InventoryCarrierPawn;
+    class APawn* PlayerHeroActor;
+    class UObject* WorldInfo;
+    BITFIELD bBadForFog:1 GCC_PACK(4);
+    FStringNoInit Description;
+    FStringNoInit DecoTextName;
+    INT IdealPlayerCountMin;
+    INT IdealPlayerCountMax;
+    FStringNoInit ExtraInfo;
+    INT SinglePlayerTeamSize;
+    class UMaterial* RadarMapImage;
+    FLOAT CustomRadarRange;
+    BYTE MeshLODDetailLevel;
+    INT LastTaunt[2];
+    BITFIELD bFreezeKarma:1;
+    BITFIELD bShouldPreload:1;
+    BITFIELD bDesireSkinPreload:1;
+    BITFIELD bKickLiveIdlers:1;
+    BITFIELD bSkinsPreloaded:1;
+    BITFIELD bClassicView:1;
+    BITFIELD bShowRadarMap:1;
+    BITFIELD bUseTerrainForRadarRange:1;
+    BITFIELD bIsSaveGame:1;
+    BITFIELD bSupportSaveGames:1;
+    INT LevelTextureLODBias;
+    FLOAT AnimMeshGlobalLOD;
+    FLOAT LastVehicleCheck;
+    FLOAT StallZ;
+    BITFIELD bUseHeadlights:1;
+    FLOAT HeadlightScaling;
+    class UStaticMesh* IndoorCamouflageMesh;
+    FLOAT IndoorMeshDrawscale;
+    class UStaticMesh* OutdoorCamouflageMesh;
+    FLOAT OutdoorMeshDrawscale;
+    FColor DustColor;
+    FColor WaterDustColor;
+    FLOAT MaxClientFrameRate;
+    FLOAT MaxTimeMargin;
+    FLOAT TimeMarginSlack;
+    FLOAT MinTimeMargin;
+#else
     FLOAT TimeDilation GCC_PACK(4);
     FLOAT TimeSeconds;
     INT Year;
@@ -3391,6 +4146,7 @@ public:
     FLOAT MinTimeMargin;
     class APlayerController* ReplicationViewer;
     class AActor* ReplicationViewTarget;
+#endif
     DECLARE_FUNCTION(execIsPendingConnection);
     DECLARE_FUNCTION(execGetAddressURL);
     DECLARE_FUNCTION(execIsSoftwareRendering);
@@ -3426,8 +4182,13 @@ public:
 
 struct ENGINE_API FKeyValuePair
 {
+#if UE_SHREK2
+    FString Key;
+    FString Value;
+#else
     FString Key GCC_PACK(4);
     FString Value;
+#endif
     friend ENGINE_API FArchive& operator<<(FArchive& Ar,FKeyValuePair& MyKeyValuePair)
     {
         return Ar << MyKeyValuePair.Key << MyKeyValuePair.Value;
@@ -3436,11 +4197,21 @@ struct ENGINE_API FKeyValuePair
 
 struct ENGINE_API FPlayerResponseLine
 {
+#if UE_SHREK2
+    INT PlayerNum;
+    INT PlayerID;
+    FString PlayerName;
+    INT Ping;
+    INT Score;
+    INT StatsID;
+    TArray<FKeyValuePair> PlayerInfo;
+#else
     INT PlayerNum GCC_PACK(4);
     FString PlayerName;
     INT Ping;
     INT Score;
     INT StatsID;
+#endif
     friend ENGINE_API FArchive& operator<<(FArchive& Ar,FPlayerResponseLine& MyPlayerResponseLine)
     {
         return Ar << MyPlayerResponseLine.PlayerNum << MyPlayerResponseLine.PlayerName << MyPlayerResponseLine.Ping << MyPlayerResponseLine.Score << MyPlayerResponseLine.StatsID;
@@ -3449,6 +4220,22 @@ struct ENGINE_API FPlayerResponseLine
 
 struct ENGINE_API FServerResponseLine
 {
+#if UE_SHREK2
+    INT ServerID;
+    FString IP;
+    INT Port;
+    INT QueryPort;
+    FString ServerName;
+    FString MapName;
+    FString GameType;
+    INT CurrentPlayers;
+    INT MaxPlayers;
+    INT Ping;
+    TArray<FKeyValuePair> ServerInfo;
+    TArray<FPlayerResponseLine> PlayerInfo;
+    INT Flags;
+    FString SkillLevel;
+#else
     INT ServerID GCC_PACK(4);
     FString IP;
     INT Port;
@@ -3463,6 +4250,7 @@ struct ENGINE_API FServerResponseLine
     FString SkillLevel;
     TArray<FKeyValuePair> ServerInfo;
     TArray<FPlayerResponseLine> PlayerInfo;
+#endif
     friend ENGINE_API FArchive& operator<<(FArchive& Ar,FServerResponseLine& MyServerResponseLine)
     {
         return Ar << MyServerResponseLine.ServerID << MyServerResponseLine.IP << MyServerResponseLine.Port << MyServerResponseLine.QueryPort << MyServerResponseLine.ServerName << MyServerResponseLine.MapName << MyServerResponseLine.GameType << MyServerResponseLine.CurrentPlayers << MyServerResponseLine.MaxPlayers << MyServerResponseLine.Ping << MyServerResponseLine.Flags << MyServerResponseLine.SkillLevel << MyServerResponseLine.ServerInfo << MyServerResponseLine.PlayerInfo;
@@ -3551,6 +4339,118 @@ struct AGameInfo_eventGameEnding_Parms
 class ENGINE_API AGameInfo : public AInfo
 {
 public:
+#if UE_SHREK2
+    BITFIELD bRestartLevel:1 GCC_PACK(4);
+    BITFIELD bPauseable:1;
+    BITFIELD bWeaponStay:1;
+    BITFIELD bCanChangeSkin:1;
+    BITFIELD bTeamGame:1;
+    BITFIELD bGameEnded:1;
+    BITFIELD bOverTime:1;
+    BITFIELD bAlternateMode:1;
+    BITFIELD bCanViewOthers:1;
+    BITFIELD bDelayedStart:1;
+    BITFIELD bWaitingToStartMatch:1;
+    BITFIELD bChangeLevels:1;
+    BITFIELD bAlreadyChanged:1;
+    BITFIELD bLoggingGame:1;
+    BITFIELD bEnableStatLogging:1;
+    BITFIELD bAllowWeaponThrowing:1;
+    BITFIELD bAllowBehindView:1;
+    BITFIELD bAdminCanPause:1;
+    BITFIELD bGameRestarted:1;
+    BITFIELD bKeepSamePlayerStart:1;
+    FLOAT GameDifficulty GCC_PACK(4);
+    INT GoreLevel;
+    FLOAT AutoAim;
+    FLOAT GameSpeed;
+    FLOAT StartTime;
+    FStringNoInit DefaultPlayerClassName;
+    FStringNoInit ScoreBoardType;
+    FStringNoInit BotMenuType;
+    FStringNoInit RulesMenuType;
+    FStringNoInit SettingsMenuType;
+    FStringNoInit GameUMenuType;
+    FStringNoInit MultiplayerUMenuType;
+    FStringNoInit GameOptionsMenuType;
+    FStringNoInit HUDType;
+    FStringNoInit MapListType;
+    FStringNoInit MapPrefix;
+    FStringNoInit BeaconName;
+    INT MaxSpectators;
+    INT NumSpectators;
+    INT MaxPlayers;
+    INT NumPlayers;
+    INT NumBots;
+    INT CurrentID;
+    FStringNoInit DefaultPlayerName;
+    FStringNoInit GameName;
+    FLOAT FearCostFallOff;
+    INT GoalScore;
+    INT MaxLives;
+    INT TimeLimit;
+    class UClass* DeathMessageClass;
+    class UClass* GameMessageClass;
+    FName OtherMesgGroup;
+    FStringNoInit MutatorClass;
+    class AMutator* BaseMutator;
+    FStringNoInit AccessControlClass;
+    class AAccessControl* AccessControl;
+    class AGameRules* GameRulesModifiers;
+    FStringNoInit BroadcastHandlerClass;
+    class ABroadcastHandler* BroadcastHandler;
+    class UObject* PersistentStore;
+    class UClass* PlayerControllerClass;
+    FStringNoInit PlayerControllerClassName;
+    class UClass* GameReplicationInfoClass;
+    class AGameReplicationInfo* GameReplicationInfo;
+    BITFIELD bWelcomePending:1 GCC_PACK(4);
+    class AGameStats* GameStats GCC_PACK(4);
+    FStringNoInit GameStatsClass;
+    TArray<FVoiceChatterInfo> VoiceChatters;
+    FStringNoInit SecurityClass;
+    FStringNoInit ScreenShotName;
+    FStringNoInit DecoTextName;
+    FStringNoInit Acronym;
+    FStringNoInit GIPropsDisplayText[15];
+    FStringNoInit GIPropsExtras[2];
+    BITFIELD bWeaponShouldViewShake:1;
+    BITFIELD bModViewShake:1;
+    BITFIELD bForceClassicView:1;
+    BITFIELD bLowGore:1;
+    BITFIELD bAttractCam:1;
+    BITFIELD bMustJoinBeforeStart:1;
+    BITFIELD bTestMode:1;
+    BITFIELD bAllowVehicles:1;
+    BITFIELD bAllowMPGameSpeed:1;
+    BITFIELD bIsSaveGame:1;
+    BITFIELD bLiberalVehiclePaths:1;
+    BITFIELD bLargeGameVOIP:1;
+    FStringNoInit HUDSettingsMenu;
+    FStringNoInit GoreLevelText[3];
+    INT ResetCountDown;
+    INT ResetTimeDelay;
+    class UClass* BroadcastClass;
+    class UClass* VoiceReplicationInfoClass;
+    class AVoiceChatReplicationInfo* VoiceReplicationInfo;
+    FStringNoInit MaplistHandlerType;
+    class UClass* MaplistHandlerClass;
+    class AMaplistManagerBase* MaplistHandler;
+    FStringNoInit DemoCommand;
+    FStringNoInit Description;
+    FStringNoInit VotingHandlerType;
+    class UClass* VotingHandlerClass;
+    class AVotingHandler* VotingHandler;
+    class UGameProfile* CurrentGameProfile;
+    class UManifest* SaveGameManifest;
+    FStringNoInit GIPropDescText[15];
+    class AVehicle* VehicleList;
+    FStringNoInit CallSigns[15];
+    FStringNoInit ServerSkillLevel;
+    FLOAT MaxIdleTime;
+    FStringNoInit NoBindString;
+    FColor BindColor;
+#else
     BITFIELD bRestartLevel:1 GCC_PACK(4);
     BITFIELD bPauseable:1;
     BITFIELD bWeaponStay:1;
@@ -3658,6 +4558,7 @@ public:
     FLOAT MaxIdleTime;
     FStringNoInit NoBindString;
     FColor BindColor;
+#endif
     DECLARE_FUNCTION(execLoadSRGrammar);
     DECLARE_FUNCTION(execParseKillMessage);
     DECLARE_FUNCTION(execGetNetworkNumber);
@@ -3803,12 +4704,21 @@ public:
 class ENGINE_API AGameStats : public AInfo
 {
 public:
+#if UE_SHREK2
+    class AFileLog* TempLog;
+    class AGameReplicationInfo* GRI;
+    BITFIELD bShowBots:1 GCC_PACK(4);
+    FStringNoInit Tab;
+    BITFIELD bLocalLog:1;
+    FStringNoInit LogFileName;
+#else
     class AFileLog* TempLog GCC_PACK(4);
     class AGameReplicationInfo* GRI;
     BITFIELD bShowBots:1 GCC_PACK(4);
     FStringNoInit Tab GCC_PACK(4);
     BITFIELD bLocalLog:1 GCC_PACK(4);
     FStringNoInit LogFileName GCC_PACK(4);
+#endif
     DECLARE_FUNCTION(execGetMapFileName);
     DECLARE_FUNCTION(execGetStatsIdentifier);
     DECLARE_CLASS(AGameStats,AInfo,0|CLASS_Config,Engine)
@@ -3819,9 +4729,15 @@ public:
 class ENGINE_API AFileLog : public AInfo
 {
 public:
+#if UE_SHREK2
+    PTRINT LogAr;
+    FStringNoInit LogFileName;
+    FStringNoInit TempFileName;
+#else
     PTRINT LogAr GCC_PACK(4);
     FStringNoInit LogFileName;
     FStringNoInit TempFileName;
+#endif
     DECLARE_FUNCTION(execLogf);
     DECLARE_FUNCTION(execCloseLog);
     DECLARE_FUNCTION(execOpenLog);
@@ -3918,6 +4834,261 @@ struct APawn_eventSetHeadScale_Parms
 class ENGINE_API APawn : public AActor
 {
 public:
+#if UE_SHREK2
+    class AController* Controller;
+    FLOAT NetRelevancyTime;
+    class APlayerController* LastRealViewer;
+    class AActor* LastViewer;
+    BITFIELD bIsMainPlayer:1 GCC_PACK(4);
+    BITFIELD bJustLanded:1;
+    BITFIELD bUpAndOut:1;
+    BITFIELD bIsWalking:1;
+    BITFIELD bUseAccelRateForWalkingBrake:1;
+    BITFIELD bWarping:1;
+    BITFIELD bWantsToCrouch:1;
+    BITFIELD bIsCrouched:1;
+    BITFIELD bTryToUncrouch:1;
+    BITFIELD bCanCrouch:1;
+    BITFIELD bCrawler:1;
+    BITFIELD bReducedSpeed:1;
+    BITFIELD bJumpCapable:1;
+    BITFIELD bCanJump:1;
+    BITFIELD bCanWalk:1;
+    BITFIELD bCanSwim:1;
+    BITFIELD bCanFly:1;
+    BITFIELD bCanClimbLadders:1;
+    BITFIELD bCanStrafe:1;
+    BITFIELD bCanDoubleJump:1;
+    BITFIELD bAvoidLedges:1;
+    BITFIELD bStopAtLedges:1;
+    BITFIELD bNoJumpAdjust:1;
+    BITFIELD bCountJumps:1;
+    BITFIELD bSimulateGravity:1;
+    BITFIELD bUpdateEyeheight:1;
+    BITFIELD bIgnoreForces:1;
+    BITFIELD bNoVelocityUpdate:1;
+    BITFIELD bCanWalkOffLedges:1;
+    BITFIELD bSteadyFiring:1;
+    BITFIELD bCanBeBaseForPawns:1;
+    BITFIELD bClientCollision:1;
+    BITFIELD bSimGravityDisabled:1;
+    BITFIELD bDirectHitWall:1;
+    BITFIELD bThumped:1;
+    BITFIELD bInvulnerableBody:1;
+    BITFIELD bIsFemale:1;
+    BITFIELD bAutoActivate:1;
+    BITFIELD bCanPickupInventory:1;
+    BITFIELD bUpdatingDisplay:1;
+    BITFIELD bAmbientCreature:1;
+    BITFIELD bLOSHearing:1;
+    BITFIELD bSameZoneHearing:1;
+    BITFIELD bAdjacentZoneHearing:1;
+    BITFIELD bMuffledHearing:1;
+    BITFIELD bAroundCornerHearing:1;
+    BITFIELD bDontPossess:1;
+    BITFIELD bAutoFire:1;
+    BITFIELD bRollToDesired:1;
+    BITFIELD bIgnorePlayFiring:1;
+    BITFIELD bCachedRelevant:1;
+    BITFIELD bUseCompressedPosition:1;
+    BITFIELD bWeaponBob:1;
+    BITFIELD bHideRegularHUD:1;
+    BITFIELD bSpecialHUD:1;
+    BITFIELD bSpecialCalcView:1;
+    BITFIELD bNoWeaponFiring:1;
+    BITFIELD bIsTyping:1;
+    BYTE FlashCount GCC_PACK(4);
+    BYTE Visibility;
+    FLOAT DesiredSpeed;
+    FLOAT MaxDesiredSpeed;
+    FName AIScriptTag;
+    FLOAT HearingThreshold;
+    FLOAT Alertness;
+    FLOAT SightRadius;
+    FLOAT PeripheralVision;
+    FLOAT SkillModifier;
+    FLOAT AvgPhysicsTime;
+    FLOAT MeleeRange;
+    class ANavigationPoint* Anchor;
+    class ANavigationPoint* LastAnchor;
+    FLOAT FindAnchorFailedTime;
+    FLOAT LastValidAnchorTime;
+    FLOAT DestinationOffset;
+    FLOAT NextPathRadius;
+    FVector SerpentineDir;
+    FLOAT SerpentineDist;
+    FLOAT SerpentineTime;
+    FLOAT UncrouchTime;
+    FLOAT SpawnTime;
+    FLOAT GroundSpeed;
+    FLOAT WaterSpeed;
+    FLOAT AirSpeed;
+    FLOAT LadderSpeed;
+    FLOAT AccelRate;
+    FLOAT JumpZ;
+    FLOAT AirControl;
+    FLOAT WalkingPct;
+    FLOAT CrouchedPct;
+    FLOAT MaxFallSpeed;
+    FVector ConstantAcceleration;
+    FLOAT fMinFloorZ;
+    FStringNoInit OwnerName;
+    class AWeapon* Weapon;
+    class AWeapon* PendingWeapon;
+    class APowerups* SelectedItem;
+    FLOAT BaseEyeHeight;
+    FLOAT EyeHeight;
+    FVector Floor;
+    FLOAT SplashTime;
+    FLOAT CrouchHeight;
+    FLOAT CrouchRadius;
+    FLOAT OldZ;
+    class APhysicsVolume* HeadVolume;
+    INT Health;
+    FLOAT BreathTime;
+    FLOAT UnderWaterTime;
+    FLOAT LastPainTime;
+    class UClass* ReducedDamageType;
+    FLOAT HeadScale;
+    FVector noise1spot;
+    FLOAT noise1time;
+    class APawn* noise1other;
+    FLOAT noise1loudness;
+    FVector noise2spot;
+    FLOAT noise2time;
+    class APawn* noise2other;
+    FLOAT noise2loudness;
+    FLOAT LastPainSound;
+    FLOAT Bob;
+    FLOAT LandBob;
+    FLOAT AppliedBob;
+    FLOAT bobtime;
+    FVector WalkBob;
+    FLOAT SoundDampening;
+    FLOAT DamageScaling;
+    FStringNoInit MenuName;
+    class AProjector* Shadow;
+    class UClass* BloodEffect;
+    class UClass* LowGoreBlood;
+    class UClass* ControllerClass;
+    class APlayerReplicationInfo* PlayerReplicationInfo;
+    class ALadderVolume* OnLadder;
+    FName LandMovementState;
+    FName WaterMovementState;
+    class APlayerStart* LastStartSpot;
+    FLOAT LastStartTime;
+    FName AnimAction;
+    FVector TakeHitLocation;
+    class UClass* HitDamageType;
+    FVector TearOffMomentum;
+    BITFIELD bPhysicsAnimUpdate:1 GCC_PACK(4);
+    BITFIELD bWasCrouched:1;
+    BITFIELD bWasWalking:1;
+    BITFIELD bWasOnGround:1;
+    BITFIELD bInitializeAnimation:1;
+    BITFIELD bPlayedDeath:1;
+    BYTE OldPhysics GCC_PACK(4);
+    FLOAT OldRotYaw;
+    FVector OldAcceleration;
+    FLOAT BaseMovementRate;
+    FName MovementAnims[4];
+    FName TurnLeftAnim;
+    FName TurnRightAnim;
+    FLOAT BlendChangeTime;
+    FLOAT MovementBlendStartTime;
+    FLOAT ForwardStrafeBias;
+    FLOAT BackwardStrafeBias;
+    FCompressedPosition PawnPosition;
+    FName MouthBone;
+    class APawn* nextPawn;
+    class APawn* nextSpecialPawn;
+    BITFIELD bSpecialPawn:1 GCC_PACK(4);
+    BITFIELD bUseRealTimePathCheck:1;
+    BITFIELD bLumosOn:1;
+    BITFIELD bLumosOff:1;
+    FLOAT fLumosRadius GCC_PACK(4);
+    FLOAT StepHeight;
+    FLOAT StepWidth;
+    FLOAT MaxMountHeight;
+    BITFIELD bUseStaticMeshSizeForMount:1 GCC_PACK(4);
+    FLOAT GroundFrictionOverride GCC_PACK(4);
+    BITFIELD bOverrideGroundFriction:1 GCC_PACK(4);
+    FLOAT FlyFrictionOverride GCC_PACK(4);
+    BITFIELD bOverrideFlyFriction:1 GCC_PACK(4);
+    FLOAT LastLocTime;
+    BITFIELD bLandRecovery:1;
+    BITFIELD bCanWallDodge:1;
+    BITFIELD bServerMoveSetPawnRot:1;
+    BITFIELD bFlyingKarma:1;
+    BITFIELD bDrawCorona:1;
+    BITFIELD bNoCoronas:1;
+    BITFIELD bStationary:1;
+    BITFIELD bSpecialCrosshair:1;
+    BITFIELD bNoTeamBeacon:1;
+    BITFIELD bScriptPostRender:1;
+    BITFIELD bCanUse:1;
+    BITFIELD bSuperSize:1;
+    BITFIELD bWaterStepup:1;
+    FLOAT NavigationPointRange;
+    class AVehicle* DrivenVehicle;
+    FVector ImpactVelocity;
+    INT PitchUpLimit;
+    INT PitchDownLimit;
+    FLOAT DrivingHeight;
+    FLOAT DrivingRadius;
+    FLOAT HealthMax;
+    FLOAT SuperHealthMax;
+    FLOAT HeadRadius;
+    FLOAT HeadHeight;
+    BITFIELD bSetPCRotOnPossess:1;
+    FLOAT AmbientSoundScaling;
+    BITFIELD bIsIdle:1;
+    BITFIELD bWaitForAnim:1;
+    BITFIELD bReverseRun:1;
+    BITFIELD bDoTorsoTwist:1;
+    BITFIELD FootTurning:1;
+    BITFIELD FootStill:1;
+    BYTE ViewPitch;
+    INT SmoothViewPitch;
+    INT SmoothViewYaw;
+    FLOAT DodgeSpeedFactor;
+    FLOAT DodgeSpeedZ;
+    INT OldAnimDir;
+    FVector OldVelocity;
+    FLOAT IdleTime;
+    FName SwimAnims[4];
+    FName CrouchAnims[4];
+    FName WalkAnims[4];
+    FName AirAnims[4];
+    FName TakeoffAnims[4];
+    FName LandAnims[4];
+    FName DoubleJumpAnims[4];
+    FName DodgeAnims[4];
+    FName AirStillAnim;
+    FName TakeoffStillAnim;
+    FName CrouchTurnRightAnim;
+    FName CrouchTurnLeftAnim;
+    FName IdleCrouchAnim;
+    FName IdleSwimAnim;
+    FName IdleWeaponAnim;
+    FName IdleRestAnim;
+    FName IdleChatAnim;
+    TArrayNoInit<FName> TauntAnims;
+    FStringNoInit TauntAnimNames[16];
+    INT FootRot;
+    INT TurnDir;
+    FName RootBone;
+    FName HeadBone;
+    FName SpineBone1;
+    FName SpineBone2;
+    FLOAT ShieldStrength;
+    FHitFXData HitFx[8];
+    INT HitFxTicker;
+    class AController* DelayedDamageInstigatorController;
+    class AController* LastHitBy;
+    FLOAT MinFlySpeed;
+    FLOAT MaxRotation;
+#else
     class AController* Controller GCC_PACK(4);
     FLOAT NetRelevancyTime;
     class APlayerController* LastRealViewer;
@@ -4151,6 +5322,7 @@ public:
     class AController* LastHitBy;
     FLOAT MinFlySpeed;
     FLOAT MaxRotation;
+#endif
     DECLARE_FUNCTION(execForceCrouch);
     DECLARE_FUNCTION(execReachedDestination);
     DECLARE_FUNCTION(execGet4WayDirection);
@@ -4344,6 +5516,138 @@ struct AVehicle_eventVehicleLocked_Parms
 class ENGINE_API AVehicle : public APawn
 {
 public:
+#if UE_SHREK2
+    BYTE Team;
+    BITFIELD bDefensive:1 GCC_PACK(4);
+    FLOAT Steering GCC_PACK(4);
+    FLOAT Throttle;
+    BITFIELD bVehicleShadows:1;
+    BITFIELD bDriving:1;
+    BITFIELD bOldDriving:1;
+    BITFIELD bDrawVehicleShadow:1;
+    BITFIELD bDrawDriverInTP:1;
+    BITFIELD bDriverCollideActors:1;
+    BITFIELD bRelativeExitPos:1;
+    BITFIELD bAutoTurret:1;
+    BITFIELD bRemoteControlled:1;
+    BITFIELD bEjectDriver:1;
+    BITFIELD bTurnInPlace:1;
+    BITFIELD bFollowLookDir:1;
+    BITFIELD bNonHumanControl:1;
+    BITFIELD bStalled:1;
+    BITFIELD bVehicleDestroyed:1;
+    BITFIELD bShowDamageOverlay:1;
+    BITFIELD bDropDetail:1;
+    BITFIELD bNoFriendlyFire:1;
+    BITFIELD bCanHover:1;
+    BITFIELD bCanDoTrickJumps:1;
+    BITFIELD bDrawMeshInFP:1;
+    BITFIELD bZeroPCRotOnEntry:1;
+    BITFIELD bPCRelativeFPRotation:1;
+    BITFIELD bWeaponisFiring:1;
+    BITFIELD bWeaponisAltFiring:1;
+    BITFIELD bTeamLocked:1;
+    BITFIELD bEnterringUnlocks:1;
+    BITFIELD bCanFlip:1;
+    BITFIELD bAllowViewChange:1;
+    BITFIELD bAllowWeaponToss:1;
+    BITFIELD bHUDTrackVehicle:1;
+    BITFIELD bHasRadar:1;
+    BITFIELD bHasHandbrake:1;
+    BITFIELD bScriptedRise:1;
+    BITFIELD bKeyVehicle:1;
+    BITFIELD bSeparateTurretFocus:1;
+    BITFIELD bHighScoreKill:1;
+    BITFIELD bAdjustDriversHead:1;
+    BITFIELD bEnemyLockedOn:1;
+    BITFIELD bDesiredBehindView:1;
+    BITFIELD bHideRemoteDriver:1;
+    BITFIELD bShowChargingBar:1;
+    BITFIELD bDriverHoldsFlag:1;
+    BITFIELD bCanCarryFlag:1;
+    BITFIELD bSpawnProtected:1;
+    BITFIELD bFPNoZFromCameraPitch:1;
+    BYTE StuckCount;
+    BYTE OldTeam;
+    BYTE PrevTeam;
+    FRotator PlayerEnterredRotation;
+    FLOAT EjectMomentum;
+    class UClass* AutoTurretControllerClass;
+    FLOAT Rise;
+    INT DriverViewPitch;
+    INT DriverViewYaw;
+    FLOAT ThrottleTime;
+    FLOAT StuckTime;
+    FLOAT VehicleMovingTime;
+    FVector DrivePos;
+    FRotator DriveRot;
+    FName DriveAnim;
+    TArrayNoInit<FVector> ExitPositions;
+    FVector EntryPosition;
+    FLOAT EntryRadius;
+    FVector FPCamPos;
+    FVector FPCamViewOffset;
+    FLOAT TPCamDistance;
+    FStringNoInit CenterSpringForce;
+    INT CenterSpringRangePitch;
+    INT CenterSpringRangeRoll;
+    FVector TPCamLookat;
+    FVector TPCamWorldOffset;
+    FLOAT DesiredTPCamDistance;
+    FLOAT LastCameraCalcTime;
+    FLOAT CameraSpeed;
+    FRange TPCamDistRange;
+    INT MaxViewYaw;
+    INT MaxViewPitch;
+    class APawn* Driver;
+    class ASVehicleFactory* ParentFactory;
+    FStringNoInit TransEffects[2];
+    class AShadowProjector* VehicleShadow;
+    FLOAT ShadowMaxTraceDist;
+    FLOAT ShadowCullDistance;
+    FLOAT MomentumMult;
+    FLOAT DriverDamageMult;
+    FStringNoInit LockOnClassString;
+    FLOAT LastLockWarningTime;
+    FLOAT LockWarningInterval;
+    class AVehicle* NextVehicle;
+    FStringNoInit VehiclePositionString;
+    FStringNoInit VehicleNameString;
+    FStringNoInit VehicleDescription;
+    class UTexture* TeamBeaconTexture;
+    class UTexture* NoEntryTexture;
+    class UMaterial* TeamBeaconBorderMaterial;
+    class AAIMarker* myMarker;
+    FLOAT MinRunOverSpeed;
+    class UClass* RanOverDamageType;
+    class UClass* CrushedDamageType;
+    class USound* RanOverSound;
+    FName StolenAnnouncement;
+    class USound* StolenSound;
+    FLOAT LinkHealMult;
+    FLOAT OldSteering;
+    FLOAT VehicleLostTime;
+    FLOAT TeamUseTime;
+    FLOAT PlayerStartTime;
+    FLOAT MaxDesireability;
+    FLOAT AIMoveCheckTime;
+    FLOAT ObjectiveGetOutDist;
+    FName FlagBone;
+    FVector FlagOffset;
+    FRotator FlagRotation;
+    FLOAT WheelsScale;
+    TArrayNoInit<class USound*> HornSounds;
+    FLOAT LastHornTime;
+    TArrayNoInit<class USound*> BulletSounds;
+    FLOAT WaterDamage;
+    class UClass* VehicleDrowningDamType;
+    class UClass* HUDOverlayClass;
+    class AActor* HudOverlay;
+    FVector HUDOverlayOffset;
+    FLOAT HUDOverlayFOV;
+    class UMaterial* SpawnOverlay[2];
+    FSVehicleIcon VehicleIcon;
+#else
     BITFIELD bVehicleShadows:1 GCC_PACK(4);
     BITFIELD bDriving:1;
     BITFIELD bOldDriving:1;
@@ -4474,6 +5778,7 @@ public:
     FLOAT HUDOverlayFOV;
     class UMaterial* SpawnOverlay[2];
     FSVehicleIcon VehicleIcon;
+#endif
     BITFIELD eventVerifyLock(class AActor* Aggressor, class AActor*& NewTarget)
     {
         AVehicle_eventVerifyLock_Parms Parms;
@@ -4588,6 +5893,38 @@ struct ASVehicle_eventVehicleStateReceived_Parms
 class ENGINE_API ASVehicle : public AVehicle
 {
 public:
+#if UE_SHREK2
+    TArrayNoInit<class USVehicleWheel*> Wheels;
+    FLOAT Steering;
+    FLOAT Throttle;
+    FLOAT Rise;
+    class APawn* Driver;
+    TArray<FVector> ExitPositions;
+    TArray<FVector> EntryPositions;
+    FVector DrivePos;
+    FRotator DriveRot;
+    FName DriveAnim;
+    BITFIELD bDrawMeshInFP:1 GCC_PACK(4);
+    BITFIELD bDrawDriverInTP:1;
+    BITFIELD bZeroPCRotOnEntry:1;
+    FVector FPCamPos GCC_PACK(4);
+    FVector TPCamLookat;
+    FLOAT TPCamDistance;
+    INT MaxViewYaw;
+    INT MaxViewPitch;
+    FLOAT VehicleMass;
+    class UClass* DestroyEffectClass;
+    TArray<class ASVehicleTrigger*> EntryTriggers;
+    BITFIELD bGetOut:1 GCC_PACK(4);
+    class ASVehicleFactory* ParentFactory GCC_PACK(4);
+    class UObject* VehicleShadow;
+    BITFIELD bVehicleOnGround:1;
+    FLOAT FlipTorque;
+    FLOAT FlipTime;
+    FLOAT FlipScale;
+    FLOAT FlipTimeLeft;
+    FVector FlipAxis;
+#else
     TArrayNoInit<class USVehicleWheel*> Wheels GCC_PACK(4);
     BITFIELD bVehicleOnGround:1 GCC_PACK(4);
     FLOAT VehicleMass GCC_PACK(4);
@@ -4597,6 +5934,7 @@ public:
     FLOAT FlipTimeLeft;
     FVector FlipAxis;
     class UClass* DestroyEffectClass;
+#endif
     DECLARE_FUNCTION(execUpdateVehicle);
     DECLARE_FUNCTION(execGraphData);
     void eventSVehicleUpdateParams()
@@ -4645,6 +5983,23 @@ struct AKVehicle_eventVehicleStateReceived_Parms
 class ENGINE_API AKVehicle : public AVehicle
 {
 public:
+#if UE_SHREK2
+    FLOAT Steering;
+    FLOAT Throttle;
+    class APawn* Driver;
+    TArray<FVector> ExitPositions;
+    FVector DrivePos;
+    FRotator DriveRot;
+    class UClass* DestroyEffectClass;
+    BITFIELD bAutoDrive:1 GCC_PACK(4);
+    BITFIELD bGetOut:1;
+    class UObject* ParentFactory GCC_PACK(4);
+    BITFIELD bVehicleIsFiring:1 GCC_PACK(4);
+    BITFIELD bVehicleIsAltFiring:1;
+    FVector CameraHistory[5] GCC_PACK(4);
+    INT NextHistorySlot;
+    BITFIELD bHistoryWarmup:1 GCC_PACK(4);
+#else
     class UClass* DestroyEffectClass GCC_PACK(4);
     BITFIELD bAutoDrive:1 GCC_PACK(4);
     BITFIELD bVehicleIsFiring:1;
@@ -4652,6 +6007,7 @@ public:
     FVector CameraHistory[5] GCC_PACK(4);
     INT NextHistorySlot;
     BITFIELD bHistoryWarmup:1 GCC_PACK(4);
+#endif
     DECLARE_FUNCTION(execGraphData);
     void eventKVehicleUpdateParams()
     {
@@ -4676,7 +6032,11 @@ public:
 class ENGINE_API AScout : public APawn
 {
 public:
+#if UE_SHREK2
+    FLOAT MaxLandingVelocity;
+#else
     FLOAT MaxLandingVelocity GCC_PACK(4);
+#endif
     DECLARE_CLASS(AScout,APawn,0|CLASS_Config,Engine)
     #include "AScout.h"
 };
@@ -4710,6 +6070,38 @@ enum EProjectorBlending
 class ENGINE_API AProjector : public AActor
 {
 public:
+#if UE_SHREK2
+    BYTE MaterialBlendingOp;
+    BYTE FrameBufferBlendingOp;
+    class UMaterial* ProjTexture;
+    INT FOV;
+    INT MaxTraceDistance;
+    BITFIELD bProjectBSP:1 GCC_PACK(4);
+    BITFIELD bProjectTerrain:1;
+    BITFIELD bProjectStaticMesh:1;
+    BITFIELD bProjectParticles:1;
+    BITFIELD bProjectActor:1;
+    BITFIELD bLevelStatic:1;
+    BITFIELD bClipBSP:1;
+    BITFIELD bClipStaticMesh:1;
+    BITFIELD bProjectOnUnlit:1;
+    BITFIELD bGradient:1;
+    BITFIELD bProjectOnBackfaces:1;
+    BITFIELD bProjectOnAlpha:1;
+    BITFIELD bProjectOnParallelBSP:1;
+    FName ProjectTag GCC_PACK(4);
+    BITFIELD bDynamicAttach:1 GCC_PACK(4);
+    FPlane FrustumPlanes[6] GCC_PACK(4);
+    FVector FrustumVertices[8];
+    FBox Box;
+    FProjectorRenderInfoPtr RenderInfo;
+    class UTexture* GradientTexture;
+    FMatrix GradientMatrix;
+    FMatrix Matrix;
+    FVector OldLocation;
+    BITFIELD bNoProjectOnOwner:1;
+    FLOAT FadeInTime;
+#else
     BYTE MaterialBlendingOp GCC_PACK(4);
     BYTE FrameBufferBlendingOp;
     class UMaterial* ProjTexture GCC_PACK(4);
@@ -4740,6 +6132,7 @@ public:
     FMatrix GradientMatrix;
     FMatrix Matrix;
     FVector OldLocation;
+#endif
     DECLARE_FUNCTION(execDetachActor);
     DECLARE_FUNCTION(execAttachActor);
     DECLARE_FUNCTION(execAbandonProjector);
@@ -4757,6 +6150,33 @@ struct AEmitter_eventSpawnParticle_Parms
 class ENGINE_API AEmitter : public AActor
 {
 public:
+#if UE_SHREK2
+    TArrayNoInit<class UParticleEmitter*> Emitters;
+    BITFIELD AutoDestroy:1 GCC_PACK(4);
+    BITFIELD AutoReset:1;
+    BITFIELD DisableFogging:1;
+    FRangeVector GlobalOffsetRange GCC_PACK(4);
+    FRange TimeTillResetRange;
+    INT Initialized;
+    FBox BoundingBox;
+    FLOAT EmitterRadius;
+    FLOAT EmitterHeight;
+    BITFIELD ActorForcesEnabled:1 GCC_PACK(4);
+    FVector GlobalOffset GCC_PACK(4);
+    FLOAT TimeTillReset;
+    BITFIELD UseParticleProjectors:1 GCC_PACK(4);
+    class UParticleMaterial* ParticleMaterial GCC_PACK(4);
+    BITFIELD DeleteParticleEmitters:1 GCC_PACK(4);
+    TArray<FSavedEmitterInfo> savedInfos GCC_PACK(4);
+    BITFIELD TriggerToggleSpawning:1 GCC_PACK(4);
+    FLOAT fTimeToFill GCC_PACK(4);
+    FLOAT fTimeSoFar;
+    BITFIELD bAddOverTime:1 GCC_PACK(4);
+    BITFIELD bDeleteOverTime:1;
+    FScriptDelegate __LineExpression__Delegate GCC_PACK(4);
+    FVector OldLocation;
+    FVector AbsoluteVelocity;
+#else
     TArrayNoInit<class UParticleEmitter*> Emitters GCC_PACK(4);
     FRangeVector GlobalOffsetRange;
     FRange TimeTillResetRange;
@@ -4775,6 +6195,7 @@ public:
     BITFIELD DeleteParticleEmitters:1;
     BITFIELD ActorForcesEnabled:1;
     class UParticleMaterial* ParticleMaterial GCC_PACK(4);
+#endif
     DECLARE_FUNCTION(execKill);
     void eventSpawnParticle(INT Amount)
     {
@@ -4814,6 +6235,93 @@ struct AMover_eventKeyFrameReached_Parms
 class ENGINE_API AMover : public AActor
 {
 public:
+#if UE_SHREK2
+    BYTE MoverEncroachType;
+    BYTE MoverGlideType;
+    BYTE BumpType;
+    BYTE KeyNum;
+    BYTE PrevKeyNum;
+    BYTE NumKeys;
+    BYTE WorldRaytraceKey;
+    BYTE BrushRaytraceKey;
+    FLOAT MoveTime;
+    FLOAT MoveTimes[24];
+    FLOAT StayOpenTimes[24];
+    FLOAT StayOpenTime;
+    FLOAT OtherTime;
+    INT EncroachDamage;
+    BITFIELD bTriggerOnceOnly:1 GCC_PACK(4);
+    BITFIELD bSlave:1;
+    BITFIELD bUseTriggered:1;
+    BITFIELD bDamageTriggered:1;
+    BITFIELD bDynamicLightMover:1;
+    BITFIELD bUseShortestRotation:1;
+    BITFIELD bIsLeader:1;
+    FName PlayerBumpEvent GCC_PACK(4);
+    FName BumpEvent;
+    class AActor* SavedTrigger;
+    FLOAT DamageThreshold;
+    INT numTriggerEvents;
+    class AMover* Leader;
+    class AMover* Follower;
+    FName ReturnGroup;
+    FLOAT DelayTime;
+    class USound* OpeningSound;
+    class USound* OpenedSound;
+    class USound* ClosingSound;
+    class USound* ClosedSound;
+    class USound* MoveAmbientSound;
+    class USound* LoopSound;
+    FName OpeningEvent;
+    FName OpenedEvent;
+    FName ClosingEvent;
+    FName ClosedEvent;
+    FName LoopEvent;
+    FVector KeyPos[24];
+    FRotator KeyRot[24];
+    FVector BasePos;
+    FVector OldPos;
+    FVector OldPrePivot;
+    FVector SavedPos;
+    FRotator BaseRot;
+    FRotator OldRot;
+    FRotator SavedRot;
+    FLOAT PhysAlpha;
+    FLOAT PhysRate;
+    class ANavigationPoint* myMarker;
+    BITFIELD bOpening:1 GCC_PACK(4);
+    BITFIELD bDelaying:1;
+    BITFIELD bClientPause:1;
+    BITFIELD bClosed:1;
+    BITFIELD bPlayerOnly:1;
+    BITFIELD bAutoDoor:1;
+    BITFIELD bNoAIRelevance:1;
+    FVector SimOldPos GCC_PACK(4);
+    INT SimOldRotPitch;
+    INT SimOldRotYaw;
+    INT SimOldRotRoll;
+    FVector SimInterpolate;
+    FVector RealPosition;
+    FRotator RealRotation;
+    INT ClientUpdate;
+    TArrayNoInit<class AAntiPortalActor*> AntiPortals;
+    FName AntiPortalTag;
+    FLOAT MoverSpringTime;
+    FLOAT MoverMaxAmplitude;
+    BYTE MoverFluctuations;
+    FLOAT LastMoveTime;
+    BITFIELD bProjTargetMover:1 GCC_PACK(4);
+    BYTE StartKeyNum;
+    BITFIELD bToggleDirection:1;
+    BITFIELD bJumpLift:1;
+    BITFIELD bOscillatingLoop:1;
+    BYTE ClientStop;
+    BYTE StoppedPosition;
+    INT StepDirection;
+    BITFIELD bResetting:1;
+    BITFIELD BACKUP_bHidden:1;
+    FName Backup_InitialState;
+#else
     BYTE MoverEncroachType GCC_PACK(4);
     BYTE MoverGlideType;
     BYTE BumpType;
@@ -4892,6 +6400,7 @@ public:
     BITFIELD bResetting:1 GCC_PACK(4);
     BITFIELD BACKUP_bHidden:1;
     FName Backup_InitialState GCC_PACK(4);
+#endif
     void eventKeyFrameReached()
     {
         ProcessEvent(FindFunctionChecked(ENGINE_KeyFrameReached),NULL);
@@ -4913,12 +6422,21 @@ public:
 class ENGINE_API AFluidSurfaceOscillator : public AActor
 {
 public:
+#if UE_SHREK2
+    class AFluidSurfaceInfo* FluidInfo;
+    FLOAT Frequency;
+    BYTE Phase;
+    FLOAT Strength;
+    FLOAT Radius;
+    FLOAT OscTime;
+#else
     class AFluidSurfaceInfo* FluidInfo GCC_PACK(4);
     FLOAT Frequency;
     BYTE Phase;
     FLOAT Strength GCC_PACK(4);
     FLOAT Radius;
     FLOAT OscTime;
+#endif
     DECLARE_CLASS(AFluidSurfaceOscillator,AActor,0,Engine)
 	void UpdateOscillation( FLOAT DeltaTime );
 	virtual void PostEditChange();
@@ -4952,6 +6470,69 @@ struct ANavigationPoint_eventSpecialCost_Parms
 class ENGINE_API ANavigationPoint : public AActor
 {
 public:
+#if UE_SHREK2
+    TArrayNoInit<class UReachSpec*> PathList;
+    FName ProscribedPaths[4];
+    FName ForcedPaths[4];
+    INT visitedWeight;
+    INT bestPathWeight;
+    class ANavigationPoint* nextNavigationPoint;
+    class ANavigationPoint* nextOrdered;
+    class ANavigationPoint* prevOrdered;
+    class ANavigationPoint* previousPath;
+    INT cost;
+    INT ExtraCost;
+    INT TransientCost;
+    INT FearCost;
+    BITFIELD bEndPoint:1 GCC_PACK(4);
+    BITFIELD bTransientEndPoint:1;
+    BITFIELD taken:1;
+    BITFIELD bBlocked:1;
+    BITFIELD bPropagatesSound:1;
+    BITFIELD bOneWayPath:1;
+    BITFIELD bNeverUseStrafing:1;
+    BITFIELD bAlwaysUseStrafing:1;
+    BITFIELD bForceNoStrafing:1;
+    BITFIELD bAutoBuilt:1;
+    BITFIELD bSpecialMove:1;
+    BITFIELD bNoAutoConnect:1;
+    BITFIELD bNotBased:1;
+    BITFIELD bPathsChanged:1;
+    BITFIELD bDestinationOnly:1;
+    BITFIELD bSourceOnly:1;
+    BITFIELD bSpecialForced:1;
+    BITFIELD bMustBeReachable:1;
+    class APickup* InventoryCache GCC_PACK(4);
+    FLOAT InventoryDist;
+    BITFIELD bUseAsRelocationPoint:1 GCC_PACK(4);
+    BITFIELD bUseScoutExtent:1;
+    FLOAT fTimeOfLastCostCheck GCC_PACK(4);
+    FLOAT fSpecialCostTemp;
+    BITFIELD bDoDynamicCost:1 GCC_PACK(4);
+    FLOAT fMinTimeBetweenDynamicPathChecks GCC_PACK(4);
+    FLOAT fMaxRadiusFromNPCForDynamicPathCheck;
+    class UObject* cDelegate;
+    BITFIELD bQuerySpecialCost:1 GCC_PACK(4);
+    BITFIELD bFlyingOnly:1;
+    INT FlyingCost GCC_PACK(4);
+    BITFIELD bGroundOnly:1 GCC_PACK(4);
+    INT GroundCost GCC_PACK(4);
+    BITFIELD bHideEditorPaths:1;
+    BITFIELD bCanReach:1;
+    BITFIELD bBlockable:1;
+    BITFIELD bFlyingPreferred:1;
+    BITFIELD bMayCausePain:1;
+    BITFIELD bReceivePlayerToucherDiedNotify:1;
+    BITFIELD bAlreadyVisited:1;
+    BITFIELD bVehicleDestination:1;
+    BITFIELD bMakeSourceOnly:1;
+    BITFIELD bNoSuperSize:1;
+    BITFIELD bForcedOnly:1;
+    FLOAT LastDetourWeight;
+    BYTE BaseVisible[2];
+    FLOAT BaseDist[2];
+    FVector MaxPathSize;
+#else
     BITFIELD bEndPoint:1 GCC_PACK(4);
     BITFIELD bTransientEndPoint:1;
     BITFIELD bHideEditorPaths:1;
@@ -5000,6 +6581,7 @@ public:
     BYTE BaseVisible[2];
     FLOAT BaseDist[2] GCC_PACK(4);
     FVector MaxPathSize;
+#endif
     DECLARE_FUNCTION(execSetBaseDistance);
     BITFIELD eventSuggestMovePreparation(class APawn* Other)
     {
@@ -5087,12 +6669,21 @@ public:
 class ENGINE_API AJumpDest : public ANavigationPoint
 {
 public:
+#if UE_SHREK2
+    BITFIELD bOptionalJumpDest:1 GCC_PACK(4);
+    INT NumUpstreamPaths GCC_PACK(4);
+    class UReachSpec* UpstreamPaths[8];
+    FVector NeededJump[8];
+    FLOAT CalculatedGravityZ[8];
+    BITFIELD bForceDoubleJump:1;
+#else
     BITFIELD bOptionalJumpDest:1 GCC_PACK(4);
     BITFIELD bForceDoubleJump:1;
     INT NumUpstreamPaths GCC_PACK(4);
     class UReachSpec* UpstreamPaths[8];
     FVector NeededJump[8];
     FLOAT CalculatedGravityZ[8];
+#endif
     DECLARE_CLASS(AJumpDest,ANavigationPoint,0,Engine)
 	virtual void SetupForcedPath(APawn* Scout, UReachSpec* Path);
 	void ClearPaths();
@@ -5103,11 +6694,19 @@ public:
 class ENGINE_API AJumpPad : public ANavigationPoint
 {
 public:
+#if UE_SHREK2
+    FVector JumpVelocity;
+    class AActor* JumpTarget;
+    FLOAT JumpZModifier;
+    class USound* JumpSound;
+    FVector BACKUP_JumpVelocity;
+#else
     FVector JumpVelocity GCC_PACK(4);
     FVector BACKUP_JumpVelocity;
     class AActor* JumpTarget;
     FLOAT JumpZModifier;
     class USound* JumpSound;
+#endif
     DECLARE_CLASS(AJumpPad,ANavigationPoint,0,Engine)
 	void addReachSpecs(APawn * Scout, UBOOL bOnlyChanged);
 	void RenderEditorSelected(FLevelSceneNode* SceneNode,FRenderInterface* RI, FDynamicActor* FDA);
@@ -5117,6 +6716,16 @@ public:
 class ENGINE_API ADoor : public ANavigationPoint
 {
 public:
+#if UE_SHREK2
+    FName DoorTag;
+    class AMover* MyDoor;
+    FName DoorTrigger;
+    class AActor* RecommendedTrigger;
+    BITFIELD bInitiallyClosed:1 GCC_PACK(4);
+    BITFIELD bBlockedWhenClosed:1;
+    BITFIELD bDoorOpen:1;
+    BITFIELD bTempNoCollide:1;
+#else
     FName DoorTag GCC_PACK(4);
     class AMover* MyDoor;
     FName DoorTrigger;
@@ -5125,6 +6734,7 @@ public:
     BITFIELD bBlockedWhenClosed:1;
     BITFIELD bDoorOpen:1;
     BITFIELD bTempNoCollide:1;
+#endif
     DECLARE_CLASS(ADoor,ANavigationPoint,0,Engine)
     #include "ADoor.h"
 };
@@ -5149,8 +6759,13 @@ public:
 class ENGINE_API ALadder : public ASmallNavigationPoint
 {
 public:
+#if UE_SHREK2
+    class ALadderVolume* MyLadder;
+    class ALadder* LadderList;
+#else
     class ALadderVolume* MyLadder GCC_PACK(4);
     class ALadder* LadderList;
+#endif
     DECLARE_CLASS(ALadder,ASmallNavigationPoint,0,Engine)
     #include "ALadder.h"
 };
@@ -5167,9 +6782,15 @@ public:
 class ENGINE_API AWarpZoneMarker : public ASmallNavigationPoint
 {
 public:
+#if UE_SHREK2
+    class AWarpZoneInfo* markedWarpZone;
+    class AActor* TriggerActor;
+    class AActor* TriggerActor2;
+#else
     class AWarpZoneInfo* markedWarpZone GCC_PACK(4);
     class AActor* TriggerActor;
     class AActor* TriggerActor2;
+#endif
     DECLARE_CLASS(AWarpZoneMarker,ASmallNavigationPoint,0,Engine)
     #include "AWarpZoneMarker.h"
 };
@@ -5178,7 +6799,11 @@ public:
 class ENGINE_API AAIMarker : public ASmallNavigationPoint
 {
 public:
+#if UE_SHREK2
+    class AAIScript* markedScript;
+#else
     class AAIScript* markedScript GCC_PACK(4);
+#endif
     DECLARE_CLASS(AAIMarker,ASmallNavigationPoint,0,Engine)
 	virtual UBOOL IsIdentifiedAs(FName ActorName);
 };
@@ -5187,9 +6812,15 @@ public:
 class ENGINE_API AInventorySpot : public ASmallNavigationPoint
 {
 public:
+#if UE_SHREK2
+    class APickup* markedItem;
+    class AxPickUpBase* myPickupBase;
+    BITFIELD bSuperPickup:1;
+#else
     class APickup* markedItem GCC_PACK(4);
     class AxPickUpBase* myPickupBase;
     BITFIELD bSuperPickup:1 GCC_PACK(4);
+#endif
     DECLARE_CLASS(AInventorySpot,ASmallNavigationPoint,0,Engine)
 	virtual UBOOL IsIdentifiedAs(FName ActorName);
     virtual AInventorySpot* GetAInventorySpot() { return this; } 
@@ -5199,11 +6830,23 @@ public:
 class ENGINE_API APlayerStart : public ASmallNavigationPoint
 {
 public:
+#if UE_SHREK2
+    BYTE TeamNumber;
+    BITFIELD bSinglePlayerStart:1 GCC_PACK(4);
+    BITFIELD bCoopStart:1;
+    BITFIELD bEnabled:1;
+    BITFIELD bPrimaryStart:1;
+    FLOAT LastSpawnCampTime GCC_PACK(4);
+    BITFIELD bAutoSaveToSlot0:1 GCC_PACK(4);
+    INT BookMarkSaveSlot GCC_PACK(4);
+    BITFIELD bSavedToBookMarkSlot:1 GCC_PACK(4);
+#else
     BYTE TeamNumber GCC_PACK(4);
     BITFIELD bSinglePlayerStart:1 GCC_PACK(4);
     BITFIELD bCoopStart:1;
     BITFIELD bEnabled:1;
     BITFIELD bPrimaryStart:1;
+#endif
     DECLARE_CLASS(APlayerStart,ASmallNavigationPoint,0,Engine)
     #include "APlayerStart.h"
 };
@@ -5212,6 +6855,20 @@ public:
 class ENGINE_API ATeleporter : public ASmallNavigationPoint
 {
 public:
+#if UE_SHREK2
+    FStringNoInit URL;
+    FName ProductRequired;
+    BITFIELD bChangesVelocity:1 GCC_PACK(4);
+    BITFIELD bChangesYaw:1;
+    BITFIELD bReversesX:1;
+    BITFIELD bReversesY:1;
+    BITFIELD bReversesZ:1;
+    BITFIELD bEnabled:1;
+    FVector TargetVelocity GCC_PACK(4);
+    class AActor* TriggerActor;
+    class AActor* TriggerActor2;
+    FLOAT LastFired;
+#else
     FStringNoInit URL GCC_PACK(4);
     FName ProductRequired;
     BITFIELD bChangesVelocity:1 GCC_PACK(4);
@@ -5224,6 +6881,7 @@ public:
     class AActor* TriggerActor;
     class AActor* TriggerActor2;
     FLOAT LastFired;
+#endif
     DECLARE_CLASS(ATeleporter,ASmallNavigationPoint,0,Engine)
     #include "ATeleporter.h"
 };
@@ -5232,12 +6890,21 @@ public:
 class ENGINE_API ALiftExit : public ANavigationPoint
 {
 public:
+#if UE_SHREK2
+    FName LiftTag;
+    class AMover* MyLift;
+    BYTE SuggestedKeyFrame;
+    BYTE KeyFrame;
+    BITFIELD bLiftJumpExit:1;
+    BITFIELD bNoDoubleJump:1;
+#else
     FName LiftTag GCC_PACK(4);
     class AMover* MyLift;
     BYTE SuggestedKeyFrame;
     BYTE KeyFrame;
     BITFIELD bLiftJumpExit:1 GCC_PACK(4);
     BITFIELD bNoDoubleJump:1;
+#endif
     DECLARE_CLASS(ALiftExit,ANavigationPoint,0,Engine)
     NO_DEFAULT_CONSTRUCTOR(ALiftExit)
 };
@@ -5246,12 +6913,21 @@ public:
 class ENGINE_API ALiftCenter : public ANavigationPoint
 {
 public:
+#if UE_SHREK2
+    FName LiftTag;
+    class AMover* MyLift;
+    FName LiftTrigger;
+    class ATrigger* RecommendedTrigger;
+    FLOAT MaxDist2D;
+    FVector LiftOffset;
+#else
     FName LiftTag GCC_PACK(4);
     class AMover* MyLift;
     FName LiftTrigger;
     class ATrigger* RecommendedTrigger;
     FLOAT MaxDist2D;
     FVector LiftOffset;
+#endif
     DECLARE_CLASS(ALiftCenter,ANavigationPoint,0,Engine)
     #include "ALiftCenter.h"
 };
@@ -5268,7 +6944,11 @@ public:
 class ENGINE_API AAvoidMarker : public ATriggers
 {
 public:
+#if UE_SHREK2
+    BYTE TeamNum;
+#else
     BYTE TeamNum GCC_PACK(4);
+#endif
     DECLARE_CLASS(AAvoidMarker,ATriggers,0,Engine)
     NO_DEFAULT_CONSTRUCTOR(AAvoidMarker)
 };
@@ -5281,6 +6961,16 @@ struct ALineOfSightTrigger_eventPlayerSeesMe_Parms
 class ENGINE_API ALineOfSightTrigger : public ATriggers
 {
 public:
+#if UE_SHREK2
+    FLOAT MaxViewDist;
+    FLOAT OldTickTime;
+    BITFIELD bEnabled:1 GCC_PACK(4);
+    BITFIELD bTriggered:1;
+    FName SeenActorTag GCC_PACK(4);
+    class AActor* SeenActor;
+    INT MaxViewAngle;
+    FLOAT RequiredViewDir;
+#else
     FLOAT MaxViewDist GCC_PACK(4);
     FLOAT OldTickTime;
     BITFIELD bEnabled:1 GCC_PACK(4);
@@ -5289,6 +6979,7 @@ public:
     class AActor* SeenActor;
     INT MaxViewAngle;
     FLOAT RequiredViewDir;
+#endif
     void eventPlayerSeesMe(class APlayerController* P)
     {
         ALineOfSightTrigger_eventPlayerSeesMe_Parms Parms;
@@ -5303,10 +6994,17 @@ public:
 class ENGINE_API ASVehicleTrigger : public ATriggers
 {
 public:
+#if UE_SHREK2
+    BITFIELD bEnabled:1;
+    BITFIELD BACKUP_bEnabled:1;
+    BITFIELD bMarkWithPath:1;
+    class ANavigationPoint* myMarker;
+#else
     BITFIELD bEnabled:1 GCC_PACK(4);
     BITFIELD BACKUP_bEnabled:1;
     BITFIELD bMarkWithPath:1;
     class ANavigationPoint* myMarker GCC_PACK(4);
+#endif
     DECLARE_CLASS(ASVehicleTrigger,ATriggers,0,Engine)
 	virtual UBOOL ReachedBy(APawn * P, FVector Loc);
 };
@@ -5326,6 +7024,31 @@ enum ETriggerType
 class ENGINE_API ATrigger : public ATriggers
 {
 public:
+#if UE_SHREK2
+    BYTE TriggerType;
+    FStringNoInit Message;
+    BITFIELD bTriggerOnceOnly:1 GCC_PACK(4);
+    BITFIELD bInitiallyActive:1;
+    class UClass* ClassProximityType GCC_PACK(4);
+    FLOAT RepeatTriggerTime;
+    FLOAT ReTriggerDelay;
+    FLOAT TriggerTime;
+    FLOAT DamageThreshold;
+    class AActor* TriggerActor;
+    class AActor* TriggerActor2;
+    BITFIELD bSavedInitialCollision:1 GCC_PACK(4);
+    BITFIELD bSavedInitialActive:1;
+    BITFIELD bTT_CP_EventMustMatchTag:1;
+    BITFIELD bDoActionWhenTriggered:1;
+    BITFIELD bActivateOnUntouchInsteadOfTouch:1;
+    BITFIELD bTriggerByDirection:1;
+    FName OppositeDirectionEvent GCC_PACK(4);
+    BYTE TellOtherTrigger;
+    TArray<FName> MultiEvents;
+    BITFIELD bOneAtATime:1 GCC_PACK(4);
+    BITFIELD bLoop:1;
+    INT NextEventIndex GCC_PACK(4);
+#else
     BYTE TriggerType GCC_PACK(4);
     FStringNoInit Message GCC_PACK(4);
     BITFIELD bTriggerOnceOnly:1 GCC_PACK(4);
@@ -5339,6 +7062,7 @@ public:
     class AActor* TriggerActor2;
     BITFIELD bSavedInitialCollision:1 GCC_PACK(4);
     BITFIELD bSavedInitialActive:1;
+#endif
     DECLARE_CLASS(ATrigger,ATriggers,0,Engine)
     NO_DEFAULT_CONSTRUCTOR(ATrigger)
 };
@@ -5355,8 +7079,13 @@ public:
 class ENGINE_API AInventoryAttachment : public AActor
 {
 public:
+#if UE_SHREK2
+    BITFIELD bFastAttachmentReplication:1;
+    INT inventoryattachment_dummy;
+#else
     BITFIELD bFastAttachmentReplication:1 GCC_PACK(4);
     INT inventoryattachment_dummy GCC_PACK(4);
+#endif
     DECLARE_CLASS(AInventoryAttachment,AActor,0|CLASS_NativeReplication,Engine)
 	INT* GetOptimizedRepList( BYTE* Recent, FPropertyRetirement* Retire, INT* Ptr, UPackageMap* Map, UActorChannel* Channel );
 };
@@ -5368,6 +7097,17 @@ struct AWeaponAttachment_eventThirdPersonEffects_Parms
 class ENGINE_API AWeaponAttachment : public AInventoryAttachment
 {
 public:
+#if UE_SHREK2
+    BYTE FlashCount;
+    BITFIELD bAutoFire:1 GCC_PACK(4);
+    INT FiringMode GCC_PACK(4);
+    FLOAT FiringSpeed;
+    BYTE SpawnHitCount;
+    FVector mHitLocation;
+    BITFIELD bMatchWeapons:1;
+    FColor BeaconColor;
+    class UClass* SplashEffect;
+#else
     BYTE FlashCount GCC_PACK(4);
     BYTE FiringMode;
     BYTE SpawnHitCount;
@@ -5377,6 +7117,7 @@ public:
     BITFIELD bMatchWeapons:1 GCC_PACK(4);
     FColor BeaconColor GCC_PACK(4);
     class UClass* SplashEffect;
+#endif
     void eventThirdPersonEffects()
     {
         ProcessEvent(FindFunctionChecked(ENGINE_ThirdPersonEffects),NULL);
@@ -5398,6 +7139,17 @@ enum ECsgOper
 class ENGINE_API ABrush : public AActor
 {
 public:
+#if UE_SHREK2
+    BYTE CsgOper;
+    class UObject* UnusedLightMesh;
+    FVector PostPivot;
+    FScale MainScale;
+    FScale PostScale;
+    FScale TempScale;
+    FColor BrushColor;
+    INT PolyFlags;
+    BITFIELD bColored:1 GCC_PACK(4);
+#else
     BYTE CsgOper GCC_PACK(4);
     class UObject* UnusedLightMesh GCC_PACK(4);
     FVector PostPivot;
@@ -5407,6 +7159,7 @@ public:
     FColor BrushColor;
     INT PolyFlags;
     BITFIELD bColored:1 GCC_PACK(4);
+#endif
     DECLARE_CLASS(ABrush,AActor,0,Engine)
     #include "ABrush.h"
 };
@@ -5415,11 +7168,19 @@ public:
 class ENGINE_API AVolume : public ABrush
 {
 public:
+#if UE_SHREK2
+    class AActor* AssociatedActor;
+    FName AssociatedActorTag;
+    INT LocationPriority;
+    FStringNoInit LocationName;
+    class ADecorationList* DecoList;
+#else
     class AActor* AssociatedActor GCC_PACK(4);
     FName AssociatedActorTag;
     INT LocationPriority;
     FStringNoInit LocationName;
     class ADecorationList* DecoList;
+#endif
     DECLARE_FUNCTION(execEncompasses);
     DECLARE_CLASS(AVolume,ABrush,0,Engine)
     #include "AVolume.h"
@@ -5429,9 +7190,15 @@ public:
 class ENGINE_API ABlockingVolume : public AVolume
 {
 public:
+#if UE_SHREK2
+    BITFIELD bClampFluid:1 GCC_PACK(4);
+    BITFIELD bClassBlocker:1;
+    TArrayNoInit<class UClass*> BlockedClasses;
+#else
     BITFIELD bClampFluid:1 GCC_PACK(4);
     BITFIELD bClassBlocker:1;
     TArrayNoInit<class UClass*> BlockedClasses GCC_PACK(4);
+#endif
     DECLARE_CLASS(ABlockingVolume,AVolume,0,Engine)
     virtual UBOOL ShouldTrace(AActor *SourceActor, DWORD TraceFlags);
 };
@@ -5460,6 +7227,45 @@ struct APhysicsVolume_eventPhysicsChangedFor_Parms
 class ENGINE_API APhysicsVolume : public AVolume
 {
 public:
+#if UE_SHREK2
+    BITFIELD bPainCausing:1 GCC_PACK(4);
+    FVector ZoneVelocity GCC_PACK(4);
+    FVector Gravity;
+    FLOAT GroundFriction;
+    FLOAT TerminalVelocity;
+    FLOAT DamagePerSec;
+    class UClass* DamageType;
+    INT Priority;
+    class USound* EntrySound;
+    class USound* ExitSound;
+    class UClass* EntryActor;
+    class UClass* ExitActor;
+    FLOAT FluidFriction;
+    FVector ViewFlash;
+    FVector ViewFog;
+    BITFIELD bDestructive:1 GCC_PACK(4);
+    BITFIELD bNoInventory:1;
+    BITFIELD bMoveProjectiles:1;
+    BITFIELD bBounceVelocity:1;
+    BITFIELD bNeutralZone:1;
+    BITFIELD bWaterVolume:1;
+    BITFIELD bAffectAllActors:1;
+    class AInfo* PainTimer GCC_PACK(4);
+    BITFIELD bDistanceFog:1 GCC_PACK(4);
+    FColor DistanceFogColor GCC_PACK(4);
+    FLOAT DistanceFogStart;
+    FLOAT DistanceFogEnd;
+    FLOAT KExtraLinearDamping;
+    FLOAT KExtraAngularDamping;
+    FLOAT KBuoyancy;
+    class APhysicsVolume* NextPhysicsVolume;
+    FVector BACKUP_Gravity;
+    class UI3DL2Listener* VolumeEffect;
+    class UClass* PawnEntryActor;
+    BITFIELD BACKUP_bPainCausing:1;
+    BITFIELD bNoDecals:1;
+    BITFIELD bDamagesVehicles:1;
+#else
     FVector ZoneVelocity GCC_PACK(4);
     FVector Gravity;
     FVector BACKUP_Gravity;
@@ -5496,6 +7302,7 @@ public:
     FLOAT KBuoyancy;
     class AInfo* PainTimer;
     class APhysicsVolume* NextPhysicsVolume;
+#endif
     void eventPawnLeavingVolume(class APawn* Other)
     {
         APhysicsVolume_eventPawnLeavingVolume_Parms Parms;
@@ -5544,6 +7351,23 @@ public:
 class ENGINE_API ALadderVolume : public APhysicsVolume
 {
 public:
+#if UE_SHREK2
+    FName ClimbingAnimation;
+    FName TopAnimation;
+    FRotator WallDir;
+    FVector LookDir;
+    FVector ClimbDir;
+    class ALadder* LadderList;
+    BITFIELD bNoPhysicalLadder:1 GCC_PACK(4);
+    BITFIELD bAutoPath:1;
+    class APawn* PendingClimber GCC_PACK(4);
+    BITFIELD bUseLookDirForAI:1 GCC_PACK(4);
+    BITFIELD bMustEncompassPawn:1;
+    FName LadderMarkerTag GCC_PACK(4);
+    class AActor* MyLadderMarker;
+    BITFIELD bForceSuccessfulMove:1 GCC_PACK(4);
+    BITFIELD bAllowLadderStrafing:1;
+#else
     FName ClimbingAnimation GCC_PACK(4);
     FName TopAnimation;
     FRotator WallDir;
@@ -5554,6 +7378,7 @@ public:
     BITFIELD bAutoPath:1;
     BITFIELD bAllowLadderStrafing:1;
     class APawn* PendingClimber GCC_PACK(4);
+#endif
     DECLARE_CLASS(ALadderVolume,APhysicsVolume,0,Engine)
     #include "ALadderVolume.h"
 };
@@ -5570,6 +7395,66 @@ public:
 class ENGINE_API ADamageType : public AActor
 {
 public:
+#if UE_SHREK2
+    FStringNoInit DeathString;
+    FStringNoInit FemaleSuicide;
+    FStringNoInit MaleSuicide;
+    FLOAT ViewFlash;
+    FVector ViewFog;
+    class UClass* DamageEffect;
+    FStringNoInit DamageWeaponName;
+    BITFIELD bArmorStops:1 GCC_PACK(4);
+    BITFIELD bInstantHit:1;
+    BITFIELD bFastInstantHit:1;
+    BITFIELD bAlwaysGibs:1;
+    BITFIELD bNoSpecificLocation:1;
+    BITFIELD bSkeletize:1;
+    BITFIELD bCausesBlood:1;
+    BITFIELD bKUseOwnDeathVel:1;
+    FLOAT GibModifier GCC_PACK(4);
+    class UClass* PawnDamageEffect;
+    class UClass* PawnDamageEmitter;
+    TArrayNoInit<class USound*> PawnDamageSounds;
+    class UClass* LowGoreDamageEffect;
+    class UClass* LowGoreDamageEmitter;
+    TArrayNoInit<class USound*> LowGoreDamageSounds;
+    class UClass* LowDetailEffect;
+    class UClass* LowDetailEmitter;
+    FLOAT FlashScale;
+    FVector FlashFog;
+    INT DamageDesc;
+    INT DamageThreshold;
+    FVector DamageKick;
+    FLOAT KDamageImpulse;
+    FLOAT KDeathVel;
+    FLOAT KDeathUpKick;
+    BITFIELD bLocationalHit:1;
+    BITFIELD bAlwaysSevers:1;
+    BITFIELD bSpecial:1;
+    BITFIELD bDetonatesGoop:1;
+    BITFIELD bCauseConvulsions:1;
+    BITFIELD bSuperWeapon:1;
+    BITFIELD bKUseTearOffMomentum:1;
+    BITFIELD bDelayedDamage:1;
+    BITFIELD bNeverSevers:1;
+    BITFIELD bThrowRagdoll:1;
+    BITFIELD bRagdollBullet:1;
+    BITFIELD bLeaveBodyEffect:1;
+    BITFIELD bExtraMomentumZ:1;
+    BITFIELD bFlaming:1;
+    BITFIELD bRubbery:1;
+    BITFIELD bCausedByWorld:1;
+    BITFIELD bDirectDamage:1;
+    BITFIELD bBulletHit:1;
+    BITFIELD bVehicleHit:1;
+    class UMaterial* DamageOverlayMaterial;
+    class UMaterial* DeathOverlayMaterial;
+    FLOAT DamageOverlayTime;
+    FLOAT DeathOverlayTime;
+    FLOAT GibPerterbation;
+    FLOAT VehicleDamageScaling;
+    FLOAT VehicleMomentumScaling;
+#else
     FStringNoInit DeathString GCC_PACK(4);
     FStringNoInit FemaleSuicide;
     FStringNoInit MaleSuicide;
@@ -5627,6 +7512,7 @@ public:
     FLOAT KDeathUpKick;
     FLOAT VehicleDamageScaling;
     FLOAT VehicleMomentumScaling;
+#endif
     DECLARE_CLASS(ADamageType,AActor,0,Engine)
     NO_DEFAULT_CONSTRUCTOR(ADamageType)
 };
@@ -5647,10 +7533,17 @@ struct ASVehicleFactory_eventVehicleDestroyed_Parms
 class ENGINE_API ASVehicleFactory : public AActor
 {
 public:
+#if UE_SHREK2
+    class UClass* VehicleClass;
+    INT MaxVehicleCount;
+    INT VehicleCount;
+    class ANavigationPoint* myMarker;
+#else
     class UClass* VehicleClass GCC_PACK(4);
     INT MaxVehicleCount;
     INT VehicleCount;
     class ANavigationPoint* myMarker;
+#endif
     void eventVehicleUnPossessed(class AVehicle* V)
     {
         ASVehicleFactory_eventVehicleUnPossessed_Parms Parms;
@@ -5808,6 +7701,99 @@ struct AController_eventMayFall_Parms
 class ENGINE_API AController : public AActor
 {
 public:
+#if UE_SHREK2
+    class APawn* Pawn;
+    INT PlayerNum;
+    FLOAT SightCounter;
+    FLOAT FovAngle;
+    FLOAT Handedness;
+    BITFIELD bIsPlayer:1 GCC_PACK(4);
+    BITFIELD bGodMode:1;
+    BITFIELD bLOSflag:1;
+    BITFIELD bAdvancedTactics:1;
+    BITFIELD bCanOpenDoors:1;
+    BITFIELD bCanDoSpecial:1;
+    BITFIELD bAdjusting:1;
+    BITFIELD bPreparingMove:1;
+    BITFIELD bControlAnimations:1;
+    BITFIELD bEnemyInfoValid:1;
+    BITFIELD bNotifyApex:1;
+    BITFIELD bUsePlayerHearing:1;
+    BITFIELD bJumpOverWall:1;
+    BITFIELD bEnemyAcquired:1;
+    BITFIELD bSoaking:1;
+    BITFIELD bHuntPlayer:1;
+    BITFIELD bAllowedToTranslocate:1;
+    BITFIELD bAllowedToImpactJump:1;
+    BYTE bRun GCC_PACK(4);
+    BYTE bDuck;
+    BYTE bFire;
+    BYTE bAltFire;
+    FVector AdjustLoc;
+    class AController* nextController;
+    FLOAT Stimulus;
+    FLOAT MoveTimer;
+    class AActor* MoveTarget;
+    BITFIELD bMoveToSuccess:1 GCC_PACK(4);
+    FVector Destination GCC_PACK(4);
+    FVector FocalPoint;
+    class AActor* Focus;
+    class AMover* PendingMover;
+    class AActor* GoalList[4];
+    class ANavigationPoint* home;
+    FLOAT MinHitWall;
+    FLOAT RespawnPredictionTime;
+    INT AcquisitionYawRate;
+    class APawn* Enemy;
+    class AActor* Target;
+    FVector LastSeenPos;
+    FVector LastSeeingPos;
+    FLOAT LastSeenTime;
+    FStringNoInit VoiceType;
+    FLOAT OldMessageTime;
+    class AActor* RouteCache[16];
+    class UReachSpec* CurrentPath;
+    FVector CurrentPathDir;
+    class AActor* RouteGoal;
+    FLOAT RouteDist;
+    FLOAT LastRouteFind;
+    class UClass* PlayerReplicationInfoClass;
+    class APlayerReplicationInfo* PlayerReplicationInfo;
+    class UClass* PawnClass;
+    class UClass* PreviousPawnClass;
+    FLOAT GroundPitchTime;
+    FVector ViewX;
+    FVector ViewY;
+    FVector ViewZ;
+    class ANavigationPoint* StartSpot;
+    FVector MonitorStartLoc;
+    class APawn* MonitoredPawn;
+    FLOAT MonitorMaxDistSq;
+    class AAvoidMarker* FearSpots[2];
+    class AActor* LastFailedReach;
+    FLOAT FailedReachTime;
+    FVector FailedReachLocation;
+    class UClass* LastPawnWeapon;
+    BITFIELD bAdrenalineEnabled:1;
+    BITFIELD bNotifyFallingHitWall:1;
+    BITFIELD bSlowerZAcquire:1;
+    BITFIELD bInDodgeMove:1;
+    BITFIELD bVehicleTransition:1;
+    BITFIELD bForceStrafe:1;
+    BITFIELD bNotifyPostLanded:1;
+    BYTE bVoiceTalk;
+    FLOAT FocusLead;
+    FLOAT DodgeToGoalPct;
+    FLOAT DodgeLandZ;
+    class AVehicle* LastBlockingVehicle;
+    class UReachSpec* NextRoutePath;
+    FVector DirectionHint;
+    FLOAT WarningDelay;
+    class AProjectile* WarningProjectile;
+    class APawn* ShotTarget;
+    FLOAT Adrenaline;
+    FLOAT AdrenalineMax;
+#else
     class APawn* Pawn GCC_PACK(4);
     INT PlayerNum;
     FLOAT SightCounter;
@@ -5898,6 +7884,7 @@ public:
     FLOAT Adrenaline;
     FLOAT AdrenalineMax;
     class UClass* LastPawnWeapon;
+#endif
     DECLARE_FUNCTION(execCanMakePathTo);
     DECLARE_FUNCTION(execEndClimbLadder);
     DECLARE_FUNCTION(execStopWaiting);
@@ -6314,6 +8301,263 @@ struct APlayerController_eventClientTravel_Parms
 class ENGINE_API APlayerController : public AController
 {
 public:
+#if UE_SHREK2
+    class UPlayer* Player;
+    BITFIELD bLookUpStairs:1 GCC_PACK(4);
+    BITFIELD bSnapToLevel:1;
+    BITFIELD bAlwaysMouseLook:1;
+    BITFIELD bKeyboardLook:1;
+    BITFIELD bCenterView:1;
+    BITFIELD bBehindView:1;
+    BITFIELD bFrozen:1;
+    BITFIELD bPressedJump:1;
+    BITFIELD bDoubleJump:1;
+    BITFIELD bUpdatePosition:1;
+    BITFIELD bIsTyping:1;
+    BITFIELD bFixedCamera:1;
+    BITFIELD bJumpStatus:1;
+    BITFIELD bUpdating:1;
+    BITFIELD bNeverSwitchOnPickup:1;
+    BITFIELD bZooming:1;
+    BITFIELD bAlwaysLevel:1;
+    BITFIELD bSetTurnRot:1;
+    BITFIELD bCheatFlying:1;
+    BITFIELD bFreeCamera:1;
+    BITFIELD bZeroRoll:1;
+    BITFIELD bCameraPositionLocked:1;
+    BITFIELD bViewBot:1;
+    BITFIELD UseFixedVisibility:1;
+    BITFIELD bBlockCloseCamera:1;
+    BITFIELD bValidBehindCamera:1;
+    BITFIELD bForcePrecache:1;
+    BITFIELD bClientDemo:1;
+    BITFIELD bAllActorsRelevant:1;
+    BITFIELD bShortConnectTimeOut:1;
+    BITFIELD bPendingDestroy:1;
+    BITFIELD bNoVoiceMessages:1;
+    BITFIELD bNoVoiceTaunts:1;
+    BITFIELD bNoAutoTaunts:1;
+    BITFIELD bAutoTaunt:1;
+    BITFIELD bNoMatureLanguage:1;
+    BITFIELD bDynamicNetSpeed:1;
+    BYTE AnnouncerLevel GCC_PACK(4);
+    BYTE AnnouncerVolume;
+    FLOAT AimingHelp;
+    FLOAT MaxResponseTime;
+    FLOAT WaitDelay;
+    FLOAT aBaseX;
+    FLOAT aBaseY;
+    FLOAT aBaseZ;
+    FLOAT aMouseX;
+    FLOAT aMouseY;
+    FLOAT aForward;
+    FLOAT aTurn;
+    FLOAT aStrafe;
+    FLOAT aUp;
+    FLOAT aLookUp;
+    BYTE bStrafe;
+    BYTE bSnapLevel;
+    BYTE bLook;
+    BYTE bFreeLook;
+    BYTE bTurn180;
+    BYTE bTurnToNearest;
+    BYTE bXAxis;
+    BYTE bYAxis;
+    BYTE DoubleClickDir;
+    INT ShowFlags;
+    INT Misc1;
+    INT Misc2;
+    INT RendMap;
+    FLOAT OrthoZoom;
+    class AActor* ViewTarget;
+    class AController* RealViewTarget;
+    class APlayerController* DemoViewer;
+    FLOAT CameraDist;
+    FVector OldCameraLoc;
+    FRotator OldCameraRot;
+    TArrayNoInit<class UCameraEffect*> CameraEffects;
+    FLOAT DesiredFOV;
+    FLOAT DefaultFOV;
+    FLOAT ZoomLevel;
+    FVector FixedLocation;
+    FRotator FixedRotation;
+    FMatrix RenderWorldToCamera;
+    FVector FlashScale;
+    FVector FlashFog;
+    FLOAT ConstantGlowScale;
+    FVector ConstantGlowFog;
+    FColor LastDistanceFogColor;
+    FLOAT LastDistanceFogStart;
+    FLOAT LastDistanceFogEnd;
+    FLOAT CurrentDistanceFogEnd;
+    FLOAT TimeSinceLastFogChange;
+    INT LastZone;
+    FRotator TargetViewRotation;
+    FRotator BlendedTargetViewRotation;
+    FLOAT TargetEyeHeight;
+    FVector TargetWeaponViewOffset;
+    class AHUD* myHUD;
+    FLOAT LastPlaySound;
+    FLOAT LastPlaySpeech;
+    FStringNoInit Song;
+    BYTE Transition;
+    class ASavedMove* SavedMoves;
+    class ASavedMove* FreeMoves;
+    class ASavedMove* PendingMove;
+    FLOAT CurrentTimeStamp;
+    FLOAT LastUpdateTime;
+    FLOAT ServerTimeStamp;
+    FLOAT TimeMargin;
+    FLOAT ClientUpdateTime;
+    FLOAT MaxTimeMargin;
+    class AWeapon* OldClientWeapon;
+    INT WeaponUpdate;
+    FStringNoInit ProgressMessage[4];
+    FColor ProgressColor[4];
+    FLOAT ProgressTimeOut;
+    FStringNoInit QuickSaveString;
+    FStringNoInit NoPauseMessage;
+    FStringNoInit ViewingFrom;
+    FStringNoInit OwnCamera;
+    class AGameReplicationInfo* GameReplicationInfo;
+    FStringNoInit StatsUsername;
+    FStringNoInit StatsPassword;
+    class UClass* LocalMessageClass;
+    FLOAT MaxShakeRoll;
+    FVector MaxShakeOffset;
+    FLOAT ShakeRollRate;
+    FVector ShakeOffsetRate;
+    FVector ShakeOffset;
+    FLOAT ShakeRollTime;
+    FVector ShakeOffsetTime;
+    class APawn* TurnTarget;
+    INT EnemyTurnSpeed;
+    INT GroundPitch;
+    FRotator TurnRot180;
+    FVector OldFloor;
+    class UCheatManager* CheatManager;
+    class UClass* CheatClass;
+    class UPlayerInput* PlayerInput;
+    class UClass* InputClass;
+    FVector FailedPathStart;
+    INT DemoViewPitch;
+    INT DemoViewYaw;
+    class ASecurity* PlayerSecurity;
+    FLOAT ForcePrecacheTime;
+    FLOAT LastPingUpdate;
+    FLOAT ExactPing;
+    FLOAT OldPing;
+    FLOAT SpectateSpeed;
+    FLOAT DynamicPingThreshold;
+    FLOAT NextSpeedChange;
+    INT ClientCap;
+    BITFIELD bEnablePickupForceFeedback:1 GCC_PACK(4);
+    BITFIELD bEnableWeaponForceFeedback:1;
+    BITFIELD bEnableDamageForceFeedback:1;
+    BITFIELD bEnableGUIForceFeedback:1;
+    BITFIELD bForceFeedbackSupported:1;
+    BITFIELD bQueuedToSaveGame:1;
+    INT iSaveSlotID GCC_PACK(4);
+    FString AdditionalSaveGameCommand;
+    BITFIELD bHideSpectatorBeacons:1;
+    BITFIELD bHideVehicleNoEntryIndicator:1;
+    BITFIELD bFreeCam:1;
+    BITFIELD bFreeCamZoom:1;
+    BITFIELD bFreeCamSwivel:1;
+    BITFIELD bEnableAmbientShake:1;
+    BITFIELD bNoTextToSpeechVoiceMessages:1;
+    BITFIELD bSmallWeapons:1;
+    BITFIELD bWeaponViewShake:1;
+    BITFIELD bLandingShake:1;
+    BITFIELD bAimingHelp:1;
+    BITFIELD bVoiceChatEnabled:1;
+    BITFIELD bEnableInitialChatRoom:1;
+    BITFIELD bViewingMatineeCinematic:1;
+    BITFIELD bCustomListener:1;
+    BITFIELD bAcuteHearing:1;
+    BITFIELD bMenuBeforeRespawn:1;
+    BITFIELD bSkippedLastUpdate:1;
+    BITFIELD bLastPressedJump:1;
+    BITFIELD bEnableStatsTracking:1;
+    BITFIELD bOnlySpeakTeamText:1;
+    BITFIELD bWasSpeedHack:1;
+    BITFIELD bIsSpaceFighter:1;
+    BITFIELD bWasSaturated:1;
+    FLOAT FOVBias;
+    BYTE AutoJoinMask;
+    FLOAT TextToSpeechVoiceVolume;
+    class APawn* AcknowledgedPawn;
+    FLOAT aLastForward;
+    FLOAT aLastStrafe;
+    FLOAT aLastUp;
+    FLOAT NumServerDrives;
+    FLOAT NumSkips;
+    FLOAT VehicleCheckRadius;
+    BITFIELD bSuccessfulUse:1;
+    FRange CameraDistRange;
+    FLOAT DesiredZoomLevel;
+    FVector ListenerLocation;
+    FRotator ListenerRotation;
+    FLOAT ScreenFlashScaling;
+    FLOAT TimeMarginSlack;
+    class AVoiceChatReplicationInfo* VoiceReplicationInfo;
+    class AVotingReplicationInfoBase* VoteReplicationInfo;
+    class UClass* ChatRoomMessageClass;
+    FVector ShakeOffsetMax;
+    FVector ShakeRotRate;
+    FVector ShakeRotMax;
+    FRotator ShakeRot;
+    FVector ShakeRotTime;
+    FLOAT AmbientShakeFalloffStartTime;
+    FLOAT AmbientShakeFalloffTime;
+    FVector AmbientShakeOffsetMag;
+    FLOAT AmbientShakeOffsetFreq;
+    FRotator AmbientShakeRotMag;
+    FLOAT AmbientShakeRotFreq;
+    class UAdminBase* AdminManager;
+    class AMaplistManagerBase* MapHandler;
+    FStringNoInit PlayerChatType;
+    class APlayerChatManager* ChatManager;
+    FRotator CameraDeltaRotation;
+    FLOAT CameraDeltaRad;
+    FRotator CameraSwivel;
+    FLOAT TeamBeaconMaxDist;
+    FLOAT TeamBeaconPlayerInfoMaxDist;
+    class UTexture* TeamBeaconTexture;
+    class UTexture* LinkBeaconTexture;
+    class UTexture* SpeakingBeaconTexture;
+    FColor TeamBeaconTeamColors[2];
+    FColor TeamBeaconCustomColor;
+    TArrayNoInit<FPlayerNameInfo> PlayerNameArray;
+    FLOAT LoginDelay;
+    FLOAT NextLoginTime;
+    FLOAT VoiceChangeLimit;
+    FStringNoInit MidGameMenuClass;
+    FStringNoInit DemoMenuClass;
+    FStringNoInit AdminMenuClass;
+    FStringNoInit ChatPasswordMenuClass;
+    TArrayNoInit<FStoredChatPassword> StoredChatPasswords;
+    class AVoiceChatRoom* ActiveRoom;
+    FStringNoInit LastActiveChannel;
+    FStringNoInit VoiceChatCodec;
+    FStringNoInit VoiceChatLANCodec;
+    FStringNoInit ChatPassword;
+    FStringNoInit DefaultActiveChannel;
+    FClientAdjustment PendingAdjustment;
+    class AAnnouncerQueueManager* AnnouncerQueueManager;
+    class AAnnouncerVoice* StatusAnnouncer;
+    class AAnnouncerVoice* RewardAnnouncer;
+    FLOAT LastActiveTime;
+    class AActor* CalcViewActor;
+    FVector CalcViewActorLocation;
+    FVector CalcViewLocation;
+    FRotator CalcViewRotation;
+    FLOAT LastPlayerCalcView;
+    FLOAT LastBroadcastTime;
+    FStringNoInit LastBroadcastString[4];
+    FLOAT LastSpeedHackLog;
+    FStringNoInit PlayerOwnerName;
+#else
     class UPlayer* Player GCC_PACK(4);
     BITFIELD bLookUpStairs:1 GCC_PACK(4);
     BITFIELD bSnapToLevel:1;
@@ -6561,6 +8805,7 @@ public:
     FStringNoInit LastBroadcastString[4];
     FLOAT LastSpeedHackLog;
     FStringNoInit PlayerOwnerName;
+#endif
     DECLARE_FUNCTION(execClientHearSound);
     DECLARE_FUNCTION(execFindStairRotation);
     DECLARE_FUNCTION(execCheckSpeedHack);
@@ -6816,11 +9061,19 @@ public:
 class ENGINE_API AAIController : public AController
 {
 public:
+#if UE_SHREK2
+    BITFIELD bHunting:1 GCC_PACK(4);
+    BITFIELD bAdjustFromWalls:1;
+    class AAIScript* MyScript GCC_PACK(4);
+    FLOAT Skill;
+    BITFIELD bPlannedJump:1;
+#else
     BITFIELD bHunting:1 GCC_PACK(4);
     BITFIELD bAdjustFromWalls:1;
     BITFIELD bPlannedJump:1;
     class AAIScript* MyScript GCC_PACK(4);
     FLOAT Skill;
+#endif
     DECLARE_FUNCTION(execWaitToSeeEnemy);
     DECLARE_CLASS(AAIController,AController,0|CLASS_Config,Engine)
     #include "AAIController.h"
@@ -6830,6 +9083,25 @@ public:
 class ENGINE_API AInventory : public AActor
 {
 public:
+#if UE_SHREK2
+    BYTE InventoryGroup;
+    BYTE GroupOffset;
+    BITFIELD bDisplayableInv:1 GCC_PACK(4);
+    BITFIELD bTossedOut:1;
+    class UClass* PickupClass GCC_PACK(4);
+    INT Charge;
+    FVector PlayerViewOffset;
+    FRotator PlayerViewPivot;
+    BITFIELD bDrawingFirstPerson:1 GCC_PACK(4);
+    FLOAT BobDamping GCC_PACK(4);
+    class AActor* ThirdPersonActor;
+    class UClass* AttachmentClass;
+    class UObject* Icon;
+    class UObject* StatusIcon;
+    FStringNoInit ItemName;
+    class UMaterial* IconMaterial;
+    FIntBox IconCoords;
+#else
     BYTE InventoryGroup GCC_PACK(4);
     BYTE GroupOffset;
     BITFIELD bDisplayableInv:1 GCC_PACK(4);
@@ -6845,6 +9117,7 @@ public:
     class UMaterial* IconMaterial;
     FIntBox IconCoords;
     FStringNoInit ItemName;
+#endif
     DECLARE_CLASS(AInventory,AActor,0|CLASS_NativeReplication,Engine)
     #include "AInventory.h"
 };
@@ -6853,6 +9126,27 @@ public:
 class ENGINE_API AAmmunition : public AInventory
 {
 public:
+#if UE_SHREK2
+    INT MaxAmmo;
+    INT AmmoAmount;
+    INT PickupAmmo;
+    BITFIELD bRecommendSplashDamage:1 GCC_PACK(4);
+    BITFIELD bTossed:1;
+    BITFIELD bTrySplash:1;
+    BITFIELD bLeadTarget:1;
+    BITFIELD bInstantHit:1;
+    BITFIELD bSplashDamage:1;
+    class UClass* ProjectileClass GCC_PACK(4);
+    class UClass* MyDamageType;
+    FLOAT WarnTargetPct;
+    FLOAT RefireRate;
+    class USound* FireSound;
+    FLOAT MaxAutoAimRange;
+    INT InitialAmount;
+    BITFIELD bTryHeadShot:1;
+    FLOAT MaxRange;
+    class UMaterial* IconFlashMaterial;
+#else
     INT MaxAmmo GCC_PACK(4);
     INT AmmoAmount;
     INT InitialAmount;
@@ -6871,6 +9165,7 @@ public:
     class USound* FireSound;
     FLOAT MaxRange;
     class UMaterial* IconFlashMaterial;
+#endif
     DECLARE_CLASS(AAmmunition,AInventory,0|CLASS_NativeReplication,Engine)
     #include "AAmmunition.h"
 };
@@ -6879,6 +9174,16 @@ public:
 class ENGINE_API APowerups : public AInventory
 {
 public:
+#if UE_SHREK2
+    INT NumCopies;
+    BITFIELD bCanHaveMultipleCopies:1 GCC_PACK(4);
+    BITFIELD bAutoActivate:1;
+    BITFIELD bActivatable:1;
+    BITFIELD bActive:1;
+    FStringNoInit ExpireMessage GCC_PACK(4);
+    class USound* ActivateSound;
+    class USound* DeActivateSound;
+#else
     INT NumCopies GCC_PACK(4);
     BITFIELD bCanHaveMultipleCopies:1 GCC_PACK(4);
     BITFIELD bAutoActivate:1;
@@ -6887,6 +9192,7 @@ public:
     FStringNoInit ExpireMessage GCC_PACK(4);
     class USound* ActivateSound;
     class USound* DeActivateSound;
+#endif
     DECLARE_CLASS(APowerups,AInventory,0|CLASS_NativeReplication,Engine)
     #include "APowerups.h"
 };
@@ -6925,6 +9231,132 @@ struct AWeapon_eventWeaponTick_Parms
 class ENGINE_API AWeapon : public AInventory
 {
 public:
+#if UE_SHREK2
+    class UClass* AmmoName;
+    INT PickupAmmoCount;
+    class AAmmunition* AmmoType;
+    BYTE ReloadCount;
+    BITFIELD bPointing:1 GCC_PACK(4);
+    BITFIELD bWeaponUp:1;
+    BITFIELD bChangeWeapon:1;
+    BITFIELD bCanThrow:1;
+    BITFIELD bRapidFire:1;
+    BITFIELD bForceReload:1;
+    BITFIELD bSpectated:1;
+    class AWeapon* OldWeapon GCC_PACK(4);
+    FLOAT StopFiringTime;
+    INT AutoSwitchPriority;
+    FVector FireOffset;
+    FLOAT ShakeMag;
+    FLOAT shaketime;
+    FVector ShakeVert;
+    FVector ShakeSpeed;
+    class UObject* CrossHair;
+    class APowerups* Affector;
+    FLOAT TraceAccuracy;
+    BITFIELD bMeleeWeapon:1 GCC_PACK(4);
+    BITFIELD bSniping:1;
+    FLOAT aimerror GCC_PACK(4);
+    FLOAT AIRating;
+    FLOAT CurrentRating;
+    FLOAT TraceDist;
+    FLOAT MaxRange;
+    FRotator AdjustedAim;
+    class UObject* FireSound;
+    class USound* SelectSound;
+    FStringNoInit MessageNoAmmo;
+    FString WeaponDescription;
+    FColor NameColor;
+    BITFIELD bSteadyToggle:1 GCC_PACK(4);
+    BITFIELD bForceFire:1;
+    BITFIELD bForceAltFire:1;
+    FString LeftHandedMesh GCC_PACK(4);
+    FLOAT DisplayFOV;
+    FLOAT FlashTime;
+    FLOAT MuzzleScale;
+    FLOAT FlashOffsetY;
+    FLOAT FlashOffsetX;
+    FLOAT FlashLength;
+    FLOAT MuzzleFlashSize;
+    class UObject* MFTexture;
+    BYTE FlashCount;
+    BITFIELD bAutoFire:1 GCC_PACK(4);
+    BITFIELD bMuzzleFlash:1;
+    BITFIELD bSetFlashTime:1;
+    BITFIELD bDrawMuzzleFlash:1;
+    BITFIELD bMuzzleFlashParticles:1;
+    class UObject* MuzzleFlashMesh GCC_PACK(4);
+    FLOAT MuzzleFlashScale;
+    BYTE MuzzleFlashStyle;
+    class UObject* MuzzleFlashTexture;
+    FLOAT FireAdjust;
+    class UClass* FireModeClass[2];
+    class UWeaponFire* FireMode[2];
+    class AAmmunition* Ammo[2];
+    FName IdleAnim;
+    FName RestAnim;
+    FName AimAnim;
+    FName RunAnim;
+    FName SelectAnim;
+    FName PutDownAnim;
+    FLOAT IdleAnimRate;
+    FLOAT RestAnimRate;
+    FLOAT AimAnimRate;
+    FLOAT RunAnimRate;
+    FLOAT SelectAnimRate;
+    FLOAT PutDownAnimRate;
+    FLOAT PutDownTime;
+    FLOAT BringUpTime;
+    FStringNoInit SelectForce;
+    INT BotMode;
+    BITFIELD bShowChargingBar:1;
+    BITFIELD bMatchWeapons:1;
+    BITFIELD bForceSwitch:1;
+    BITFIELD bNotInPriorityList:1;
+    BITFIELD bNotInDemo:1;
+    BITFIELD bNoVoluntarySwitch:1;
+    BITFIELD bDebugging:1;
+    BITFIELD bNoInstagibReplace:1;
+    BITFIELD bInitOldMesh:1;
+    BITFIELD bUseOldWeaponMesh:1;
+    BITFIELD bEndOfRound:1;
+    BITFIELD bNoAmmoInstances:1;
+    BITFIELD bBerserk:1;
+    INT AmmoCharge[2];
+    class UClass* AmmoClass[2];
+    class UMesh* OldMesh;
+    FStringNoInit OldPickup;
+    FLOAT OldDrawScale;
+    FLOAT OldCenteredOffsetY;
+    FVector OldPlayerViewOffset;
+    FVector OldSmallViewOffset;
+    FRotator OldPlayerViewPivot;
+    INT OldCenteredRoll;
+    INT OldCenteredYaw;
+    FStringNoInit Description;
+    class UClass* DemoReplacement;
+    BITFIELD bPendingSwitch:1;
+    FVector EffectOffset;
+    BYTE ClientState;
+    BYTE ExchangeFireModes;
+    BYTE Priority;
+    BYTE DefaultPriority;
+    FLOAT hand;
+    FLOAT RenderedHand;
+    FColor HudColor;
+    FVector SmallViewOffset;
+    FVector SmallEffectOffset;
+    FLOAT CenteredOffsetY;
+    INT CenteredRoll;
+    INT CenteredYaw;
+    INT CustomCrosshair;
+    FColor CustomCrossHairColor;
+    FLOAT CustomCrossHairScale;
+    FStringNoInit CustomCrossHairTextureName;
+    class UTexture* CustomCrossHairTexture;
+    FLOAT DownDelay;
+    FLOAT MinReloadPct;
+#else
     class UClass* FireModeClass[2] GCC_PACK(4);
     class UWeaponFire* FireMode[2];
     class AAmmunition* Ammo[2];
@@ -7001,6 +9433,7 @@ public:
     class UTexture* CustomCrossHairTexture;
     FLOAT DownDelay;
     FLOAT MinReloadPct;
+#endif
     DECLARE_FUNCTION(execInitWeaponFires);
     void eventStopFire(INT Mode)
     {
@@ -7040,6 +9473,25 @@ public:
 class ENGINE_API APickup : public AActor
 {
 public:
+#if UE_SHREK2
+    FLOAT MaxDesireability;
+    class AInventorySpot* myMarker;
+    class ANavigationPoint* PickupCache;
+    class UClass* InventoryType;
+    BITFIELD bInstantRespawn:1 GCC_PACK(4);
+    BITFIELD bOnlyReplicateHidden:1;
+    BITFIELD bAmbientGlow:1;
+    BITFIELD bDropped:1;
+    BITFIELD bPredictRespawns:1;
+    FLOAT RespawnTime GCC_PACK(4);
+    FLOAT RespawnEffectTime;
+    FStringNoInit PickupMessage;
+    class USound* PickupSound;
+    FStringNoInit PickupForce;
+    BITFIELD bUseInPathBuilding:1 GCC_PACK(4);
+    class AxPickUpBase* PickUpBase;
+    class AController* TeamOwner[4];
+#else
     FLOAT MaxDesireability GCC_PACK(4);
     class AInventorySpot* myMarker;
     class ANavigationPoint* PickupCache;
@@ -7056,6 +9508,7 @@ public:
     FStringNoInit PickupForce;
     class AxPickUpBase* PickUpBase;
     class AController* TeamOwner[4];
+#endif
     DECLARE_FUNCTION(execRemoveFromNavigation);
     DECLARE_FUNCTION(execAddToNavigation);
     DECLARE_CLASS(APickup,AActor,0|CLASS_NativeReplication,Engine)
@@ -7066,17 +9519,28 @@ public:
 class ENGINE_API AAmmo : public APickup
 {
 public:
+#if UE_SHREK2
+    INT AmmoAmount;
+#else
     INT AmmoAmount GCC_PACK(4);
+#endif
     DECLARE_CLASS(AAmmo,APickup,0,Engine)
     NO_DEFAULT_CONSTRUCTOR(AAmmo)
 };
 
 struct ENGINE_API FConsoleMessage
 {
+#if UE_SHREK2
+    FStringNoInit Text;
+    FColor TextColor;
+    FLOAT MessageLife;
+    class APlayerReplicationInfo* PRI;
+#else
     FStringNoInit Text GCC_PACK(4);
     FColor TextColor;
     FLOAT MessageLife;
     class APlayerReplicationInfo* PRI;
+#endif
 };
 
 
@@ -7109,6 +9573,114 @@ struct AHUD_eventOnPostRender_Parms
 class ENGINE_API AHUD : public AActor
 {
 public:
+#if UE_SHREK2
+    class UObject* SmallFont;
+    class UObject* MedFont;
+    class UObject* BigFont;
+    class UObject* LargeFont;
+    FString HUDConfigWindowType;
+    class AHUD* nextHUD;
+    class APlayerController* PlayerOwner;
+    FStringNoInit ProgressFontName;
+    class UFont* ProgressFontFont;
+    FLOAT ProgressFadeTime;
+    FColor MOTDColor;
+    class AScoreBoard* ScoreBoard;
+    BITFIELD bHideHUD:1 GCC_PACK(4);
+    BITFIELD bShowScores:1;
+    BITFIELD bShowDebugInfo:1;
+    BITFIELD bDrawLines:1;
+    BITFIELD bHideCenterMessages:1;
+    BITFIELD bBadConnectionAlert:1;
+    BITFIELD bMessageBeep:1;
+    FLOAT HudCanvasScale GCC_PACK(4);
+    FString LoadingMessage;
+    FString SavingMessage;
+    FString ConnectingMessage;
+    FString PausedMessage;
+    FString PrecachingMessage;
+    class UObject* Movie;
+    INT MoviePosX;
+    INT MoviePosY;
+    FLOAT TexMovieTop;
+    FLOAT TexMovieLeft;
+    FLOAT TexMovieBottom;
+    FLOAT TexMovieRight;
+    BITFIELD TexMovieTranslucent:1 GCC_PACK(4);
+    class UObject* TextureMovie GCC_PACK(4);
+    FColor ConsoleColor;
+    INT ConsoleMessageCount;
+    INT ConsoleFontSize;
+    INT MessageFontOffset;
+    FRotator CirclingRotation;
+    BITFIELD bPortalDebugView:1 GCC_PACK(4);
+    FLOAT DebugSceneXLocation GCC_PACK(4);
+    FLOAT DebugSceneYLocation;
+    FLOAT DebugSceneSizeX;
+    FLOAT DebugSceneSizeY;
+    FConsoleMessage TextMessages[8];
+    FLOAT ConsoleMessagePosX;
+    FLOAT ConsoleMessagePosY;
+    FStringNoInit FontArrayNames[9];
+    class UFont* FontArrayFonts[9];
+    INT FontScreenWidthMedium[9];
+    INT FontScreenWidthSmall[9];
+    class APawn* PawnOwner;
+    class APlayerReplicationInfo* PawnOwnerPRI;
+    class UConsole* PlayerConsole;
+    class AScoreBoard* LocalStatsScreen;
+    class AActor* VoteMenu;
+    FColor WhiteColor;
+    FColor RedColor;
+    FColor GreenColor;
+    FColor CyanColor;
+    FColor BlueColor;
+    FColor GoldColor;
+    FColor PurpleColor;
+    FColor TurqColor;
+    FColor GrayColor;
+    FColor BlackColor;
+    BITFIELD bShowVoteMenu:1;
+    BITFIELD bShowScoreBoard:1;
+    BITFIELD bShowBadConnectionAlert:1;
+    BITFIELD bShowWeaponInfo:1;
+    BITFIELD bShowPersonalInfo:1;
+    BITFIELD bShowPoints:1;
+    BITFIELD bShowWeaponBar:1;
+    BITFIELD bCrosshairShow:1;
+    BITFIELD bShowPortrait:1;
+    BITFIELD bShowPortraitVC:1;
+    BITFIELD bNoEnemyNames:1;
+    BITFIELD bSmallWeaponBar:1;
+    BITFIELD bBuiltMOTD:1;
+    BITFIELD bShowLocalStats:1;
+    class APlayerReplicationInfo* PortraitPRI;
+    FStringNoInit OverrideConsoleFontName;
+    class UFont* OverrideConsoleFont;
+    FLOAT HudScale;
+    FLOAT HudOpacity;
+    INT CrosshairStyle;
+    FLOAT CrosshairScale;
+    FLOAT CrosshairOpacity;
+    FColor CrossHairColor;
+    FLOAT ResScaleX;
+    FLOAT ResScaleY;
+    FStringNoInit MOTD[4];
+    INT MOTDState;
+    FLOAT LastPickupTime;
+    FLOAT LastAmmoPickupTime;
+    FLOAT LastWeaponPickupTime;
+    FLOAT LastHealthPickupTime;
+    FLOAT LastArmorPickupTime;
+    FLOAT LastVoiceGain;
+    FLOAT LastVoiceGainTime;
+    INT LastPlayerIDTalking;
+    FLOAT LastPlayerIDTalkingTime;
+    class ASceneSubtitles* SubTitles;
+    TArrayNoInit<class AHudOverlay*> Overlays;
+    FScriptDelegate __OnPostRender__Delegate;
+    FScriptDelegate __OnBuildMOTD__Delegate;
+#else
     class APlayerController* PlayerOwner GCC_PACK(4);
     class APawn* PawnOwner;
     class APlayerReplicationInfo* PawnOwnerPRI;
@@ -7185,6 +9757,7 @@ public:
     TArrayNoInit<class AHudOverlay*> Overlays;
     FScriptDelegate __OnPostRender__Delegate;
     FScriptDelegate __OnBuildMOTD__Delegate;
+#endif
     DECLARE_FUNCTION(execStaticDrawCanvasLine);
     DECLARE_FUNCTION(execDrawCanvasLine);
     DECLARE_FUNCTION(execDraw3DLine);
@@ -7239,6 +9812,29 @@ struct AProjectile_eventPostRender2D_Parms
 class ENGINE_API AProjectile : public AActor
 {
 public:
+#if UE_SHREK2
+    FLOAT Speed;
+    FLOAT MaxSpeed;
+    FLOAT TossZ;
+    class AActor* ZeroCollider;
+    BITFIELD bSwitchToZeroCollision:1 GCC_PACK(4);
+    FLOAT Damage GCC_PACK(4);
+    FLOAT DamageRadius;
+    FLOAT MomentumTransfer;
+    class UClass* MyDamageType;
+    class USound* SpawnSound;
+    class USound* ImpactSound;
+    class UClass* ExplosionDecal;
+    FLOAT ExploWallOut;
+    BITFIELD bNoFX:1;
+    BITFIELD bReadyToSplash:1;
+    BITFIELD bSpecialCalcView:1;
+    class AController* InstigatorController;
+    class AActor* LastTouched;
+    class AActor* HurtWall;
+    FLOAT MaxEffectDistance;
+    BITFIELD bScriptPostRender:1;
+#else
     FLOAT Speed GCC_PACK(4);
     FLOAT MaxSpeed;
     FLOAT TossZ;
@@ -7260,6 +9856,7 @@ public:
     class AActor* HurtWall;
     FLOAT MaxEffectDistance;
     BITFIELD bScriptPostRender:1 GCC_PACK(4);
+#endif
     void eventPostRender2D(class UCanvas* C, FLOAT ScreenLocX, FLOAT ScreenLocY)
     {
         AProjectile_eventPostRender2D_Parms Parms;
@@ -7280,6 +9877,27 @@ struct ADecoration_eventNotReachableBy_Parms
 class ENGINE_API ADecoration : public AActor
 {
 public:
+#if UE_SHREK2
+    class UClass* EffectWhenDestroyed;
+    BITFIELD bPushable:1 GCC_PACK(4);
+    BITFIELD bDamageable:1;
+    BITFIELD bPushSoundPlaying:1;
+    BITFIELD bSplash:1;
+    class USound* PushSound GCC_PACK(4);
+    class USound* EndPushSound;
+    INT numLandings;
+    class UClass* Contents;
+    INT NumFrags;
+    class UTexture* FragSkin;
+    class UClass* FragType;
+    FVector FragMomentum;
+    INT Health;
+    FLOAT SplashTime;
+    FVector OwnerPrevLocation;
+    FVector PrevLocation;
+    class ANavigationPoint* LastAnchor;
+    FLOAT LastValidAnchorTime;
+#else
     class UClass* EffectWhenDestroyed GCC_PACK(4);
     BITFIELD bPushable:1 GCC_PACK(4);
     BITFIELD bDamageable:1;
@@ -7297,6 +9915,7 @@ public:
     FLOAT SplashTime;
     class ANavigationPoint* LastAnchor;
     FLOAT LastValidAnchorTime;
+#endif
     void eventNotReachableBy(class APawn* P)
     {
         ADecoration_eventNotReachableBy_Parms Parms;
@@ -7340,7 +9959,11 @@ public:
 class ENGINE_API ANote : public AActor
 {
 public:
+#if UE_SHREK2
+    FStringNoInit Text;
+#else
     FStringNoInit Text GCC_PACK(4);
+#endif
     DECLARE_CLASS(ANote,AActor,0,Engine)
     #include "ANote.h"
 };
@@ -7349,11 +9972,19 @@ public:
 class ENGINE_API ALight : public AActor
 {
 public:
+#if UE_SHREK2
+    FLOAT MinCoronaSize;
+    FLOAT MaxCoronaSize;
+    FLOAT CoronaRotation;
+    FLOAT CoronaRotationOffset;
+    BITFIELD UseOwnFinalBlend:1 GCC_PACK(4);
+#else
     FLOAT MinCoronaSize GCC_PACK(4);
     FLOAT MaxCoronaSize;
     FLOAT CoronaRotation;
     FLOAT CoronaRotationOffset;
     BITFIELD UseOwnFinalBlend:1 GCC_PACK(4);
+#endif
     DECLARE_CLASS(ALight,AActor,0,Engine)
     #include "ALight.h"
 };
@@ -7362,6 +9993,18 @@ public:
 class ENGINE_API AKRepulsor : public AActor
 {
 public:
+#if UE_SHREK2
+    BITFIELD bEnableRepulsion:1 GCC_PACK(4);
+    FVector CheckDir GCC_PACK(4);
+    FLOAT CheckDist;
+    FLOAT Softness;
+    FLOAT PenScale;
+    PTRINT KContact;
+    BITFIELD bRepulseWater:1;
+    BITFIELD bRepulsorInContact:1;
+    BITFIELD bRepulsorOnWater:1;
+    FLOAT PenOffset;
+#else
     BITFIELD bEnableRepulsion:1 GCC_PACK(4);
     BITFIELD bRepulseWater:1;
     BITFIELD bRepulsorInContact:1;
@@ -7372,6 +10015,7 @@ public:
     FLOAT PenScale;
     FLOAT PenOffset;
     PTRINT KContact;
+#endif
     DECLARE_CLASS(AKRepulsor,AActor,0,Engine)
 #ifdef WITH_KARMA
 	void Destroy();
@@ -7397,6 +10041,26 @@ public:
 class ENGINE_API AKTire : public AKActor
 {
 public:
+#if UE_SHREK2
+    class AKCarWheelJoint* WheelJoint;
+    FLOAT RollFriction;
+    FLOAT LateralFriction;
+    FLOAT RollSlip;
+    FLOAT LateralSlip;
+    FLOAT MinSlip;
+    FLOAT SlipRate;
+    FLOAT Softness;
+    FLOAT Adhesion;
+    FLOAT Restitution;
+    BITFIELD bTireOnGround:1 GCC_PACK(4);
+    FLOAT GroundSlipVel GCC_PACK(4);
+    FVector GroundSlipVec;
+    FLOAT SpinSpeed;
+    class UMaterial* GroundMaterial;
+    FKRigidBodyState ReceiveState;
+    BITFIELD bReceiveStateNew:1 GCC_PACK(4);
+    BYTE GroundSurfaceType;
+#else
     class AKCarWheelJoint* WheelJoint GCC_PACK(4);
     FLOAT RollFriction;
     FLOAT LateralFriction;
@@ -7415,6 +10079,7 @@ public:
     BYTE GroundSurfaceType;
     FKRigidBodyState ReceiveState GCC_PACK(4);
     BITFIELD bReceiveStateNew:1 GCC_PACK(4);
+#endif
     DECLARE_CLASS(AKTire,AKActor,0,Engine)
 #ifdef WITH_KARMA
 	// Actor interface.
@@ -7430,6 +10095,22 @@ struct AKConstraint_eventKForceExceed_Parms
 class ENGINE_API AKConstraint : public AKActor
 {
 public:
+#if UE_SHREK2
+    PTRINT KConstraintData;
+    class AActor* KConstraintActor1;
+    class AActor* KConstraintActor2;
+    FName KConstraintBone1;
+    FName KConstraintBone2;
+    BITFIELD bKDisableCollision:1 GCC_PACK(4);
+    FVector KPos1 GCC_PACK(4);
+    FVector KPriAxis1;
+    FVector KSecAxis1;
+    FVector KPos2;
+    FVector KPriAxis2;
+    FVector KSecAxis2;
+    BITFIELD bKForceFrameUpdate:1 GCC_PACK(4);
+    FLOAT KForceThreshold GCC_PACK(4);
+#else
     PTRINT KConstraintData GCC_PACK(4);
     class AActor* KConstraintActor1;
     class AActor* KConstraintActor2;
@@ -7444,6 +10125,7 @@ public:
     FVector KSecAxis2;
     BITFIELD bKForceFrameUpdate:1 GCC_PACK(4);
     FLOAT KForceThreshold GCC_PACK(4);
+#endif
     DECLARE_FUNCTION(execKGetConstraintTorque);
     DECLARE_FUNCTION(execKGetConstraintForce);
     DECLARE_FUNCTION(execKUpdateConstraintParams);
@@ -7480,6 +10162,22 @@ public:
 class ENGINE_API AKCarWheelJoint : public AKConstraint
 {
 public:
+#if UE_SHREK2
+    FLOAT KSteerAngle;
+    FLOAT KProportionalGap;
+    FLOAT KMaxSteerTorque;
+    FLOAT KMaxSteerSpeed;
+    BITFIELD bKSteeringLocked:1 GCC_PACK(4);
+    FLOAT KMotorTorque GCC_PACK(4);
+    FLOAT KMaxSpeed;
+    FLOAT KBraking;
+    FLOAT KSuspLowLimit;
+    FLOAT KSuspHighLimit;
+    FLOAT KSuspStiffness;
+    FLOAT KSuspDamping;
+    FLOAT KSuspRef;
+    FLOAT KWheelHeight;
+#else
     FLOAT KSteerAngle GCC_PACK(4);
     FLOAT KProportionalGap;
     FLOAT KMaxSteerTorque;
@@ -7494,6 +10192,7 @@ public:
     FLOAT KSuspDamping;
     FLOAT KSuspRef;
     FLOAT KWheelHeight;
+#endif
     DECLARE_CLASS(AKCarWheelJoint,AKConstraint,0,Engine)
 #ifdef WITH_KARMA
     virtual void KUpdateConstraintParams();
@@ -7505,9 +10204,15 @@ public:
 class ENGINE_API AKConeLimit : public AKConstraint
 {
 public:
+#if UE_SHREK2
+    FLOAT KHalfAngle;
+    FLOAT KStiffness;
+    FLOAT KDamping;
+#else
     FLOAT KHalfAngle GCC_PACK(4);
     FLOAT KStiffness;
     FLOAT KDamping;
+#endif
     DECLARE_CLASS(AKConeLimit,AKConstraint,0,Engine)
 #ifdef WITH_KARMA
     virtual void KUpdateConstraintParams();
@@ -7526,6 +10231,18 @@ enum EHingeType
 class ENGINE_API AKHinge : public AKConstraint
 {
 public:
+#if UE_SHREK2
+    BYTE KHingeType;
+    FLOAT KStiffness;
+    FLOAT KDamping;
+    FLOAT KDesiredAngVel;
+    FLOAT KMaxTorque;
+    FLOAT KDesiredAngle;
+    FLOAT KProportionalGap;
+    FLOAT KAltDesiredAngle;
+    BITFIELD KUseAltDesired:1 GCC_PACK(4);
+    FLOAT KCurrentAngle GCC_PACK(4);
+#else
     BYTE KHingeType GCC_PACK(4);
     FLOAT KStiffness GCC_PACK(4);
     FLOAT KDamping;
@@ -7536,6 +10253,7 @@ public:
     FLOAT KAltDesiredAngle;
     BITFIELD KUseAltDesired:1 GCC_PACK(4);
     FLOAT KCurrentAngle GCC_PACK(4);
+#endif
     DECLARE_CLASS(AKHinge,AKConstraint,0,Engine)
 #ifdef WITH_KARMA
     virtual void KUpdateConstraintParams();
@@ -7921,6 +10639,180 @@ enum EBlendMode
 class ENGINE_API UParticleEmitter : public UObject
 {
 public:
+#if UE_SHREK2
+    FVector Acceleration;
+    BITFIELD UseCollision:1 GCC_PACK(4);
+    BITFIELD PawnCollision:1;
+    FVector ExtentMultiplier GCC_PACK(4);
+    FRangeVector DampingFactorRange;
+    BITFIELD UseCollisionPlanes:1 GCC_PACK(4);
+    TArrayNoInit<FPlane> CollisionPlanes GCC_PACK(4);
+    BITFIELD UseMaxCollisions:1 GCC_PACK(4);
+    FRange MaxCollisions GCC_PACK(4);
+    INT SpawnFromOtherEmitter;
+    INT SpawnAmount;
+    FRangeVector SpawnedVelocityScaleRange;
+    BITFIELD UseSpawnedVelocityScale:1 GCC_PACK(4);
+    class AEmitter* OuterEmitter GCC_PACK(4);
+    FName AttractingActorTag;
+    class AActor* AttractingActor;
+    FLOAT Opacity;
+    BITFIELD bAddOwnerVelocity:1 GCC_PACK(4);
+    BITFIELD UseColorScale:1;
+    TArrayNoInit<FParticleColorScale> ColorScale GCC_PACK(4);
+    FLOAT ColorScaleRepeats;
+    FRangeVector ColorMultiplierRange;
+    FPlane FadeOutFactor;
+    FLOAT FadeOutStartTime;
+    BITFIELD FadeOut:1 GCC_PACK(4);
+    FPlane FadeInFactor GCC_PACK(4);
+    FLOAT FadeInEndTime;
+    BITFIELD FadeIn:1 GCC_PACK(4);
+    BITFIELD UseActorForces:1;
+    BYTE CoordinateSystem GCC_PACK(4);
+    INT MaxParticles;
+    BITFIELD ResetAfterChange:1 GCC_PACK(4);
+    BYTE EffectAxis GCC_PACK(4);
+    FLOAT LowScale;
+    BITFIELD RespawnDeadParticles:1 GCC_PACK(4);
+    BITFIELD AutoDestroy:1;
+    BITFIELD AutoReset:1;
+    BITFIELD Disabled:1;
+    BITFIELD DisableFogging:1;
+    FRange AutoResetTimeRange GCC_PACK(4);
+    FStringNoInit Name;
+    FVector StartLocationOffset;
+    FRangeVector StartLocationRange;
+    INT AddLocationFromOtherEmitter;
+    BYTE StartLocationShape;
+    FRange SphereRadiusRange;
+    FRangeVector StartLocationPolarRange;
+    FRange StartMassRange;
+    class UStaticMesh* MeshSpawningStaticMesh;
+    BYTE MeshSpawning;
+    BITFIELD VelocityFromMesh:1 GCC_PACK(4);
+    FRangeVector VelocityScaleRange GCC_PACK(4);
+    FRangeVector MeshScaleRange;
+    BITFIELD UniformMeshScale:1 GCC_PACK(4);
+    BITFIELD UniformVelocityScale:1;
+    BITFIELD UseColorFromMesh:1;
+    BITFIELD SpawnOnlyInDirectionOfNormal:1;
+    FVector MeshNormal GCC_PACK(4);
+    FRange MeshNormalThresholdRange;
+    INT AlphaRef;
+    BITFIELD AlphaTest:1 GCC_PACK(4);
+    BITFIELD AcceptsProjectors:1;
+    BITFIELD ZTest:1;
+    BITFIELD ZWrite:1;
+    BITFIELD UseRevolution:1;
+    FRangeVector RevolutionCenterOffsetRange GCC_PACK(4);
+    FRangeVector RevolutionsPerSecondRange;
+    BITFIELD UseRevolutionScale:1 GCC_PACK(4);
+    TArrayNoInit<FParticleRevolutionScale> RevolutionScale GCC_PACK(4);
+    FLOAT RevolutionScaleRepeats;
+    BYTE UseRotationFrom;
+    BITFIELD SpinParticles:1 GCC_PACK(4);
+    FRotator RotationOffset GCC_PACK(4);
+    FVector SpinCCWorCW;
+    FRangeVector SpinsPerSecondRange;
+    FRangeVector StartSpinRange;
+    BITFIELD DampRotation:1 GCC_PACK(4);
+    FRangeVector RotationDampingFactorRange GCC_PACK(4);
+    FVector RotationNormal;
+    BITFIELD UseSizeScale:1 GCC_PACK(4);
+    BITFIELD UseRegularSizeScale:1;
+    TArrayNoInit<FParticleTimeScale> SizeScale GCC_PACK(4);
+    FLOAT SizeScaleRepeats;
+    FRangeVector StartSizeRange;
+    BITFIELD UniformSize:1 GCC_PACK(4);
+    BYTE UseSkeletalLocationAs GCC_PACK(4);
+    class AActor* SkeletalMeshActor;
+    FVector SkeletalScale;
+    FRange RelativeBoneIndexRange;
+    TArrayNoInit<FParticleSound> Sounds;
+    BYTE SpawningSound;
+    FRange SpawningSoundIndex;
+    FRange SpawningSoundProbability;
+    BYTE CollisionSound;
+    FRange CollisionSoundIndex;
+    FRange CollisionSoundProbability;
+    FLOAT ParticlesPerSecond;
+    FLOAT InitialParticlesPerSecond;
+    BITFIELD AutomaticInitialSpawning:1 GCC_PACK(4);
+    BYTE DrawStyle GCC_PACK(4);
+    class UTexture* Texture;
+    INT TextureUSubdivisions;
+    INT TextureVSubdivisions;
+    BITFIELD BlendBetweenSubdivisions:1 GCC_PACK(4);
+    BITFIELD UseSubdivisionScale:1;
+    TArrayNoInit<FLOAT> SubdivisionScale GCC_PACK(4);
+    INT SubdivisionStart;
+    INT SubdivisionEnd;
+    BITFIELD UseRandomSubdivision:1 GCC_PACK(4);
+    FLOAT SecondsBeforeInactive GCC_PACK(4);
+    FLOAT MinSquaredVelocity;
+    FRange InitialTimeRange;
+    FRange LifetimeRange;
+    FRange InitialDelayRange;
+    BITFIELD TriggerDisabled:1 GCC_PACK(4);
+    BITFIELD ResetOnTrigger:1;
+    FRange SpawnOnTriggerRange GCC_PACK(4);
+    FLOAT SpawnOnTriggerPPS;
+    FRangeVector StartVelocityRange;
+    FRange StartVelocityRadialRange;
+    FVector MaxAbsVelocity;
+    FRangeVector VelocityLossRange;
+    INT AddVelocityFromOtherEmitter;
+    FRangeVector AddVelocityMultiplierRange;
+    BYTE GetVelocityDirectionFrom;
+    BITFIELD UseVelocityScale:1 GCC_PACK(4);
+    TArrayNoInit<FParticleVelocityScale> VelocityScale GCC_PACK(4);
+    FLOAT VelocityScaleRepeats;
+    FLOAT WarmupTicksPerSecond;
+    FLOAT RelativeWarmupTime;
+    class AEmitter* Owner;
+    BITFIELD Initialized:1 GCC_PACK(4);
+    BITFIELD Inactive:1;
+    FLOAT InactiveTime GCC_PACK(4);
+    TArrayNoInit<FParticle> Particles;
+    INT ParticleIndex;
+    INT ActiveParticles;
+    FLOAT PPSFraction;
+    FBox BoundingBox;
+    FVector RealExtentMultiplier;
+    BITFIELD RealDisableFogging:1 GCC_PACK(4);
+    BITFIELD AllParticlesDead:1;
+    BITFIELD WarmedUp:1;
+    INT OtherIndex GCC_PACK(4);
+    FLOAT InitialDelay;
+    FVector GlobalOffset;
+    FLOAT TimeTillReset;
+    INT PS2Data;
+    INT MaxActiveParticles;
+    INT CurrentCollisionSoundIndex;
+    INT CurrentSpawningSoundIndex;
+    INT CurrentMeshSpawningIndex;
+    FLOAT MaxSizeScale;
+    INT KillPending;
+    INT DeferredParticles;
+    FVector RealMeshNormal;
+    TArrayNoInit<FVector> MeshVertsAndNormals;
+    INT CurrentSpawnOnTrigger;
+    BITFIELD Backup_Disabled:1;
+    BITFIELD UseAbsoluteTimeForSizeScale:1;
+    BITFIELD DetermineVelocityByLocationDifference:1;
+    BITFIELD ScaleSizeXByVelocity:1;
+    BITFIELD ScaleSizeYByVelocity:1;
+    BITFIELD ScaleSizeZByVelocity:1;
+    BITFIELD AddVelocityFromOwner:1;
+    FLOAT LowDetailFactor;
+    BYTE DetailMode;
+    FVector ScaleSizeByVelocityMultiplier;
+    FLOAT ScaleSizeByVelocityMax;
+    BITFIELD RotateVelocityLossRange:1;
+    INT RenderableParticles;
+    FRangeVector RealVelocityLossRange;
+#else
     BITFIELD UseCollision:1 GCC_PACK(4);
     BITFIELD UseCollisionPlanes:1;
     BITFIELD UseMaxCollisions:1;
@@ -8087,6 +10979,7 @@ public:
     INT CurrentSpawnOnTrigger;
     INT RenderableParticles;
     FRangeVector RealVelocityLossRange;
+#endif
     DECLARE_FUNCTION(execReset);
     DECLARE_FUNCTION(execTrigger);
     DECLARE_FUNCTION(execSpawnParticle);
@@ -8113,6 +11006,22 @@ enum ETrailShadeType
 class ENGINE_API UTrailEmitter : public UParticleEmitter
 {
 public:
+#if UE_SHREK2
+    INT MaxPointsPerTrail;
+    FLOAT DistanceThreshold;
+    BITFIELD UseCrossedSheets:1 GCC_PACK(4);
+    INT MaxTrailTwistAngle GCC_PACK(4);
+    TArrayNoInit<FParticleTrailData> TrailData;
+    TArrayNoInit<FParticleTrailInfo> TrailInfo;
+    class UVertexBuffer* VertexBuffer;
+    class UIndexBuffer* IndexBuffer;
+    INT VerticesPerParticle;
+    INT IndicesPerParticle;
+    INT PrimitivesPerParticle;
+    BYTE TrailShadeType;
+    BYTE TrailLocation;
+    FLOAT PointLifeTime;
+#else
     BYTE TrailShadeType GCC_PACK(4);
     BYTE TrailLocation;
     INT MaxPointsPerTrail GCC_PACK(4);
@@ -8127,6 +11036,7 @@ public:
     INT VerticesPerParticle;
     INT IndicesPerParticle;
     INT PrimitivesPerParticle;
+#endif
     DECLARE_FUNCTION(execResetTrail);
     DECLARE_CLASS(UTrailEmitter,UParticleEmitter,0,Engine)
     #include "UTrailEmitter.h"
@@ -8148,9 +11058,15 @@ enum EParticleDirectionUsage
 class ENGINE_API USpriteEmitter : public UParticleEmitter
 {
 public:
+#if UE_SHREK2
+    BYTE UseDirectionAs;
+    FVector ProjectionNormal;
+    FVector RealProjectionNormal;
+#else
     BYTE UseDirectionAs GCC_PACK(4);
     FVector ProjectionNormal GCC_PACK(4);
     FVector RealProjectionNormal;
+#endif
     DECLARE_CLASS(USpriteEmitter,UParticleEmitter,0,Engine)
     #include "USpriteEmitter.h"
 };
@@ -8159,6 +11075,18 @@ public:
 class ENGINE_API USparkEmitter : public UParticleEmitter
 {
 public:
+#if UE_SHREK2
+    FRange LineSegmentsRange;
+    FRange TimeBeforeVisibleRange;
+    FRange TimeBetweenSegmentsRange;
+    TArrayNoInit<FParticleSparkData> SparkData;
+    class UVertexBuffer* VertexBuffer;
+    class UIndexBuffer* IndexBuffer;
+    INT NumSegments;
+    INT VerticesPerParticle;
+    INT IndicesPerParticle;
+    INT PrimitivesPerParticle;
+#else
     FRange LineSegmentsRange GCC_PACK(4);
     FRange TimeBeforeVisibleRange;
     FRange TimeBetweenSegmentsRange;
@@ -8169,6 +11097,7 @@ public:
     INT VerticesPerParticle;
     INT IndicesPerParticle;
     INT PrimitivesPerParticle;
+#endif
     DECLARE_CLASS(USparkEmitter,UParticleEmitter,0,Engine)
     #include "USparkEmitter.h"
 };
@@ -8177,11 +11106,19 @@ public:
 class ENGINE_API UMeshEmitter : public UParticleEmitter
 {
 public:
+#if UE_SHREK2
+    class UStaticMesh* StaticMesh;
+    BITFIELD UseMeshBlendMode:1 GCC_PACK(4);
+    BITFIELD RenderTwoSided:1;
+    BITFIELD UseParticleColor:1;
+    FVector MeshExtent GCC_PACK(4);
+#else
     class UStaticMesh* StaticMesh GCC_PACK(4);
     BITFIELD UseMeshBlendMode:1 GCC_PACK(4);
     BITFIELD RenderTwoSided:1;
     BITFIELD UseParticleColor:1;
     FVector MeshExtent GCC_PACK(4);
+#endif
     DECLARE_CLASS(UMeshEmitter,UParticleEmitter,0,Engine)
     #include "UMeshEmitter.h"
 };
@@ -8201,6 +11138,44 @@ enum EBeamEndPointType
 class ENGINE_API UBeamEmitter : public UParticleEmitter
 {
 public:
+#if UE_SHREK2
+    FRange BeamDistanceRange;
+    TArrayNoInit<FParticleBeamEndPoint> BeamEndPoints;
+    BYTE DetermineEndPointBy;
+    FLOAT BeamTextureUScale;
+    FLOAT BeamTextureVScale;
+    INT RotatingSheets;
+    BITFIELD TriggerEndpoint:1 GCC_PACK(4);
+    FRangeVector LowFrequencyNoiseRange GCC_PACK(4);
+    INT LowFrequencyPoints;
+    FRangeVector HighFrequencyNoiseRange;
+    INT HighFrequencyPoints;
+    TArrayNoInit<FParticleBeamScale> LFScaleFactors;
+    TArrayNoInit<FParticleBeamScale> HFScaleFactors;
+    FLOAT LFScaleRepeats;
+    FLOAT HFScaleRepeats;
+    BITFIELD UseHighFrequencyScale:1 GCC_PACK(4);
+    BITFIELD UseLowFrequencyScale:1;
+    BITFIELD NoiseDeterminesEndPoint:1;
+    FRangeVector DynamicHFNoiseRange GCC_PACK(4);
+    FRange DynamicHFNoisePointsRange;
+    FRange DynamicTimeBetweenNoiseRange;
+    BITFIELD UseBranching:1 GCC_PACK(4);
+    FRange BranchProbability GCC_PACK(4);
+    FRange BranchHFPointsRange;
+    INT BranchEmitter;
+    FRange BranchSpawnAmountRange;
+    BITFIELD LinkupLifetime:1 GCC_PACK(4);
+    INT SheetsUsed GCC_PACK(4);
+    INT VerticesPerParticle;
+    INT IndicesPerParticle;
+    INT PrimitivesPerParticle;
+    FLOAT BeamValueSum;
+    TArrayNoInit<FParticleBeamData> HFPoints;
+    TArrayNoInit<FVector> LFPoints;
+    TArrayNoInit<class AActor*> HitActors;
+    FLOAT TimeSinceLastDynamicNoise;
+#else
     FRange BeamDistanceRange GCC_PACK(4);
     TArrayNoInit<FParticleBeamEndPoint> BeamEndPoints;
     BYTE DetermineEndPointBy;
@@ -8237,6 +11212,7 @@ public:
     TArrayNoInit<FVector> LFPoints;
     TArrayNoInit<class AActor*> HitActors;
     FLOAT TimeSinceLastDynamicNoise;
+#endif
     DECLARE_CLASS(UBeamEmitter,UParticleEmitter,0,Engine)
     #include "UBeamEmitter.h"
 };
@@ -8245,6 +11221,19 @@ public:
 class ENGINE_API UShadowBitmapMaterial : public UBitmapMaterial
 {
 public:
+#if UE_SHREK2
+    PTRINT TextureInterfaces[2];
+    class AActor* ShadowActor;
+    FVector LightDirection;
+    FLOAT LightDistance;
+    FLOAT LightFOV;
+    BITFIELD Dirty:1 GCC_PACK(4);
+    BITFIELD Invalid:1;
+    BITFIELD bBlobShadow:1;
+    FLOAT CullDistance GCC_PACK(4);
+    BYTE ShadowDarkness;
+    class UBitmapMaterial* BlobShadow;
+#else
     PTRINT TextureInterfaces[2] GCC_PACK(4);
     class AActor* ShadowActor;
     FVector LightDirection;
@@ -8256,6 +11245,7 @@ public:
     FLOAT CullDistance GCC_PACK(4);
     BYTE ShadowDarkness;
     class UBitmapMaterial* BlobShadow GCC_PACK(4);
+#endif
     DECLARE_CLASS(UShadowBitmapMaterial,UBitmapMaterial,0,Engine)
 	virtual void Destroy();
 
@@ -8267,12 +11257,21 @@ public:
 class ENGINE_API UScriptedTexture : public UBitmapMaterial
 {
 public:
+#if UE_SHREK2
+    PTRINT RenderTarget;
+    class UViewport* RenderViewport;
+    class AActor* Client;
+    INT Revision;
+    INT OldRevision;
+    INT Invalid;
+#else
     PTRINT RenderTarget GCC_PACK(4);
     class UViewport* RenderViewport;
     class AActor* Client;
     INT Revision;
     INT OldRevision;
     INT Invalid;
+#endif
     DECLARE_FUNCTION(execDrawPortal);
     DECLARE_FUNCTION(execDrawTile);
     DECLARE_FUNCTION(execTextSize);
@@ -8289,18 +11288,30 @@ public:
 
 struct ENGINE_API FTerrainMaterialLayer
 {
+#if UE_SHREK2
+    class UMaterial* Texture;
+    class UBitmapMaterial* AlphaWeight;
+    FMatrix TextureMatrix;
+#else
     class UMaterial* Texture GCC_PACK(4);
     class UBitmapMaterial* AlphaWeight;
     FMatrix TextureMatrix;
+#endif
 };
 
 
 class ENGINE_API UTerrainMaterial : public URenderedMaterial
 {
 public:
+#if UE_SHREK2
+    TArrayNoInit<FTerrainMaterialLayer> Layers;
+    BYTE RenderMethod;
+    BITFIELD FirstPass:1 GCC_PACK(4);
+#else
     TArrayNoInit<FTerrainMaterialLayer> Layers GCC_PACK(4);
     BYTE RenderMethod;
     BITFIELD FirstPass:1 GCC_PACK(4);
+#endif
     DECLARE_CLASS(UTerrainMaterial,URenderedMaterial,0,Engine)
 	virtual UMaterial* CheckFallback();
 	virtual UBOOL HasFallback();
@@ -8310,6 +11321,22 @@ public:
 class ENGINE_API UProjectorMaterial : public URenderedMaterial
 {
 public:
+#if UE_SHREK2
+    class UBitmapMaterial* Gradient;
+    class UMaterial* Projected;
+    class UMaterial* BaseMaterial;
+    BYTE BaseMaterialBlending;
+    BYTE FrameBufferBlending;
+    FMatrix Matrix;
+    FMatrix GradientMatrix;
+    BITFIELD bProjected:1 GCC_PACK(4);
+    BITFIELD bProjectOnUnlit:1;
+    BITFIELD bGradient:1;
+    BITFIELD bProjectOnAlpha:1;
+    BITFIELD bProjectOnBackfaces:1;
+    BITFIELD bStaticProjector:1;
+    BITFIELD bTwoSided:1;
+#else
     class UBitmapMaterial* Gradient GCC_PACK(4);
     class UMaterial* Projected;
     class UMaterial* BaseMaterial;
@@ -8324,6 +11351,7 @@ public:
     BITFIELD bProjectOnBackfaces:1;
     BITFIELD bStaticProjector:1;
     BITFIELD bTwoSided:1;
+#endif
     DECLARE_CLASS(UProjectorMaterial,URenderedMaterial,0,Engine)
     NO_DEFAULT_CONSTRUCTOR(UProjectorMaterial)
 };
@@ -8332,6 +11360,21 @@ public:
 class ENGINE_API UParticleMaterial : public URenderedMaterial
 {
 public:
+#if UE_SHREK2
+    INT ParticleBlending;
+    INT BlendBetweenSubdivisions;
+    INT RenderTwoSided;
+    INT UseTFactor;
+    class UBitmapMaterial* BitmapMaterial;
+    INT AlphaTest;
+    INT AlphaRef;
+    INT ZTest;
+    INT ZWrite;
+    INT Wireframe;
+    BITFIELD AcceptsProjectors:1 GCC_PACK(4);
+    INT NumProjectors GCC_PACK(4);
+    FParticleProjectorInfo Projectors[8];
+#else
     INT ParticleBlending GCC_PACK(4);
     INT BlendBetweenSubdivisions;
     INT RenderTwoSided;
@@ -8345,6 +11388,7 @@ public:
     BITFIELD AcceptsProjectors:1 GCC_PACK(4);
     INT NumProjectors GCC_PACK(4);
     FParticleProjectorInfo Projectors[8];
+#endif
     DECLARE_CLASS(UParticleMaterial,URenderedMaterial,0,Engine)
     NO_DEFAULT_CONSTRUCTOR(UParticleMaterial)
 };
@@ -8378,11 +11422,19 @@ enum EColorFadeType
 class ENGINE_API UFadeColor : public UConstantMaterial
 {
 public:
+#if UE_SHREK2
+    FColor Color1;
+    FColor Color2;
+    FLOAT FadePeriod;
+    FLOAT FadePhase;
+    BYTE ColorFadeType;
+#else
     FColor Color1 GCC_PACK(4);
     FColor Color2;
     FLOAT FadePeriod;
     FLOAT FadePhase;
     BYTE ColorFadeType;
+#endif
     DECLARE_CLASS(UFadeColor,UConstantMaterial,0,Engine)
 	//
 	// UConstantMaterial interface
@@ -8394,7 +11446,11 @@ public:
 class ENGINE_API UConstantColor : public UConstantMaterial
 {
 public:
+#if UE_SHREK2
+    FColor Color;
+#else
     FColor Color GCC_PACK(4);
+#endif
     DECLARE_CLASS(UConstantColor,UConstantMaterial,0,Engine)
 	//
 	// UConstantMaterial interface
@@ -8417,6 +11473,22 @@ enum EOutputBlending
 class ENGINE_API UShader : public URenderedMaterial
 {
 public:
+#if UE_SHREK2
+    class UMaterial* Diffuse;
+    class UMaterial* Opacity;
+    class UMaterial* Specular;
+    class UMaterial* SpecularityMask;
+    class UMaterial* SelfIllumination;
+    class UMaterial* SelfIlluminationMask;
+    class UMaterial* Detail;
+    FLOAT DetailScale;
+    BYTE OutputBlending;
+    BITFIELD TwoSided:1 GCC_PACK(4);
+    BITFIELD Wireframe:1;
+    BITFIELD ModulateStaticLighting2X:1;
+    BITFIELD PerformLightingOnSpecularPass:1;
+    BITFIELD ModulateSpecular2X:1;
+#else
     class UMaterial* Diffuse GCC_PACK(4);
     class UMaterial* Opacity;
     class UMaterial* Specular;
@@ -8431,6 +11503,7 @@ public:
     BITFIELD ModulateStaticLighting2X:1;
     BITFIELD PerformLightingOnSpecularPass:1;
     BITFIELD ModulateSpecular2X:1;
+#endif
     DECLARE_CLASS(UShader,URenderedMaterial,0,Engine)
     #include "UShader.h"
 };
@@ -8439,7 +11512,11 @@ public:
 class ENGINE_API UModifier : public UMaterial
 {
 public:
+#if UE_SHREK2
+    class UMaterial* Material;
+#else
     class UMaterial* Material GCC_PACK(4);
+#endif
     DECLARE_CLASS(UModifier,UMaterial,0,Engine)
     #include "UModifier.h"
 };
@@ -8448,8 +11525,13 @@ public:
 class ENGINE_API UOpacityModifier : public UModifier
 {
 public:
+#if UE_SHREK2
+    class UMaterial* Opacity;
+    BITFIELD bOverrideTexModifier:1 GCC_PACK(4);
+#else
     class UMaterial* Opacity GCC_PACK(4);
     BITFIELD bOverrideTexModifier:1 GCC_PACK(4);
+#endif
     DECLARE_CLASS(UOpacityModifier,UModifier,0,Engine)
     NO_DEFAULT_CONSTRUCTOR(UOpacityModifier)
 };
@@ -8470,15 +11552,30 @@ enum EMaterialSequenceAction
 };
 struct ENGINE_API FMaterialSequenceItem
 {
+#if UE_SHREK2
+    class UMaterial* Material;
+    FLOAT Time;
+    BYTE Action;
+#else
     class UMaterial* Material GCC_PACK(4);
     FLOAT Time;
     BYTE Action;
+#endif
 };
 
 
 class ENGINE_API UMaterialSequence : public UModifier
 {
 public:
+#if UE_SHREK2
+    TArrayNoInit<FMaterialSequenceItem> SequenceItems;
+    BYTE TriggerAction;
+    BITFIELD Loop:1 GCC_PACK(4);
+    BITFIELD Paused:1;
+    FLOAT CurrentTime GCC_PACK(4);
+    FLOAT LastTime;
+    FLOAT TotalTime;
+#else
     TArrayNoInit<FMaterialSequenceItem> SequenceItems GCC_PACK(4);
     BYTE TriggerAction;
     BITFIELD Loop:1 GCC_PACK(4);
@@ -8486,6 +11583,7 @@ public:
     FLOAT CurrentTime GCC_PACK(4);
     FLOAT LastTime;
     FLOAT TotalTime;
+#endif
     DECLARE_CLASS(UMaterialSequence,UModifier,0,Engine)
 	virtual void PostEditChange();
 	virtual UBOOL CheckCircularReferences( TArray<class UMaterial*>& History );
@@ -8497,8 +11595,13 @@ public:
 class ENGINE_API UMaterialSwitch : public UModifier
 {
 public:
+#if UE_SHREK2
+    INT Current;
+    TArrayNoInit<class UMaterial*> Materials;
+#else
     INT Current GCC_PACK(4);
     TArrayNoInit<class UMaterial*> Materials;
+#endif
     DECLARE_CLASS(UMaterialSwitch,UModifier,0,Engine)
 	virtual void PostEditChange();
 	virtual UBOOL CheckCircularReferences( TArray<class UMaterial*>& History );
@@ -8520,12 +11623,21 @@ enum EFrameBufferBlending
 class ENGINE_API UFinalBlend : public UModifier
 {
 public:
+#if UE_SHREK2
+    BYTE FrameBufferBlending;
+    BITFIELD ZWrite:1 GCC_PACK(4);
+    BITFIELD ZTest:1;
+    BITFIELD AlphaTest:1;
+    BITFIELD TwoSided:1;
+    BYTE AlphaRef GCC_PACK(4);
+#else
     BYTE FrameBufferBlending GCC_PACK(4);
     BITFIELD ZWrite:1 GCC_PACK(4);
     BITFIELD ZTest:1;
     BITFIELD AlphaTest:1;
     BITFIELD TwoSided:1;
     BYTE AlphaRef GCC_PACK(4);
+#endif
     DECLARE_CLASS(UFinalBlend,UModifier,0,Engine)
     #include "UFinalBlend.h"
 };
@@ -8559,10 +11671,17 @@ enum ETexCoordSrc
 class ENGINE_API UTexModifier : public UModifier
 {
 public:
+#if UE_SHREK2
+    BYTE TexCoordSource;
+    BYTE TexCoordCount;
+    BITFIELD TexCoordProjected:1 GCC_PACK(4);
+    INT texmodifier_dummy;
+#else
     BYTE TexCoordSource GCC_PACK(4);
     BYTE TexCoordCount;
     BITFIELD TexCoordProjected:1 GCC_PACK(4);
     INT texmodifier_dummy GCC_PACK(4);
+#endif
     DECLARE_CLASS(UTexModifier,UModifier,0,Engine)
 	// UTexModifier interface
 	virtual FMatrix* GetMatrix(FLOAT TimeSeconds) { return NULL; }
@@ -8580,7 +11699,11 @@ public:
 class ENGINE_API UTexCoordSource : public UTexModifier
 {
 public:
+#if UE_SHREK2
+    INT SourceChannel;
+#else
     INT SourceChannel GCC_PACK(4);
+#endif
     DECLARE_CLASS(UTexCoordSource,UTexModifier,0,Engine)
 	void PostEditChange();
 };
@@ -8589,7 +11712,11 @@ public:
 class ENGINE_API UTexMatrix : public UTexModifier
 {
 public:
+#if UE_SHREK2
+    FMatrix Matrix;
+#else
     FMatrix Matrix GCC_PACK(4);
+#endif
     DECLARE_CLASS(UTexMatrix,UTexModifier,0,Engine)
 	// UTexModifier interface
 	virtual FMatrix* GetMatrix(FLOAT TimeSeconds) { return &Matrix; }
@@ -8605,7 +11732,11 @@ enum ETexEnvMapType
 class ENGINE_API UTexEnvMap : public UTexModifier
 {
 public:
+#if UE_SHREK2
+    BYTE EnvMapType;
+#else
     BYTE EnvMapType GCC_PACK(4);
+#endif
     DECLARE_CLASS(UTexEnvMap,UTexModifier,0,Engine)
 	// UTexModifier interface
 	virtual FMatrix* GetMatrix(FLOAT TimeSeconds);
@@ -8623,6 +11754,23 @@ enum ETexOscillationType
 class ENGINE_API UTexOscillator : public UTexModifier
 {
 public:
+#if UE_SHREK2
+    FLOAT UOscillationRate;
+    FLOAT VOscillationRate;
+    FLOAT UOscillationPhase;
+    FLOAT VOscillationPhase;
+    FLOAT UOscillationAmplitude;
+    FLOAT VOscillationAmplitude;
+    BYTE UOscillationType;
+    BYTE VOscillationType;
+    FLOAT UOffset;
+    FLOAT VOffset;
+    FMatrix M;
+    FLOAT LastSu;
+    FLOAT LastSv;
+    FLOAT CurrentUJitter;
+    FLOAT CurrentVJitter;
+#else
     FLOAT UOscillationRate GCC_PACK(4);
     FLOAT VOscillationRate;
     FLOAT UOscillationPhase;
@@ -8638,6 +11786,7 @@ public:
     FLOAT LastSv;
     FLOAT CurrentUJitter;
     FLOAT CurrentVJitter;
+#endif
     DECLARE_CLASS(UTexOscillator,UTexModifier,0,Engine)
 	// UTexModifier interface
 	virtual FMatrix* GetMatrix(FLOAT TimeSeconds);
@@ -8657,11 +11806,19 @@ enum ERetriggerAction
 class ENGINE_API UTexOscillatorTriggered : public UTexOscillator
 {
 public:
+#if UE_SHREK2
+    BYTE RetriggerAction;
+    FLOAT StopAfterPeriod;
+    FLOAT TriggeredTime;
+    BITFIELD Reverse:1 GCC_PACK(4);
+    BITFIELD Triggered:1;
+#else
     BYTE RetriggerAction GCC_PACK(4);
     FLOAT StopAfterPeriod GCC_PACK(4);
     FLOAT TriggeredTime;
     BITFIELD Reverse:1 GCC_PACK(4);
     BITFIELD Triggered:1;
+#endif
     DECLARE_CLASS(UTexOscillatorTriggered,UTexOscillator,0,Engine)
 	// UTexModifier interface
 	virtual FMatrix* GetMatrix(FLOAT TimeSeconds);
@@ -8678,6 +11835,17 @@ enum ETexRotationType
 class ENGINE_API UTexRotator : public UTexModifier
 {
 public:
+#if UE_SHREK2
+    FMatrix M;
+    BYTE TexRotationType;
+    FRotator Rotation;
+    BITFIELD ConstantRotation:1 GCC_PACK(4);
+    FLOAT UOffset GCC_PACK(4);
+    FLOAT VOffset;
+    FRotator OscillationRate;
+    FRotator OscillationAmplitude;
+    FRotator OscillationPhase;
+#else
     FMatrix M GCC_PACK(4);
     BYTE TexRotationType;
     FRotator Rotation GCC_PACK(4);
@@ -8687,6 +11855,7 @@ public:
     FRotator OscillationRate;
     FRotator OscillationAmplitude;
     FRotator OscillationPhase;
+#endif
     DECLARE_CLASS(UTexRotator,UTexModifier,0,Engine)
 	// UTexModifier interface
 	virtual FMatrix* GetMatrix(FLOAT TimeSeconds);
@@ -8706,11 +11875,19 @@ public:
 class ENGINE_API UTexScaler : public UTexModifier
 {
 public:
+#if UE_SHREK2
+    FMatrix M;
+    FLOAT UScale;
+    FLOAT VScale;
+    FLOAT UOffset;
+    FLOAT VOffset;
+#else
     FMatrix M GCC_PACK(4);
     FLOAT UScale;
     FLOAT VScale;
     FLOAT UOffset;
     FLOAT VOffset;
+#endif
     DECLARE_CLASS(UTexScaler,UTexModifier,0,Engine)
 	// UTexModifier interface
 	virtual FMatrix* GetMatrix(FLOAT TimeSeconds);
@@ -8734,9 +11911,15 @@ public:
 class ENGINE_API UTexPanner : public UTexModifier
 {
 public:
+#if UE_SHREK2
+    FRotator PanDirection;
+    FLOAT PanRate;
+    FMatrix M;
+#else
     FRotator PanDirection GCC_PACK(4);
     FLOAT PanRate;
     FMatrix M;
+#endif
     DECLARE_CLASS(UTexPanner,UTexModifier,0,Engine)
 	// UTexModifier interface
 	virtual FMatrix* GetMatrix(FLOAT TimeSeconds);
@@ -8746,11 +11929,19 @@ public:
 class ENGINE_API UTexPannerTriggered : public UTexPanner
 {
 public:
+#if UE_SHREK2
+    BYTE RetriggerAction;
+    FLOAT StopAfterPeriod;
+    FLOAT TriggeredTime;
+    BITFIELD Reverse:1 GCC_PACK(4);
+    BITFIELD Triggered:1;
+#else
     BYTE RetriggerAction GCC_PACK(4);
     FLOAT StopAfterPeriod GCC_PACK(4);
     FLOAT TriggeredTime;
     BITFIELD Reverse:1 GCC_PACK(4);
     BITFIELD Triggered:1;
+#endif
     DECLARE_CLASS(UTexPannerTriggered,UTexPanner,0,Engine)
 	// UTexModifier interface
 	virtual FMatrix* GetMatrix(FLOAT TimeSeconds);
@@ -8760,9 +11951,15 @@ public:
 class ENGINE_API UColorModifier : public UModifier
 {
 public:
+#if UE_SHREK2
+    FColor Color;
+    BITFIELD RenderTwoSided:1 GCC_PACK(4);
+    BITFIELD AlphaBlend:1;
+#else
     FColor Color GCC_PACK(4);
     BITFIELD RenderTwoSided:1 GCC_PACK(4);
     BITFIELD AlphaBlend:1;
+#endif
     DECLARE_CLASS(UColorModifier,UModifier,0,Engine)
     NO_DEFAULT_CONSTRUCTOR(UColorModifier)
 };
@@ -8792,6 +11989,17 @@ enum EColorOperation
 class ENGINE_API UCombiner : public UMaterial
 {
 public:
+#if UE_SHREK2
+    BYTE CombineOperation;
+    BYTE AlphaOperation;
+    class UMaterial* Material1;
+    class UMaterial* Material2;
+    class UMaterial* Mask;
+    BITFIELD InvertMask:1 GCC_PACK(4);
+    BITFIELD Modulate2X:1;
+    BITFIELD Modulate4X:1;
+    INT combiner_dummy;
+#else
     INT combiner_dummy GCC_PACK(4);
     BYTE CombineOperation;
     BYTE AlphaOperation;
@@ -8801,6 +12009,7 @@ public:
     BITFIELD InvertMask:1 GCC_PACK(4);
     BITFIELD Modulate2X:1;
     BITFIELD Modulate4X:1;
+#endif
     DECLARE_CLASS(UCombiner,UMaterial,0,Engine)
     #include "UCombiner.h"
 };
@@ -8816,6 +12025,53 @@ enum EVehicleSteerType
 class ENGINE_API USVehicleWheel : public UObject
 {
 public:
+#if UE_SHREK2
+    FLOAT Steer;
+    FLOAT DriveForce;
+    FLOAT LongFriction;
+    FLOAT LatFriction;
+    FLOAT LongSlip;
+    FLOAT LatSlip;
+    FLOAT ChassisTorque;
+    FLOAT TrackVel;
+    BITFIELD bPoweredWheel:1 GCC_PACK(4);
+    BITFIELD bHandbrakeWheel:1;
+    BITFIELD bTrackWheel:1;
+    BYTE SteerType GCC_PACK(4);
+    FName BoneName;
+    FVector BoneOffset;
+    FLOAT WheelRadius;
+    FLOAT Softness;
+    FLOAT PenScale;
+    FLOAT Restitution;
+    FLOAT Adhesion;
+    FLOAT WheelInertia;
+    FLOAT SuspensionTravel;
+    FLOAT SuspensionOffset;
+    FLOAT HandbrakeSlipFactor;
+    FLOAT HandbrakeFrictionFactor;
+    FName SupportBoneName;
+    BYTE SupportBoneAxis;
+    FInterpCurve LongFrictionFunc;
+    FInterpCurve LatSlipFunc;
+    FVector WheelPosition;
+    FLOAT SupportPivotDistance;
+    BITFIELD bWheelOnGround:1 GCC_PACK(4);
+    FLOAT TireLoad GCC_PACK(4);
+    FVector WheelDir;
+    FVector WheelAxle;
+    FLOAT SpinVel;
+    FLOAT SlipAngle;
+    FLOAT SlipVel;
+    FLOAT SuspensionPosition;
+    FLOAT CurrentRotation;
+    PTRINT KContact;
+    BITFIELD bLeftTrack:1;
+    BYTE BoneRollAxis;
+    BYTE BoneSteerAxis;
+    FLOAT PenOffset;
+    FLOAT SuspensionMaxRenderTravel;
+#else
     FLOAT Steer GCC_PACK(4);
     FLOAT DriveForce;
     FLOAT LongFriction;
@@ -8861,6 +12117,7 @@ public:
     FLOAT SuspensionPosition;
     FLOAT CurrentRotation;
     PTRINT KContact;
+#endif
     DECLARE_CLASS(USVehicleWheel,UObject,0,Engine)
     NO_DEFAULT_CONSTRUCTOR(USVehicleWheel)
 };
@@ -8869,7 +12126,14 @@ public:
 class ENGINE_API UAnimNotify : public UObject
 {
 public:
+#if UE_SHREK2
+    INT Revision;
+    FName AnimName;
+    FLOAT Time;
+    FLOAT frame;
+#else
     INT Revision GCC_PACK(4);
+#endif
     DECLARE_CLASS(UAnimNotify,UObject,0,Engine)
 	// AnimNotify interface.
 	virtual void Notify( UMeshInstance *Instance, AActor *Owner ) {};
@@ -8881,7 +12145,11 @@ public:
 class ENGINE_API UAnimNotify_MatSubAction : public UAnimNotify
 {
 public:
+#if UE_SHREK2
+    class UMatSubAction* SubAction;
+#else
     class UMatSubAction* SubAction GCC_PACK(4);
+#endif
     DECLARE_CLASS(UAnimNotify_MatSubAction,UAnimNotify,0,Engine)
 	// AnimNotify interface.
 	virtual void Notify( UMeshInstance *Instance, AActor *Owner );
@@ -8910,7 +12178,11 @@ public:
 class ENGINE_API UAnimNotify_Script : public UAnimNotify
 {
 public:
+#if UE_SHREK2
+    FName NotifyName;
+#else
     FName NotifyName GCC_PACK(4);
+#endif
     DECLARE_CLASS(UAnimNotify_Script,UAnimNotify,0,Engine)
 	// AnimNotify interface.
 	virtual void Notify( UMeshInstance *Instance, AActor *Owner );
@@ -8933,9 +12205,15 @@ public:
 class ENGINE_API UAnimNotify_Sound : public UAnimNotify
 {
 public:
+#if UE_SHREK2
+    class USound* Sound;
+    FLOAT Volume;
+    INT Radius;
+#else
     class USound* Sound GCC_PACK(4);
     FLOAT Volume;
     INT Radius;
+#endif
     DECLARE_CLASS(UAnimNotify_Sound,UAnimNotify,0,Engine)
 	// AnimNotify interface.
 	virtual void Notify( UMeshInstance *Instance, AActor *Owner );
@@ -8945,8 +12223,13 @@ public:
 class ENGINE_API UAnimNotify_DestroyEffect : public UAnimNotify
 {
 public:
+#if UE_SHREK2
+    FName DestroyTag;
+    BITFIELD bExpireParticles:1 GCC_PACK(4);
+#else
     FName DestroyTag GCC_PACK(4);
     BITFIELD bExpireParticles:1 GCC_PACK(4);
+#endif
     DECLARE_CLASS(UAnimNotify_DestroyEffect,UAnimNotify,0,Engine)
 	// AnimNotify interface.
 	virtual void Notify( UMeshInstance *Instance, AActor *Owner );
@@ -8956,6 +12239,17 @@ public:
 class ENGINE_API UAnimNotify_Effect : public UAnimNotify
 {
 public:
+#if UE_SHREK2
+    class UClass* EffectClass;
+    FName Bone;
+    FVector OffsetLocation;
+    FRotator OffsetRotation;
+    BITFIELD Attach:1 GCC_PACK(4);
+    FName Tag GCC_PACK(4);
+    FLOAT DrawScale;
+    FVector DrawScale3D;
+    class AActor* LastSpawnedEffect;
+#else
     class UClass* EffectClass GCC_PACK(4);
     FName Bone;
     FVector OffsetLocation;
@@ -8965,6 +12259,7 @@ public:
     FLOAT DrawScale;
     FVector DrawScale3D;
     class AActor* LastSpawnedEffect;
+#endif
     DECLARE_CLASS(UAnimNotify_Effect,UAnimNotify,0,Engine)
 	// AnimNotify interface.
 	virtual void Notify( UMeshInstance *Instance, AActor *Owner );
@@ -8990,6 +12285,16 @@ enum ESAStatus
 class ENGINE_API UMatSubAction : public UMatObject
 {
 public:
+#if UE_SHREK2
+    FLOAT Delay;
+    FLOAT Duration;
+    class UTexture* Icon;
+    BYTE Status;
+    FStringNoInit Desc;
+    FLOAT PctStarting;
+    FLOAT PctEnding;
+    FLOAT PctDuration;
+#else
     FLOAT Delay GCC_PACK(4);
     FLOAT Duration;
     class UTexture* Icon;
@@ -8998,6 +12303,7 @@ public:
     FLOAT PctStarting;
     FLOAT PctEnding;
     FLOAT PctDuration;
+#endif
     DECLARE_CLASS(UMatSubAction,UMatObject,0,Engine)
     #include "UMatSubAction.h"
 };
@@ -9015,7 +12321,11 @@ public:
 class ENGINE_API USubActionSceneSpeed : public UMatSubAction
 {
 public:
+#if UE_SHREK2
+    FRange SceneSpeed;
+#else
     FRange SceneSpeed GCC_PACK(4);
+#endif
     DECLARE_CLASS(USubActionSceneSpeed,UMatSubAction,0,Engine)
     #include "USubActionSceneSpeed.h"
 };
@@ -9024,7 +12334,11 @@ public:
 class ENGINE_API USubActionGameSpeed : public UMatSubAction
 {
 public:
+#if UE_SHREK2
+    FRange GameSpeed;
+#else
     FRange GameSpeed GCC_PACK(4);
+#endif
     DECLARE_CLASS(USubActionGameSpeed,UMatSubAction,0,Engine)
     #include "USubActionGameSpeed.h"
 };
@@ -9033,7 +12347,11 @@ public:
 class ENGINE_API USubActionOrientation : public UMatSubAction
 {
 public:
+#if UE_SHREK2
+    FOrientation CamOrientation;
+#else
     FOrientation CamOrientation GCC_PACK(4);
+#endif
     DECLARE_CLASS(USubActionOrientation,UMatSubAction,0,Engine)
     #include "USubActionOrientation.h"
 };
@@ -9042,7 +12360,11 @@ public:
 class ENGINE_API USubActionCameraShake : public UMatSubAction
 {
 public:
+#if UE_SHREK2
+    FRangeVector Shake;
+#else
     FRangeVector Shake GCC_PACK(4);
+#endif
     DECLARE_CLASS(USubActionCameraShake,UMatSubAction,0,Engine)
     #include "USubActionCameraShake.h"
 };
@@ -9051,7 +12373,11 @@ public:
 class ENGINE_API USubActionFOV : public UMatSubAction
 {
 public:
+#if UE_SHREK2
+    FRange FOV;
+#else
     FRange FOV GCC_PACK(4);
+#endif
     DECLARE_CLASS(USubActionFOV,UMatSubAction,0,Engine)
     #include "USubActionFOV.h"
 };
@@ -9060,7 +12386,11 @@ public:
 class ENGINE_API USubActionTrigger : public UMatSubAction
 {
 public:
+#if UE_SHREK2
+    FName EventName;
+#else
     FName EventName GCC_PACK(4);
+#endif
     DECLARE_CLASS(USubActionTrigger,UMatSubAction,0,Engine)
     #include "USubActionTrigger.h"
 };
@@ -9069,8 +12399,13 @@ public:
 class ENGINE_API USubActionFade : public UMatSubAction
 {
 public:
+#if UE_SHREK2
+    FColor FadeColor;
+    BITFIELD bFadeOut:1 GCC_PACK(4);
+#else
     FColor FadeColor GCC_PACK(4);
     BITFIELD bFadeOut:1 GCC_PACK(4);
+#endif
     DECLARE_CLASS(USubActionFade,UMatSubAction,0,Engine)
     #include "USubActionFade.h"
 };
@@ -9079,6 +12414,22 @@ public:
 class ENGINE_API UMatAction : public UMatObject
 {
 public:
+#if UE_SHREK2
+    class AInterpolationPoint* IntPoint;
+    FStringNoInit Comment;
+    FLOAT Duration;
+    TArrayNoInit<class UMatSubAction*> SubActions;
+    BITFIELD bSmoothCorner:1 GCC_PACK(4);
+    FVector StartControlPoint GCC_PACK(4);
+    FVector EndControlPoint;
+    BITFIELD bConstantPathVelocity:1 GCC_PACK(4);
+    FLOAT PathVelocity GCC_PACK(4);
+    FLOAT PathLength;
+    TArrayNoInit<FVector> SampleLocations;
+    FLOAT PctStarting;
+    FLOAT PctEnding;
+    FLOAT PctDuration;
+#else
     class AInterpolationPoint* IntPoint GCC_PACK(4);
     FStringNoInit Comment;
     FLOAT Duration;
@@ -9093,6 +12444,7 @@ public:
     FLOAT PctStarting;
     FLOAT PctEnding;
     FLOAT PctDuration;
+#endif
     DECLARE_CLASS(UMatAction,UMatObject,0,Engine)
     #include "UMatAction.h"
 };
@@ -9115,7 +12467,11 @@ enum EPathStyle
 class ENGINE_API UActionMoveCamera : public UMatAction
 {
 public:
+#if UE_SHREK2
+    BYTE PathStyle;
+#else
     BYTE PathStyle GCC_PACK(4);
+#endif
     DECLARE_CLASS(UActionMoveCamera,UMatAction,0|CLASS_Config,Engine)
     NO_DEFAULT_CONSTRUCTOR(UActionMoveCamera)
 };
@@ -9271,6 +12627,33 @@ struct UPlayerInput_eventPlayerInput_Parms
 class ENGINE_API UPlayerInput : public UObject
 {
 public:
+#if UE_SHREK2
+    BITFIELD bInvertMouse:1 GCC_PACK(4);
+    BITFIELD bUseJoystick:1;
+    BITFIELD bWasForward:1;
+    BITFIELD bWasBack:1;
+    BITFIELD bWasLeft:1;
+    BITFIELD bWasRight:1;
+    BITFIELD bEdgeForward:1;
+    BITFIELD bEdgeBack:1;
+    BITFIELD bEdgeLeft:1;
+    BITFIELD bEdgeRight:1;
+    BITFIELD bAdjustSampling:1;
+    BYTE MouseSmoothingMode GCC_PACK(4);
+    FLOAT MouseSmoothingStrength;
+    FLOAT MouseSensitivity;
+    FLOAT MouseSamplingTime;
+    FLOAT MouseAccelThreshold;
+    FLOAT SmoothedMouse[2];
+    FLOAT ZeroTime[2];
+    FLOAT SamplingTime[2];
+    FLOAT MaybeTime[2];
+    FLOAT OldSamples[4];
+    INT MouseSamples[2];
+    FLOAT DoubleClickTimer;
+    FLOAT DoubleClickTime;
+    BITFIELD bEnableDodging:1;
+#else
     BITFIELD bInvertMouse:1 GCC_PACK(4);
     BITFIELD bWasForward:1;
     BITFIELD bWasBack:1;
@@ -9295,6 +12678,7 @@ public:
     FLOAT DoubleClickTimer;
     FLOAT DoubleClickTime;
     BITFIELD bEnableDodging:1 GCC_PACK(4);
+#endif
     void eventPlayerInput(FLOAT DeltaTime)
     {
         UPlayerInput_eventPlayerInput_Parms Parms;
@@ -9309,8 +12693,14 @@ public:
 class ENGINE_API UCheatManager : public UObject
 {
 public:
+#if UE_SHREK2
+    FRotator LockedRotation;
+    FString ProjectSpecificPackage;
+    BITFIELD bCheatsEnabled:1;
+#else
     FRotator LockedRotation GCC_PACK(4);
     BITFIELD bCheatsEnabled:1 GCC_PACK(4);
+#endif
     DECLARE_CLASS(UCheatManager,UObject,0,Engine)
     NO_DEFAULT_CONSTRUCTOR(UCheatManager)
 };
@@ -9319,6 +12709,40 @@ public:
 class ENGINE_API UI3DL2Listener : public UObject
 {
 public:
+#if UE_SHREK2
+    FLOAT EnvironmentSize;
+    FLOAT EnvironmentDiffusion;
+    INT Room;
+    INT RoomHF;
+    INT RoomLF;
+    FLOAT DecayTime;
+    FLOAT DecayHFRatio;
+    FLOAT DecayLFRatio;
+    INT Reflections;
+    FLOAT ReflectionsDelay;
+    FVector ReflectionsPan;
+    INT Reverb;
+    FLOAT ReverbDelay;
+    FVector ReverbPan;
+    FLOAT EchoTime;
+    FLOAT EchoDepth;
+    FLOAT ModulationTime;
+    FLOAT ModulationDepth;
+    FLOAT RoomRolloffFactor;
+    FLOAT AirAbsorptionHF;
+    FLOAT HFReference;
+    FLOAT LFReference;
+    BITFIELD bDecayTimeScale:1 GCC_PACK(4);
+    BITFIELD bReflectionsScale:1;
+    BITFIELD bReflectionsDelayScale:1;
+    BITFIELD bReverbScale:1;
+    BITFIELD bReverbDelayScale:1;
+    BITFIELD bEchoTimeScale:1;
+    BITFIELD bModulationTimeScale:1;
+    BITFIELD bDecayHFLimit:1;
+    INT Environment GCC_PACK(4);
+    INT Updated;
+#else
     FLOAT EnvironmentSize GCC_PACK(4);
     FLOAT EnvironmentDiffusion;
     INT Room;
@@ -9351,6 +12775,7 @@ public:
     BITFIELD bDecayHFLimit:1;
     INT Environment GCC_PACK(4);
     INT Updated;
+#endif
     DECLARE_CLASS(UI3DL2Listener,UObject,0,Engine)
     #include "UI3DL2Listener.h"
 };
@@ -9429,6 +12854,20 @@ public:
 class ENGINE_API ULevelSummary : public UObject
 {
 public:
+#if UE_SHREK2
+    FStringNoInit Title;
+    FStringNoInit Author;
+    INT IdealPlayerCount;
+    FStringNoInit LevelEnterText;
+    FStringNoInit Description;
+    FStringNoInit DecoTextName;
+    INT IdealPlayerCountMin;
+    INT IdealPlayerCountMax;
+    BITFIELD HideFromMenus:1;
+    INT SinglePlayerTeamSize;
+    class UMaterial* Screenshot;
+    FStringNoInit ExtraInfo;
+#else
     FStringNoInit Title GCC_PACK(4);
     FStringNoInit Description;
     FStringNoInit LevelEnterText;
@@ -9440,6 +12879,7 @@ public:
     INT SinglePlayerTeamSize GCC_PACK(4);
     class UMaterial* Screenshot;
     FStringNoInit ExtraInfo;
+#endif
     DECLARE_CLASS(ULevelSummary,UObject,0,Engine)
     #include "ULevelSummary.h"
 };
@@ -9448,6 +12888,19 @@ public:
 class ENGINE_API UReachSpec : public UObject
 {
 public:
+#if UE_SHREK2
+    INT Distance;
+    class ANavigationPoint* Start;
+    class ANavigationPoint* End;
+    INT CollisionRadius;
+    INT CollisionHeight;
+    INT reachFlags;
+    INT MaxLandingVelocity;
+    BYTE bPruned;
+    BITFIELD bForced:1 GCC_PACK(4);
+    BITFIELD bSymmetric:1;
+    FPlane ASymmetricPathColor GCC_PACK(4);
+#else
     INT Distance GCC_PACK(4);
     class ANavigationPoint* Start;
     class ANavigationPoint* End;
@@ -9457,6 +12910,7 @@ public:
     INT MaxLandingVelocity;
     BYTE bPruned;
     BITFIELD bForced:1 GCC_PACK(4);
+#endif
     DECLARE_CLASS(UReachSpec,UObject,0,Engine)
     #include "UReachSpec.h"
 };
@@ -9612,6 +13066,20 @@ public:
 class ENGINE_API UKarmaParamsCollision : public UObject
 {
 public:
+#if UE_SHREK2
+    PTRINT KarmaData;
+    FLOAT KScale;
+    FVector KScale3D;
+    FLOAT KFriction;
+    FLOAT KRestitution;
+    FLOAT KImpactThreshold;
+    BITFIELD bContactingLevel:1 GCC_PACK(4);
+    FVector KAcceleration;
+    FVector ContactRegionCenter;
+    FVector ContactRegionNormal;
+    FLOAT ContactRegionRadius;
+    FLOAT ContactRegionNormalForce;
+#else
     PTRINT KarmaData GCC_PACK(4);
     FLOAT KScale;
     FVector KScale3D;
@@ -9624,6 +13092,7 @@ public:
     FVector ContactRegionNormal;
     FLOAT ContactRegionRadius;
     FLOAT ContactRegionNormalForce;
+#endif
     DECLARE_FUNCTION(execCalcContactRegion);
     DECLARE_CLASS(UKarmaParamsCollision,UObject,0,Engine)
 #ifdef WITH_KARMA
@@ -9635,6 +13104,35 @@ public:
 class ENGINE_API UKarmaParams : public UKarmaParamsCollision
 {
 public:
+#if UE_SHREK2
+    PTRINT KAng3;
+    PTRINT KTriList;
+    FLOAT KLastVel;
+    FLOAT KMass;
+    FLOAT KLinearDamping;
+    FLOAT KAngularDamping;
+    FLOAT KBuoyancy;
+    BITFIELD KStartEnabled:1 GCC_PACK(4);
+    FVector KStartLinVel GCC_PACK(4);
+    FVector KStartAngVel;
+    BITFIELD bKNonSphericalInertia:1 GCC_PACK(4);
+    FLOAT KActorGravScale GCC_PACK(4);
+    FLOAT KVelDropBelowThreshold;
+    BITFIELD bHighDetailOnly:1 GCC_PACK(4);
+    BITFIELD bClientOnly:1;
+    BITFIELD bKDoubleTickRate:1;
+    BITFIELD bKStayUpright:1;
+    BITFIELD bKAllowRotate:1;
+    BITFIELD bDestroyOnSimError:1;
+    FLOAT StayUprightStiffness GCC_PACK(4);
+    FLOAT StayUprightDamping;
+    BYTE SafeTimeMode;
+    TArrayNoInit<class AKRepulsor*> Repulsors;
+    FLOAT KMaxSpeed;
+    FLOAT KMaxAngularSpeed;
+    BITFIELD bDestroyOnWorldPenetrate:1;
+    BITFIELD bDoSafetime:1;
+#else
     PTRINT KAng3 GCC_PACK(4);
     PTRINT KTriList;
     FLOAT KLastVel;
@@ -9661,6 +13159,7 @@ public:
     FLOAT StayUprightStiffness GCC_PACK(4);
     FLOAT StayUprightDamping;
     TArrayNoInit<class AKRepulsor*> Repulsors;
+#endif
     DECLARE_CLASS(UKarmaParams,UKarmaParamsCollision,0,Engine)
 #ifdef WITH_KARMA
     void PostEditChange();
@@ -9672,6 +13171,16 @@ public:
 class ENGINE_API UKarmaParamsSkel : public UKarmaParams
 {
 public:
+#if UE_SHREK2
+    FStringNoInit KSkeleton;
+    BITFIELD bKDoConvulsions:1 GCC_PACK(4);
+    FRange KConvulseSpacing GCC_PACK(4);
+    FVector KShotStart;
+    FVector KShotEnd;
+    FLOAT KShotStrength;
+    BITFIELD bKImportantRagdoll:1 GCC_PACK(4);
+    BITFIELD bRubbery:1;
+#else
     FStringNoInit KSkeleton GCC_PACK(4);
     BITFIELD bKDoConvulsions:1 GCC_PACK(4);
     BITFIELD bRubbery:1;
@@ -9680,6 +13189,7 @@ public:
     FVector KShotEnd;
     FLOAT KShotStrength;
     BITFIELD bKImportantRagdoll:1 GCC_PACK(4);
+#endif
     DECLARE_CLASS(UKarmaParamsSkel,UKarmaParams,0,Engine)
     NO_DEFAULT_CONSTRUCTOR(UKarmaParamsSkel)
 };
@@ -9688,8 +13198,13 @@ public:
 class ENGINE_API UKarmaParamsRBFull : public UKarmaParams
 {
 public:
+#if UE_SHREK2
+    FLOAT KInertiaTensor[6];
+    FVector KCOMOffset;
+#else
     FLOAT KInertiaTensor[6] GCC_PACK(4);
     FVector KCOMOffset;
+#endif
     DECLARE_CLASS(UKarmaParamsRBFull,UKarmaParams,0,Engine)
     NO_DEFAULT_CONSTRUCTOR(UKarmaParamsRBFull)
 };

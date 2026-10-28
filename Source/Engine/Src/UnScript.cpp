@@ -1583,6 +1583,107 @@ void AActor::execGetAnimParams( FFrame& Stack, RESULT_DECL )
 }
 
 
+#if UE_SHREK2
+// Mainline animation query natives (600-605), removed in UT2004.
+void AActor::execGetAnimSequence( FFrame& Stack, RESULT_DECL )
+{
+	guardSlow(AActor::execGetAnimSequence);
+	P_GET_INT(Channel);
+	P_FINISH;
+	*(FName*)Result = NAME_None;
+	if( Mesh ) { Mesh->MeshGetInstance(this); if( MeshInstance ) *(FName*)Result = MeshInstance->GetActiveAnimSequence( Channel ); }
+	unguardexecSlow;
+}
+IMPLEMENT_FUNCTION( AActor, 603, execGetAnimSequence );
+
+void AActor::execGetAnimRate( FFrame& Stack, RESULT_DECL )
+{
+	guardSlow(AActor::execGetAnimRate);
+	P_GET_INT(Channel);
+	P_FINISH;
+	*(FLOAT*)Result = 0.f;
+	if( Mesh ) { Mesh->MeshGetInstance(this); if( MeshInstance ) *(FLOAT*)Result = MeshInstance->GetActiveAnimRate( Channel ); }
+	unguardexecSlow;
+}
+IMPLEMENT_FUNCTION( AActor, 600, execGetAnimRate );
+
+void AActor::execGetAnimFrame( FFrame& Stack, RESULT_DECL )
+{
+	guardSlow(AActor::execGetAnimFrame);
+	P_GET_INT(Channel);
+	P_FINISH;
+	*(FLOAT*)Result = 0.f;
+	if( Mesh ) { Mesh->MeshGetInstance(this); if( MeshInstance ) *(FLOAT*)Result = MeshInstance->GetActiveAnimFrame( Channel ); }
+	unguardexecSlow;
+}
+IMPLEMENT_FUNCTION( AActor, 601, execGetAnimFrame );
+
+// Seconds into the current sequence on the channel.
+static FMeshAnimSeq* GetChannelSeq( AActor* Actor, INT Channel )
+{
+	if( !Actor->Mesh ) return NULL;
+	Actor->Mesh->MeshGetInstance( Actor );
+	USkeletalMeshInstance* SkelInst = Cast<USkeletalMeshInstance>( Actor->MeshInstance );
+	if( !SkelInst ) return NULL;
+	UMeshAnimation* AnimObj = SkelInst->FindAnimObjectForSequence( SkelInst->GetActiveAnimSequence( Channel ) );
+	return AnimObj ? AnimObj->GetAnimSeq( SkelInst->GetActiveAnimSequence( Channel ) ) : NULL;
+}
+
+void AActor::execGetAnimTime( FFrame& Stack, RESULT_DECL )
+{
+	guardSlow(AActor::execGetAnimTime);
+	P_GET_INT(Channel);
+	P_FINISH;
+	*(FLOAT*)Result = 0.f;
+	if( Mesh ) { Mesh->MeshGetInstance(this); if( MeshInstance )
+	{
+		FLOAT Frame = MeshInstance->GetActiveAnimFrame( Channel );
+		FMeshAnimSeq* Seq = GetChannelSeq( this, Channel );
+		*(FLOAT*)Result = ( Seq && Seq->Rate > 0.f ) ? Frame / Seq->Rate : Frame;
+	} }
+	unguardexecSlow;
+}
+IMPLEMENT_FUNCTION( AActor, 602, execGetAnimTime );
+
+void AActor::execGetAnimNumFrames( FFrame& Stack, RESULT_DECL )
+{
+	guardSlow(AActor::execGetAnimNumFrames);
+	P_GET_INT(Channel);
+	P_FINISH;
+	FMeshAnimSeq* Seq = GetChannelSeq( this, Channel );
+	*(FLOAT*)Result = Seq ? (FLOAT)Seq->NumFrames : 0.f;
+	unguardexecSlow;
+}
+IMPLEMENT_FUNCTION( AActor, 604, execGetAnimNumFrames );
+
+void AActor::execGetAnimObjectByName( FFrame& Stack, RESULT_DECL )
+{
+	guardSlow(AActor::execGetAnimObjectByName);
+	P_GET_NAME(NameOfAnim);
+	P_FINISH;
+	*(UObject**)Result = NULL;
+	if( Mesh ) { Mesh->MeshGetInstance(this);
+		USkeletalMeshInstance* SkelInst = Cast<USkeletalMeshInstance>( MeshInstance );
+		if( SkelInst ) *(UObject**)Result = SkelInst->FindAnimObjectForSequence( NameOfAnim ); }
+	unguardexecSlow;
+}
+IMPLEMENT_FUNCTION( AActor, 605, execGetAnimObjectByName );
+
+// Mainline StopSound( Sound ): stop all instances of the sound on this actor.
+void AActor::execStopSound( FFrame& Stack, RESULT_DECL )
+{
+	guardSlow(AActor::execStopSound);
+	P_GET_OBJECT(USound, Sound);
+	P_FINISH;
+#ifdef WITH_LIPSINC
+	if( GetLevel() && GetLevel()->Engine && GetLevel()->Engine->Audio )
+		GetLevel()->Engine->Audio->StopSound( this, Sound );
+#endif
+	unguardexecSlow;
+}
+IMPLEMENT_FUNCTION( AActor, 265, execStopSound );
+#endif
+
 // native final function bool AnimIsInGroup( int Channel, name GroupName ); 
 // Determine if currently playing animation of channel (default 0) is member of given group 
 
@@ -3350,6 +3451,10 @@ void AActor::execUpdateURL( FFrame& Stack, RESULT_DECL )
 		GameEngine->LastURL.SaveURLConfig( TEXT("DefaultPlayer"), *NewOption, TEXT("User") );
 	unguard;
 }
+#if UE_SHREK2
+// Mainline declares UpdateURL as native(546); UT2004 binds it by name only.
+static BYTE ShrekUpdateURLReg546 = GRegisterNative( 546, (Native)&AActor::execUpdateURL );
+#endif
 void AActor::execGetUrlOption( FFrame& Stack, RESULT_DECL )
 {
 	guard(AActor::execUpdateURL);

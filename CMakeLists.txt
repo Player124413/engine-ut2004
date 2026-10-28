@@ -92,6 +92,10 @@ message(STATUS "Target arch: ${TARGET_ARCH}")
 message(STATUS "64-bit: ${TARGET_IS_64BIT}")
 
 option(UE_ALLOW_64BIT "Build x86_64 instead of demoting to -m32. 32-bit is the default." OFF)
+option(UE_GAME_SHREK2 "Build the engine for Shrek 2 (KnowWonder's UE2 mainline game) instead of UT2004: its native class layout, packages and module name" OFF)
+if(UE_GAME_SHREK2)
+  add_compile_definitions(UE_SHREK2=1)
+endif()
 # UE_PTR_BYTES: the pointer width this build will actually produce, computed once so the gates below
 # have something trustworthy to test. Neither obvious variable is right on its own:
 #   * CMAKE_SIZEOF_VOID_P is fixed during project() and does not see the -m32 demotion applied

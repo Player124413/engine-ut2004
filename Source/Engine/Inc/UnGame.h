@@ -27,17 +27,39 @@ class ENGINE_API UGameEngine : public UEngine
 	ULevel*			GLevel;
 	ULevel*			GEntry;
 	UPendingLevel*	GPendingLevel;
+#if UE_SHREK2
+	class APlayerController* LevelLoadingController;
+	INT LevelLoadingTotalActorCount;
+	INT LevelLoadingActorCount;
+#endif
 	FURL			LastURL;
 	TArrayNoInit<FString> ServerActors;
 	TArrayNoInit<FString> ServerPackages;
+#if UE_SHREK2
+	class UObject* GWorldInfo;
+	FLOAT fAvgFrameTime;
+	TArray<UObject*> DummyArray;
+	class UObject* DummyObject;
+#endif
 
+#if !UE_SHREK2
 	TArray<UPackageCheckInfo*> PackageValidation GCC_PACK(4);	// The Database of allowed MD5s
+#endif
+#if !UE_SHREK2
 	UObject* MD5Package;
+#endif
 
+#if !UE_SHREK2
 	FString			PendingRecordMovie;		// If set, a record movie command is issued on level start.
+#endif
 
 	FStringNoInit MainMenuClass;
+#if UE_SHREK2
+	FStringNoInit InitialMenuClass;
+#endif
+#if !UE_SHREK2
 	FStringNoInit SinglePlayerMenuClass;
+#endif
 	FStringNoInit ConnectingMenuClass;
 	FStringNoInit DisconnectMenuClass;
 	FStringNoInit LoadingClass;
@@ -50,6 +72,12 @@ class ENGINE_API UGameEngine : public UEngine
 	BITFIELD		ColorPlayerAndWeaponTextures:1;
 	BITFIELD		ColorInterfaceTextures:1;
 	BITFIELD        VoIPAllowVAD:1;
+#if UE_SHREK2
+	TArray<UPackageCheckInfo*> PackageValidation GCC_PACK(4);
+	UObject* MD5Package;
+	FString PendingRecordMovie;
+	FStringNoInit SinglePlayerMenuClass;
+#endif
 
 	// Constructors.
 	UGameEngine();

@@ -193,23 +193,17 @@ void UGameEngine::Init()
 	if( GUfrontLog )
 		printf("[ENGINE-DBG] About to load Packages.md5\n");
 
-#ifdef __EMSCRIPTEN__
-	// Skip MD5 package validation on the web: the host serves the packages, and the validation file is
-	// not loaded through the web file system.
+#if defined(__EMSCRIPTEN__) || UE_SHREK2
+	// Skip MD5 package validation: mainline has no package validation database.
 	MD5Package = NULL;
-	if( GUfrontLog )
-		printf("[ENGINE-DBG] Skipped Packages.md5 on Emscripten\n");
 #else
 	MD5Package = LoadPackage( NULL, TEXT("Packages.md5"), 0 );
 #endif
 
 	if (!MD5Package)
 	{
-#ifndef __EMSCRIPTEN__
+#if !defined(__EMSCRIPTEN__) && !UE_SHREK2
         appErrorf(LocalizeError(TEXT("FailedMD5Load"),TEXT("Engine")), TEXT("Packages.md5"));
-#else
-        if( GUfrontLog )
-            printf("[ENGINE-DBG] MD5Package is NULL (expected on Emscripten)\n");
 #endif
 	}
     else
@@ -350,7 +344,14 @@ void UGameEngine::Init()
 		if ( !Client->InteractionMaster->eventAddInteraction(TEXT("ini:Engine.Engine.StreamPlayer"), Viewport) )
 			debugf(TEXT("Error creating music player! Please check the StreamPlayer line of the [Engine.Engine] section of the UT2004.ini file."));
 
+#if UE_SHREK2
+		// Mainline Console has no ViewportInitialized event.
+		UFunction* ViewportInitFn = Console->FindFunction(ENGINE_ViewportInitialized);
+		if( ViewportInitFn )
+			Console->ProcessEvent( ViewportInitFn, NULL );
+#else
 		Cast<UConsole>(Console)->eventViewportInitialized();	// Let the console know it has a viewport
+#endif
 		// Look for changes to the ini file from the command line
 		TCHAR TMainMenuClass[1024]=TEXT("");
 		if( Parse( appCmdLine(), TEXT("-MainMenu="), TMainMenuClass, 1024 ) )
@@ -394,7 +395,9 @@ void UGameEngine::Init()
 			PlayerController->bForceFeedbackSupported = (UBOOL)GForceFeedbackAvailable;
 
 			// Load speech recognition grammar.
-			GLevel->GetLevelInfo()->Game->eventSetGrammar();		
+			#if !UE_SHREK2
+			GLevel->GetLevelInfo()->Game->eventSetGrammar();
+#endif		
 			Cast<UBaseGUIController>(GUIController)->eventAutoLoadMenus();			// Load Inital Menus
 		}
 		// --- jdf
@@ -2795,7 +2798,9 @@ ULevel* UGameEngine::LoadMap( const FURL& URL, UPendingLevel* Pending, const TMa
 		if( Info->Game )
 		{		
 			Info->Game->eventInitGame( Options, Error );
-			Info->Game->eventSetGrammar();
+			#if !UE_SHREK2
+			Info->Game->eventSetGrammar(); // mainline GameInfo has no voice-order grammar
+#endif
 		}
 
 		// Send PreBeginPlay.

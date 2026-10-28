@@ -293,6 +293,118 @@ struct UGUIController_eventOnNeedRawKeyPress_Parms
 class XINTERFACE_API UGUIController : public UBaseGUIController
 {
 public:
+#if UE_SHREK2
+    TArrayNoInit<class UGUIPage*> MenuStack;
+    class UGUIPage* ActivePage;
+    TArrayNoInit<class UGUIFont*> FontStack;
+    TArrayNoInit<class UGUIStyles*> StyleStack;
+    TArrayNoInit<FString> StyleNames;
+    TArrayNoInit<class UMaterial*> MouseCursors;
+    TArrayNoInit<FVector> MouseCursorOffset;
+    TArrayNoInit<class UGUIPage*> PersistentStack;
+    BYTE ControllerMask;
+    BYTE ControllerId;
+    FLOAT MouseX;
+    FLOAT MouseY;
+    FLOAT LastMouseX;
+    FLOAT LastMouseY;
+    BITFIELD ShiftPressed:1 GCC_PACK(4);
+    BITFIELD AltPressed:1;
+    BITFIELD CtrlPressed:1;
+    FLOAT DblClickWindow GCC_PACK(4);
+    FLOAT LastClickTime;
+    INT LastClickX;
+    INT LastClickY;
+    FLOAT ButtonRepeatDelay;
+    BYTE RepeatKey;
+    BYTE RepeatKey__pad[3];
+    FLOAT RepeatDelta;
+    FLOAT RepeatDelta__pad[3];
+    FLOAT RepeatTime;
+    FLOAT RepeatTime__pad[3];
+    FLOAT CursorFade;
+    INT CursorStep;
+    FLOAT FastCursorFade;
+    INT FastCursorStep;
+    class UGUIComponent* FocusedControl;
+    class UGUIComponent* ActiveControl;
+    class UGUIComponent* SkipControl;
+    class UGUIComponent* MoveControl;
+    BITFIELD bIgnoreNextRelease:1 GCC_PACK(4);
+    BITFIELD bModAuthor:1;
+    BITFIELD bDesignMode:1;
+    BITFIELD bHighlightCurrent:1;
+    BITFIELD bCurMenuInitialized:1;
+    FStringNoInit GameResolution GCC_PACK(4);
+    FLOAT MenuMouseSens;
+    BITFIELD MainNotWanted:1 GCC_PACK(4);
+    class USound* MouseOverSound GCC_PACK(4);
+    class USound* ClickSound;
+    class USound* EditSound;
+    class USound* UpSound;
+    class USound* DownSound;
+    BITFIELD bForceMouseCheck:1 GCC_PACK(4);
+    BITFIELD bIgnoreUntilPress:1;
+    TArrayNoInit<FAutoLoadMenu> AutoLoad GCC_PACK(4);
+    BITFIELD bEmulatedJoypad:1 GCC_PACK(4);
+    BITFIELD bJoyMouse:1;
+    BITFIELD bHideMouseCursor:1;
+    FLOAT JoyDeadZone GCC_PACK(4);
+    FLOAT JoyLeftXAxis[4];
+    FLOAT JoyLeftYAxis[4];
+    FLOAT JoyRightXAxis[4];
+    FLOAT JoyRightYAxis[4];
+    BYTE JoyButtons[64];
+    FLOAT JoyControlsDelta[16];
+    class UMaterial* WhiteBorder;
+    FScriptDelegate __OnNeedRawKeyPress__Delegate;
+    INT FONT_NUM;
+    INT STYLE_NUM;
+    INT CURSOR_NUM;
+    TArrayNoInit<FProfileStruct> Profilers;
+    FFloatBox MouseCursorBounds;
+    TArrayNoInit<class UMaterial*> ImageList;
+    TArrayNoInit<FString> DefaultStyleNames;
+    TArrayNoInit<FRestoreMenuItem> RestoreMenus;
+    TArrayNoInit<FDesignModeHint> DesignModeHints;
+    INT MaxSimultaneousPings;
+    INT ResX;
+    INT ResY;
+    PTRINT Designer;
+    class USound* DragSound;
+    class USound* FadeSound;
+    class UGUIComponent* DropSource;
+    class UGUIComponent* DropTarget;
+    class UGUIContextMenu* ContextMenu;
+    class UGUIToolTip* MouseOver;
+    FStringNoInit LastGameType;
+    FStringNoInit RequestDataMenu;
+    FStringNoInit ArrayPropertyMenu;
+    FStringNoInit DynArrayPropertyMenu;
+    FStringNoInit FilterMenu;
+    FStringNoInit MapVotingMenu;
+    FStringNoInit KickVotingMenu;
+    FStringNoInit MatchSetupMenu;
+    FStringNoInit EditFavoriteMenu;
+    TArrayNoInit<FString> MainMenuOptions;
+    FStringNoInit DesignerMenu;
+    BITFIELD bModulateStackedMenus:1;
+    BITFIELD bQuietMenu:1;
+    BITFIELD bNoToolTips:1;
+    BITFIELD bDesignModeToolTips:1;
+    BITFIELD bAutoRefreshBrowser:1;
+    BITFIELD bExpertMode:1;
+    BITFIELD bInteractiveMode:1;
+    BITFIELD bDrawFullPaths:1;
+    BITFIELD bSnapCursor:1;
+    FLOAT RenderDelta;
+    FLOAT LastRenderTime;
+    BITFIELD bFixedMouseSize:1;
+    BYTE KeyDown[255];
+    TArrayNoInit<class UClass*> RegisteredClasses;
+    BITFIELD bECEEdition:1;
+    FScriptDelegate __AddBuddy__Delegate;
+#else
     INT FONT_NUM GCC_PACK(4);
     INT STYLE_NUM;
     INT CURSOR_NUM;
@@ -388,6 +500,7 @@ public:
     BITFIELD bECEEdition:1 GCC_PACK(4);
     FScriptDelegate __OnNeedRawKeyPress__Delegate GCC_PACK(4);
     FScriptDelegate __AddBuddy__Delegate;
+#endif
     DECLARE_FUNCTION(execGetMainMenuClass);
     DECLARE_FUNCTION(execCheckForECE);
     DECLARE_FUNCTION(execAuthroizeFirewall);
@@ -858,10 +971,17 @@ enum eMenuState
 };
 struct XINTERFACE_API FGUIListElem
 {
+#if UE_SHREK2
+    FString Item;
+    class UObject* ExtraData;
+    FString ExtraStrData;
+    BITFIELD bSection:1;
+#else
     FString Item GCC_PACK(4);
     class UObject* ExtraData;
     FString ExtraStrData;
     BITFIELD bSection:1 GCC_PACK(4);
+#endif
 };
 
 struct XINTERFACE_API FMultiSelectListElem
@@ -911,6 +1031,15 @@ struct XINTERFACE_API FGUITreeNode
 class XINTERFACE_API UGUI : public UObject
 {
 public:
+#if UE_SHREK2
+    class UGUIController* Controller;
+    FPlane SaveModulation;
+    FLOAT SaveX;
+    FLOAT SaveY;
+    FColor SaveColor;
+    class UFont* SaveFont;
+    BYTE SaveStyle;
+#else
     class UGUIController* Controller GCC_PACK(4);
     FPlane SaveModulation;
     FLOAT SaveX;
@@ -918,6 +1047,7 @@ public:
     FColor SaveColor;
     class UFont* SaveFont;
     BYTE SaveStyle;
+#endif
     DECLARE_FUNCTION(execGetModLogo);
     DECLARE_FUNCTION(execGetModValue);
     DECLARE_FUNCTION(execGetModList);
@@ -1224,6 +1354,122 @@ struct UGUIComponent_eventOnArrival_Parms
 class XINTERFACE_API UGUIComponent : public UGUI
 {
 public:
+#if UE_SHREK2
+    class UGUIComponent* MenuOwner;
+    BYTE MenuState;
+    FStringNoInit IniOption;
+    FStringNoInit IniDefault;
+    FStringNoInit StyleName;
+    BITFIELD bBoundToParent:1 GCC_PACK(4);
+    BITFIELD bScaleToParent:1;
+    BITFIELD bHasFocus:1;
+    BITFIELD bVisible:1;
+    BITFIELD bAcceptsInput:1;
+    BITFIELD bCaptureTabs:1;
+    BITFIELD bCaptureMouse:1;
+    BITFIELD bNeverFocus:1;
+    BITFIELD bRepeatClick:1;
+    BITFIELD bRequireReleaseClick:1;
+    class UGUIComponent* FocusInstead GCC_PACK(4);
+    FStringNoInit Hint;
+    FLOAT WinTop;
+    FLOAT WinLeft;
+    FLOAT WinWidth;
+    FLOAT WinHeight;
+    INT MouseCursorIndex;
+    BITFIELD bTabStop:1 GCC_PACK(4);
+    INT TabOrder GCC_PACK(4);
+    BITFIELD bFocusOnWatch:1 GCC_PACK(4);
+    FLOAT RenderWeight GCC_PACK(4);
+    INT Tag;
+    class UGUILabel* FriendlyLabel;
+    BITFIELD bMouseOverSound:1 GCC_PACK(4);
+    BYTE OnClickSound GCC_PACK(4);
+    class UGUIStyles* Style;
+    FLOAT Bounds[4];
+    FLOAT ClientBounds[4];
+    BITFIELD bPendingFocus:1 GCC_PACK(4);
+    INT TimerIndex GCC_PACK(4);
+    BITFIELD bTimerRepeat:1 GCC_PACK(4);
+    FLOAT TimerCountdown GCC_PACK(4);
+    FLOAT TimerInterval;
+    FLOAT SaveX;
+    FLOAT SaveY;
+    FColor SaveColor;
+    class UObject* SaveFont;
+    BYTE SaveStyle;
+    class UGUIComponent* LinkOverrides[4];
+    class UGUIComponent* Links[4];
+    FScriptDelegate __OnPreDraw__Delegate;
+    FScriptDelegate __OnDraw__Delegate;
+    FScriptDelegate __OnActivate__Delegate;
+    FScriptDelegate __OnDeActivate__Delegate;
+    FScriptDelegate __OnWatch__Delegate;
+    FScriptDelegate __OnHitTest__Delegate;
+    FScriptDelegate __OnRender__Delegate;
+    FScriptDelegate __OnMessage__Delegate;
+    FScriptDelegate __OnHide__Delegate;
+    FScriptDelegate __OnShow__Delegate;
+    FScriptDelegate __OnInvalidate__Delegate;
+    FScriptDelegate __OnClick__Delegate;
+    FScriptDelegate __OnDblClick__Delegate;
+    FScriptDelegate __OnRightClick__Delegate;
+    FScriptDelegate __OnMousePressed__Delegate;
+    FScriptDelegate __OnMouseRelease__Delegate;
+    FScriptDelegate __OnChange__Delegate;
+    FScriptDelegate __OnKeyType__Delegate;
+    FScriptDelegate __OnKeyEvent__Delegate;
+    FScriptDelegate __OnCapturedMouseMove__Delegate;
+    FScriptDelegate __OnRawXController__Delegate;
+    FScriptDelegate __OnXControllerEvent__Delegate;
+    FScriptDelegate __OnLoadINI__Delegate;
+    FScriptDelegate __OnSaveINI__Delegate;
+    class UGUIPage* PageOwner;
+    BYTE LastMenuState;
+    BYTE DropState;
+    BYTE FontScale;
+    BITFIELD bDebugging:1;
+    BITFIELD bDropSource:1;
+    BITFIELD bDropTarget:1;
+    BITFIELD bInit:1;
+    BITFIELD bNeverScale:1;
+    BITFIELD bRequiresStyle:1;
+    BITFIELD bPositioned:1;
+    BITFIELD bAnimating:1;
+    BITFIELD bTravelling:1;
+    BITFIELD bSizing:1;
+    TArrayNoInit<FVector> MotionFrame;
+    TArrayNoInit<FVector> SizeFrame;
+    FLOAT MouseOffset[4];
+    class UGUIContextMenu* ContextMenu;
+    class UGUIToolTip* ToolTip;
+    FColor WhiteColor;
+    BYTE BoundingType;
+    BYTE ScalingType;
+    BITFIELD bStandardized:1;
+    FLOAT StandardHeight;
+    INT PreDrawCount;
+    INT DrawCount;
+    INT OnRenderCount;
+    INT OnRenderedCount;
+    INT OnPreDrawCount;
+    INT OnDrawCount;
+    FScriptDelegate __OnArrival__Delegate;
+    FScriptDelegate __OnEndAnimation__Delegate;
+    FScriptDelegate __OnRendered__Delegate;
+    FScriptDelegate __OnBeginTooltip__Delegate;
+    FScriptDelegate __OnEndTooltip__Delegate;
+    FScriptDelegate __OnHover__Delegate;
+    FScriptDelegate __OnTimer__Delegate;
+    FScriptDelegate __OnDesignModeKeyEvent__Delegate;
+    FScriptDelegate __OnMultiSelect__Delegate;
+    FScriptDelegate __OnBeginDrag__Delegate;
+    FScriptDelegate __OnEndDrag__Delegate;
+    FScriptDelegate __OnDragDrop__Delegate;
+    FScriptDelegate __OnDragEnter__Delegate;
+    FScriptDelegate __OnDragLeave__Delegate;
+    FScriptDelegate __OnDragOver__Delegate;
+#else
     class UGUIPage* PageOwner GCC_PACK(4);
     class UGUIComponent* MenuOwner;
     class UGUIComponent* FocusInstead;
@@ -1329,6 +1575,7 @@ public:
     FScriptDelegate __OnDragEnter__Delegate;
     FScriptDelegate __OnDragLeave__Delegate;
     FScriptDelegate __OnDragOver__Delegate;
+#endif
     DECLARE_FUNCTION(execSpecialHit);
     DECLARE_FUNCTION(execGetMenuPath);
     DECLARE_FUNCTION(execRelativeHeight);
@@ -1870,6 +2117,20 @@ struct UGUIMultiComponent_eventHandleContextMenuOpen_Parms
 class XINTERFACE_API UGUIMultiComponent : public UGUIComponent
 {
 public:
+#if UE_SHREK2
+    TArrayNoInit<class UGUIComponent*> Controls;
+    TArrayNoInit<class UGUIComponent*> Components;
+    class UGUIComponent* FocusedControl;
+    BITFIELD PropagateVisibility:1 GCC_PACK(4);
+    INT AnimationCount;
+    BITFIELD bOldStyleMenus:1;
+    BITFIELD bDrawFocusedLast:1;
+    BITFIELD bAlwaysAutomate:1;
+    FScriptDelegate __HandleContextMenuOpen__Delegate;
+    FScriptDelegate __HandleContextMenuClose__Delegate;
+    FScriptDelegate __NotifyContextSelect__Delegate;
+    FScriptDelegate __OnCreateComponent__Delegate;
+#else
     TArrayNoInit<class UGUIComponent*> Controls GCC_PACK(4);
     class UGUIComponent* FocusedControl;
     TArrayNoInit<class UGUIComponent*> Components;
@@ -1882,6 +2143,7 @@ public:
     FScriptDelegate __HandleContextMenuClose__Delegate;
     FScriptDelegate __NotifyContextSelect__Delegate;
     FScriptDelegate __OnCreateComponent__Delegate;
+#endif
     DECLARE_FUNCTION(execFindComponentIndex);
     DECLARE_FUNCTION(execRemapComponents);
     DECLARE_FUNCTION(execInitializeControls);
@@ -1996,8 +2258,13 @@ struct UGUIPanel_eventOnPostDraw_Parms
 class XINTERFACE_API UGUIPanel : public UGUIMultiComponent
 {
 public:
+#if UE_SHREK2
+    class UMaterial* Background;
+    FScriptDelegate __OnPostDraw__Delegate;
+#else
     class UMaterial* Background GCC_PACK(4);
     FScriptDelegate __OnPostDraw__Delegate;
+#endif
     BITFIELD delegateOnPostDraw(class UCanvas* Canvas)
     {
         UGUIPanel_eventOnPostDraw_Parms Parms;
@@ -2027,6 +2294,17 @@ struct UGUISplitter_eventOnReleaseSplitter_Parms
 class XINTERFACE_API UGUISplitter : public UGUIPanel
 {
 public:
+#if UE_SHREK2
+    BYTE SplitOrientation;
+    FLOAT SplitPosition;
+    BITFIELD bFixedSplitter:1 GCC_PACK(4);
+    BITFIELD bDrawSplitter:1;
+    FLOAT SplitAreaSize GCC_PACK(4);
+    FStringNoInit DefaultPanels[2];
+    class UGUIComponent* Panels[2];
+    FLOAT MaxPercentage;
+    FScriptDelegate __OnReleaseSplitter__Delegate;
+#else
     BYTE SplitOrientation GCC_PACK(4);
     FLOAT SplitPosition GCC_PACK(4);
     BITFIELD bFixedSplitter:1 GCC_PACK(4);
@@ -2036,6 +2314,7 @@ public:
     class UGUIComponent* Panels[2];
     FLOAT MaxPercentage;
     FScriptDelegate __OnReleaseSplitter__Delegate;
+#endif
     DECLARE_FUNCTION(execSplitterUpdatePositions);
     void delegateOnReleaseSplitter(class UGUIComponent* Sender, FLOAT NewPosition)
     {
@@ -2058,10 +2337,17 @@ public:
 class XINTERFACE_API UGUITabPanel : public UGUIPanel
 {
 public:
+#if UE_SHREK2
+    BITFIELD bFillHeight:1 GCC_PACK(4);
+    class UGUITabButton* MyButton GCC_PACK(4);
+    FStringNoInit PanelCaption;
+    FLOAT FadeInTime;
+#else
     FStringNoInit PanelCaption GCC_PACK(4);
     BITFIELD bFillHeight:1 GCC_PACK(4);
     FLOAT FadeInTime GCC_PACK(4);
     class UGUITabButton* MyButton;
+#endif
     DECLARE_CLASS(UGUITabPanel,UGUIPanel,0,XInterface)
     NO_DEFAULT_CONSTRUCTOR(UGUITabPanel)
 };
@@ -2070,6 +2356,26 @@ public:
 class XINTERFACE_API UGUIMenuOption : public UGUIMultiComponent
 {
 public:
+#if UE_SHREK2
+    FStringNoInit ComponentClassName;
+    FStringNoInit Caption;
+    FStringNoInit LabelFont;
+    FColor LabelColor;
+    BITFIELD bHeightFromComponent:1 GCC_PACK(4);
+    FLOAT CaptionWidth GCC_PACK(4);
+    FLOAT ComponentWidth;
+    BITFIELD bFlipped:1 GCC_PACK(4);
+    BYTE LabelJustification GCC_PACK(4);
+    BYTE ComponentJustification;
+    BITFIELD bSquare:1 GCC_PACK(4);
+    BITFIELD bVerticalLayout:1;
+    class UGUILabel* MyLabel GCC_PACK(4);
+    class UGUIComponent* MyComponent;
+    BITFIELD bIgnoreChange:1;
+    BITFIELD bValueReadOnly:1;
+    BITFIELD bAutoSizeCaption:1;
+    FStringNoInit LabelStyleName;
+#else
     BITFIELD bIgnoreChange:1 GCC_PACK(4);
     BITFIELD bValueReadOnly:1;
     BITFIELD bAutoSizeCaption:1;
@@ -2088,6 +2394,7 @@ public:
     FColor LabelColor;
     class UGUILabel* MyLabel;
     class UGUIComponent* MyComponent;
+#endif
     DECLARE_CLASS(UGUIMenuOption,UGUIMultiComponent,0,XInterface)
         void PreDraw(UCanvas* Canvas);
         UBOOL MousePressed(UBOOL IsRepeat);
@@ -2104,6 +2411,22 @@ struct UGUIComboBox_eventOnShowList_Parms
 class XINTERFACE_API UGUIComboBox : public UGUIMultiComponent
 {
 public:
+#if UE_SHREK2
+    class UGUIEditBox* Edit;
+    class UGUIScrollButtonBase* MyShowListBtn;
+    class UGUIListBox* MyListBox;
+    class UGUIList* List;
+    INT MaxVisibleItems;
+    BITFIELD bListItemsOnly:1 GCC_PACK(4);
+    BITFIELD bShowListOnFocus:1;
+    BITFIELD bReadOnly:1;
+    INT Index GCC_PACK(4);
+    FStringNoInit TextStr;
+    BITFIELD bValueReadOnly:1;
+    BITFIELD bIgnoreChangeWhenTyping:1;
+    FScriptDelegate __OnShowList__Delegate;
+    FScriptDelegate __OnHideList__Delegate;
+#else
     BITFIELD bReadOnly:1 GCC_PACK(4);
     BITFIELD bValueReadOnly:1;
     BITFIELD bIgnoreChangeWhenTyping:1;
@@ -2117,6 +2440,7 @@ public:
     class UGUIListBox* MyListBox;
     FScriptDelegate __OnShowList__Delegate;
     FScriptDelegate __OnHideList__Delegate;
+#endif
     void delegateOnHideList()
     {
         ProcessDelegate(XINTERFACE_OnHideList,&__OnHideList__Delegate,NULL);
@@ -2145,6 +2469,26 @@ struct UGUIScrollBarBase_eventPositionChanged_Parms
 class XINTERFACE_API UGUIScrollBarBase : public UGUIMultiComponent
 {
 public:
+#if UE_SHREK2
+    class UGUIListBase* MyList;
+    BYTE Orientation;
+    INT Step;
+    FLOAT GripPos;
+    FLOAT GripSize;
+    FLOAT GrabOffset;
+    INT MinGripPixels;
+    INT BigStep;
+    INT ItemCount;
+    INT ItemsPerPage;
+    INT CurPos;
+    class UGUIScrollZoneBase* MyScrollZone;
+    class UGUIScrollButtonBase* MyIncreaseButton;
+    class UGUIScrollButtonBase* MyDecreaseButton;
+    class UGUIGripButtonBase* MyGripButton;
+    FScriptDelegate __PositionChanged__Delegate;
+    FScriptDelegate __MoveGripBy__Delegate;
+    FScriptDelegate __AlignThumb__Delegate;
+#else
     BYTE Orientation GCC_PACK(4);
     INT Step GCC_PACK(4);
     FLOAT GripPos;
@@ -2163,6 +2507,7 @@ public:
     FScriptDelegate __PositionChanged__Delegate;
     FScriptDelegate __MoveGripBy__Delegate;
     FScriptDelegate __AlignThumb__Delegate;
+#endif
     void delegateAlignThumb()
     {
         ProcessDelegate(XINTERFACE_AlignThumb,&__AlignThumb__Delegate,NULL);
@@ -2187,6 +2532,18 @@ public:
 class XINTERFACE_API UGUIFloatEdit : public UGUIMultiComponent
 {
 public:
+#if UE_SHREK2
+    class UGUIEditBox* MyEditBox;
+    class UGUISpinnerButton* MyPlus;
+    class UGUISpinnerButton* MyMinus;
+    FStringNoInit Value;
+    BITFIELD bLeftJustified:1 GCC_PACK(4);
+    FLOAT MinValue GCC_PACK(4);
+    FLOAT MaxValue;
+    FLOAT Step;
+    class UGUISpinnerButton* MySpinner;
+    BITFIELD bReadOnly:1;
+#else
     class UGUIEditBox* MyEditBox GCC_PACK(4);
     class UGUISpinnerButton* MySpinner;
     FStringNoInit Value;
@@ -2195,6 +2552,7 @@ public:
     FLOAT MaxValue;
     FLOAT Step;
     BITFIELD bReadOnly:1 GCC_PACK(4);
+#endif
     DECLARE_CLASS(UGUIFloatEdit,UGUIMultiComponent,0,XInterface)
 		void PreDraw(UCanvas* Canvas);
 };
@@ -2203,6 +2561,18 @@ public:
 class XINTERFACE_API UGUINumericEdit : public UGUIMultiComponent
 {
 public:
+#if UE_SHREK2
+    class UGUIEditBox* MyEditBox;
+    class UGUISpinnerButton* MyPlus;
+    class UGUISpinnerButton* MyMinus;
+    FStringNoInit Value;
+    BITFIELD bLeftJustified:1 GCC_PACK(4);
+    INT MinValue GCC_PACK(4);
+    INT MaxValue;
+    INT Step;
+    class UGUISpinnerButton* MySpinner;
+    BITFIELD bReadOnly:1;
+#else
     class UGUIEditBox* MyEditBox GCC_PACK(4);
     class UGUISpinnerButton* MySpinner;
     FStringNoInit Value;
@@ -2211,6 +2581,7 @@ public:
     INT MaxValue;
     INT Step;
     BITFIELD bReadOnly:1 GCC_PACK(4);
+#endif
     DECLARE_CLASS(UGUINumericEdit,UGUIMultiComponent,0,XInterface)
 		void PreDraw(UCanvas* Canvas);
 };
@@ -2223,6 +2594,22 @@ struct UGUITabControl_eventMakeTabActive_Parms
 class XINTERFACE_API UGUITabControl : public UGUIMultiComponent
 {
 public:
+#if UE_SHREK2
+    BITFIELD bDockPanels:1 GCC_PACK(4);
+    TArrayNoInit<class UGUITabButton*> TabStack GCC_PACK(4);
+    class UGUITabButton* ActiveTab;
+    FStringNoInit BackgroundStyleName;
+    class UGUIStyles* BackgroundStyle;
+    class UMaterial* BackgroundImage;
+    FLOAT TabHeight;
+    BITFIELD bFillSpace:1 GCC_PACK(4);
+    BITFIELD bDrawTabAbove:1;
+    BITFIELD bFillBackground:1;
+    FColor FillColor;
+    FLOAT FadeInTime;
+    class UGUITabButton* PendingTab;
+    class UGUIBorder* MyFooter;
+#else
     BITFIELD bFillSpace:1 GCC_PACK(4);
     BITFIELD bDockPanels:1;
     BITFIELD bDrawTabAbove:1;
@@ -2237,6 +2624,7 @@ public:
     class UGUITabButton* PendingTab;
     class UGUIStyles* BackgroundStyle;
     class UGUIBorder* MyFooter;
+#endif
     void eventMakeTabActive(class UGUITabButton* Who)
     {
         UGUITabControl_eventMakeTabActive_Parms Parms;
@@ -2274,11 +2662,21 @@ public:
 class XINTERFACE_API UGUITitleBar : public UGUIBorder
 {
 public:
+#if UE_SHREK2
+    FString Caption;
+    BYTE Justification;
+    class UGUITabControl* DockedTabs;
+    BITFIELD bDockTop:1 GCC_PACK(4);
+    BITFIELD bUseTextHeight:1;
+    class UMaterial* Effect GCC_PACK(4);
+    BYTE DockAlign;
+#else
     class UGUITabControl* DockedTabs GCC_PACK(4);
     BYTE DockAlign;
     BITFIELD bUseTextHeight:1 GCC_PACK(4);
     BITFIELD bDockTop:1;
     class UMaterial* Effect GCC_PACK(4);
+#endif
     DECLARE_CLASS(UGUITitleBar,UGUIBorder,0,XInterface)
 	void PreDraw(UCanvas* Canvas);
 };
@@ -2311,6 +2709,29 @@ struct UGUIPage_eventOnOpen_Parms
 class XINTERFACE_API UGUIPage : public UGUIMultiComponent
 {
 public:
+#if UE_SHREK2
+    class UMaterial* Background;
+    FColor BackgroundColor;
+    FColor InactiveFadeColor;
+    BYTE BackgroundRStyle;
+    BITFIELD bRenderWorld:1 GCC_PACK(4);
+    BITFIELD bPauseIfPossible:1;
+    BITFIELD bCheckResolution:1;
+    class USound* OpenSound GCC_PACK(4);
+    class USound* CloseSound;
+    BITFIELD bRequire640x480:1 GCC_PACK(4);
+    BITFIELD bPersistent:1;
+    class UGUIPage* ParentPage GCC_PACK(4);
+    TArrayNoInit<class UGUIComponent*> Timers;
+    BITFIELD bAllowedAsLast:1 GCC_PACK(4);
+    BITFIELD bDisconnectOnOpen:1;
+    FScriptDelegate __OnOpen__Delegate GCC_PACK(4);
+    FScriptDelegate __OnCanClose__Delegate;
+    FScriptDelegate __OnClose__Delegate;
+    BITFIELD bCaptureInput:1;
+    BITFIELD bRestorable:1;
+    FScriptDelegate __OnReOpen__Delegate;
+#else
     BITFIELD bRenderWorld:1 GCC_PACK(4);
     BITFIELD bPauseIfPossible:1;
     BITFIELD bCheckResolution:1;
@@ -2332,6 +2753,7 @@ public:
     FScriptDelegate __OnReOpen__Delegate;
     FScriptDelegate __OnClose__Delegate;
     FScriptDelegate __OnCanClose__Delegate;
+#endif
     void eventHandleParameters(const FString& Param1, const FString& Param2)
     {
         UGUIPage_eventHandleParameters_Parms Parms;
@@ -2381,6 +2803,17 @@ public:
 class XINTERFACE_API UGUIListBoxBase : public UGUIMultiComponent
 {
 public:
+#if UE_SHREK2
+    class UGUIScrollBarBase* MyScrollBar;
+    class UGUIListBase* MyList;
+    BITFIELD bVisibleWhenEmpty:1 GCC_PACK(4);
+    FStringNoInit SelectedStyleName;
+    FStringNoInit SectionStyleName;
+    FStringNoInit OutlineStyleName;
+    FStringNoInit DefaultListClass;
+    BITFIELD bSorted:1;
+    BITFIELD bInitializeList:1;
+#else
     FStringNoInit SelectedStyleName GCC_PACK(4);
     FStringNoInit SectionStyleName;
     FStringNoInit OutlineStyleName;
@@ -2390,6 +2823,7 @@ public:
     BITFIELD bVisibleWhenEmpty:1 GCC_PACK(4);
     BITFIELD bSorted:1;
     BITFIELD bInitializeList:1;
+#endif
     DECLARE_CLASS(UGUIListBoxBase,UGUIMultiComponent,0,XInterface)
     void PreDraw(UCanvas* Canvas);
     void Draw(UCanvas* Canvas);                             // Handle drawing of the component natively
@@ -2408,12 +2842,22 @@ public:
 class XINTERFACE_API UGUIMultiColumnListBox : public UGUIListBoxBase
 {
 public:
+#if UE_SHREK2
+    class UGUIMultiColumnListHeader* Header;
+    class UGUIMultiColumnList* List;
+    FString DefaultListClass;
+    BITFIELD bDisplayHeader:1;
+    TArrayNoInit<FLOAT> HeaderColumnPerc;
+    TArrayNoInit<FString> ColumnHeadings;
+    BITFIELD bFullHeightStyle:1;
+#else
     class UGUIMultiColumnListHeader* Header GCC_PACK(4);
     BITFIELD bDisplayHeader:1 GCC_PACK(4);
     class UGUIMultiColumnList* List GCC_PACK(4);
     TArrayNoInit<FLOAT> HeaderColumnPerc;
     TArrayNoInit<FString> ColumnHeadings;
     BITFIELD bFullHeightStyle:1 GCC_PACK(4);
+#endif
     DECLARE_CLASS(UGUIMultiColumnListBox,UGUIListBoxBase,0,XInterface)
 	void PreDraw(UCanvas* Canvas);
 	void Draw(UCanvas* Canvas);
@@ -2423,6 +2867,20 @@ public:
 class XINTERFACE_API UGUIScrollTextBox : public UGUIListBoxBase
 {
 public:
+#if UE_SHREK2
+    class UGUIScrollText* MyScrollText;
+    BITFIELD bRepeat:1 GCC_PACK(4);
+    BITFIELD bNoTeletype:1;
+    BITFIELD bStripColors:1;
+    FLOAT InitialDelay GCC_PACK(4);
+    FLOAT CharDelay;
+    FLOAT EOLDelay;
+    FLOAT RepeatDelay;
+    BYTE TextAlign;
+    FStringNoInit Separator;
+    FStringNoInit ESC;
+    FStringNoInit COMMA;
+#else
     class UGUIScrollText* MyScrollText GCC_PACK(4);
     BITFIELD bRepeat:1 GCC_PACK(4);
     BITFIELD bNoTeletype:1;
@@ -2435,6 +2893,7 @@ public:
     FStringNoInit Separator GCC_PACK(4);
     FStringNoInit ESC;
     FStringNoInit COMMA;
+#endif
     DECLARE_CLASS(UGUIScrollTextBox,UGUIListBoxBase,0,XInterface)
     NO_DEFAULT_CONSTRUCTOR(UGUIScrollTextBox)
 };
@@ -2443,7 +2902,11 @@ public:
 class XINTERFACE_API UGUIListBox : public UGUIListBoxBase
 {
 public:
+#if UE_SHREK2
+    class UGUIList* List;
+#else
     class UGUIList* List GCC_PACK(4);
+#endif
     DECLARE_CLASS(UGUIListBox,UGUIListBoxBase,0,XInterface)
     NO_DEFAULT_CONSTRUCTOR(UGUIListBox)
 };
@@ -2458,6 +2921,18 @@ struct XINTERFACE_API FPaddingPercent
 class XINTERFACE_API UGUIButton : public UGUIComponent
 {
 public:
+#if UE_SHREK2
+    FStringNoInit Caption;
+    BYTE CaptionAlign;
+    class UGUIStyles* CaptionEffectStyle;
+    FStringNoInit CaptionEffectStyleName;
+    FPaddingPercent AutoSizePadding;
+    FStringNoInit SizingCaption;
+    BITFIELD bAutoSize:1;
+    BITFIELD bAutoShrink:1;
+    BITFIELD bWrapCaption:1;
+    BITFIELD bUseCaptionHeight:1;
+#else
     BYTE CaptionAlign GCC_PACK(4);
     class UGUIStyles* CaptionEffectStyle GCC_PACK(4);
     FStringNoInit CaptionEffectStyleName;
@@ -2468,6 +2943,7 @@ public:
     BITFIELD bAutoShrink:1;
     BITFIELD bWrapCaption:1;
     BITFIELD bUseCaptionHeight:1;
+#endif
     DECLARE_CLASS(UGUIButton,UGUIComponent,0,XInterface)
 	void PreDraw(UCanvas* Canvas);
 	void Draw(UCanvas* Canvas);
@@ -2487,12 +2963,21 @@ public:
 class XINTERFACE_API UGUIGFXButton : public UGUIButton
 {
 public:
+#if UE_SHREK2
+    class UMaterial* Graphic;
+    BYTE Position;
+    BITFIELD bCheckBox:1 GCC_PACK(4);
+    BITFIELD bClientBound:1;
+    BITFIELD bChecked:1;
+    INT ImageIndex;
+#else
     INT ImageIndex GCC_PACK(4);
     class UMaterial* Graphic;
     BYTE Position;
     BITFIELD bCheckBox:1 GCC_PACK(4);
     BITFIELD bClientBound:1;
     BITFIELD bChecked:1;
+#endif
     DECLARE_CLASS(UGUIGFXButton,UGUIButton,0,XInterface)
 		void Draw(UCanvas* Canvas);
 };
@@ -2518,8 +3003,13 @@ public:
 class XINTERFACE_API UGUICheckBoxButton : public UGUIGFXButton
 {
 public:
+#if UE_SHREK2
+    class UMaterial* CheckedOverlay[10];
+    BITFIELD bAllOverlay:1;
+#else
     class UMaterial* CheckedOverlay[10] GCC_PACK(4);
     BITFIELD bAllOverlay:1 GCC_PACK(4);
+#endif
     DECLARE_CLASS(UGUICheckBoxButton,UGUIGFXButton,0,XInterface)
 		void Draw(UCanvas* Canvas);
 };
@@ -2532,6 +3022,28 @@ struct UGUIEditBox_eventSetText_Parms
 class XINTERFACE_API UGUIEditBox : public UGUIButton
 {
 public:
+#if UE_SHREK2
+    FStringNoInit TextStr;
+    FStringNoInit AllowedCharSet;
+    BITFIELD bMaskText:1 GCC_PACK(4);
+    BITFIELD bIntOnly:1;
+    BITFIELD bFloatOnly:1;
+    BITFIELD bIncludeSign:1;
+    BITFIELD bConvertSpaces:1;
+    INT MaxWidth GCC_PACK(4);
+    BYTE TextCase;
+    INT BorderOffsets[4];
+    BITFIELD bReadOnly:1 GCC_PACK(4);
+    INT CaretPos GCC_PACK(4);
+    INT FirstVis;
+    INT LastSizeX;
+    INT LastCaret;
+    INT LastLength;
+    BITFIELD bAllSelected:1 GCC_PACK(4);
+    BYTE LastKey GCC_PACK(4);
+    FLOAT DelayTime;
+    BITFIELD bAlwaysNotify:1;
+#else
     FStringNoInit TextStr GCC_PACK(4);
     FStringNoInit AllowedCharSet;
     BITFIELD bMaskText:1 GCC_PACK(4);
@@ -2552,6 +3064,7 @@ public:
     BITFIELD bAllSelected:1 GCC_PACK(4);
     BYTE LastKey GCC_PACK(4);
     FLOAT DelayTime GCC_PACK(4);
+#endif
     void eventSetText(const FString& NewText)
     {
         UGUIEditBox_eventSetText_Parms Parms;
@@ -2576,8 +3089,14 @@ struct UGUISpinnerButton_eventOnPlusClick_Parms
 class XINTERFACE_API UGUISpinnerButton : public UGUIButton
 {
 public:
+#if UE_SHREK2
+    BITFIELD PlusButton:1 GCC_PACK(4);
+    FScriptDelegate __OnPlusClick__Delegate;
+    FScriptDelegate __OnMinusClick__Delegate;
+#else
     FScriptDelegate __OnPlusClick__Delegate GCC_PACK(4);
     FScriptDelegate __OnMinusClick__Delegate;
+#endif
     BITFIELD delegateOnMinusClick(class UGUIComponent* Sender)
     {
         UGUISpinnerButton_eventOnMinusClick_Parms Parms;
@@ -2832,6 +3351,27 @@ public:
 class XINTERFACE_API UGUIProgressBar : public UGUIComponent
 {
 public:
+#if UE_SHREK2
+    class UMaterial* BarBack;
+    class UMaterial* BarTop;
+    FColor BarColor;
+    FLOAT Low;
+    FLOAT High;
+    FLOAT Value;
+    FLOAT CaptionWidth;
+    BYTE CaptionAlign;
+    BYTE ValueRightAlign;
+    FStringNoInit Caption;
+    FStringNoInit FontName;
+    FStringNoInit ValueFontName;
+    FLOAT GraphicMargin;
+    FLOAT ValueRightWidth;
+    BITFIELD bShowLow:1 GCC_PACK(4);
+    BITFIELD bShowHigh:1;
+    BITFIELD bShowValue:1;
+    INT NumDecimals GCC_PACK(4);
+    BYTE BarDirection;
+#else
     class UMaterial* BarBack GCC_PACK(4);
     class UMaterial* BarTop;
     FColor BarColor;
@@ -2851,12 +3391,35 @@ public:
     BITFIELD bShowValue:1;
     INT NumDecimals GCC_PACK(4);
     BYTE BarDirection;
+#endif
     DECLARE_CLASS(UGUIProgressBar,UGUIComponent,0,XInterface)
 	void Draw(UCanvas* Canvas);
 };
 
 struct XINTERFACE_API FAnimInfo
 {
+#if UE_SHREK2
+    FName AnimationName;
+    FLOAT fAnimRate;
+    FLOAT fChanceToPlay;
+    BITFIELD bStopAtThisAnim:1 GCC_PACK(4);
+    FLOAT fPauseBeforeAnim GCC_PACK(4);
+    FLOAT fPauseAfterAnim;
+    FLOAT fTweenInTime;
+    BITFIELD bLoop:1 GCC_PACK(4);
+    class UObject* SoundToPlay GCC_PACK(4);
+    FSoundInfo SndInfo;
+    FColor ColorToFadeTo;
+    FLOAT fTimeForColorFade;
+    FLOAT cX;
+    FLOAT cY;
+    FLOAT Scale;
+    FLOAT FadeTime;
+    FLOAT Alpha;
+    FLOAT TargetAlpha;
+    FLOAT ResetDelay;
+    FLOAT TravelTime;
+#else
     FLOAT cX GCC_PACK(4);
     FLOAT cY;
     FLOAT Scale;
@@ -2865,6 +3428,7 @@ struct XINTERFACE_API FAnimInfo
     FLOAT TargetAlpha;
     FLOAT ResetDelay;
     FLOAT TravelTime;
+#endif
 };
 
 
@@ -2899,6 +3463,23 @@ public:
 class XINTERFACE_API UGUIImage : public UGUIComponent
 {
 public:
+#if UE_SHREK2
+    class UMaterial* Image;
+    FColor ImageColor;
+    BYTE ImageStyle;
+    BYTE ImageRenderStyle;
+    BYTE ImageAlign;
+    INT X1;
+    INT Y1;
+    INT X2;
+    INT Y2;
+    class UMaterial* DropShadow;
+    INT DropShadowX;
+    INT DropShadowY;
+    FLOAT BorderOffsets[4];
+    FLOAT X3;
+    FLOAT Y3;
+#else
     class UMaterial* Image GCC_PACK(4);
     class UMaterial* DropShadow;
     FColor ImageColor;
@@ -2914,6 +3495,7 @@ public:
     FLOAT BorderOffsets[4];
     FLOAT X3;
     FLOAT Y3;
+#endif
     DECLARE_CLASS(UGUIImage,UGUIComponent,0,XInterface)
 		void UpdateBounds();
 		void Draw(UCanvas* Canvas);
@@ -2970,6 +3552,28 @@ struct UGUISlider_eventOnPreDrawCaption_Parms
 class XINTERFACE_API UGUISlider : public UGUIComponent
 {
 public:
+#if UE_SHREK2
+    FLOAT MinValue;
+    FLOAT MaxValue;
+    FStringNoInit CaptionStyleName;
+    FLOAT Value;
+    FLOAT Step;
+    class UGUIStyles* CaptionStyle;
+    BITFIELD bIntSlider:1 GCC_PACK(4);
+    FString ButtonStyleName GCC_PACK(4);
+    class UGUIStyles* ButtonStyle;
+    FScriptDelegate __OnDrawCaption__Delegate;
+    FLOAT MarkerWidth;
+    BITFIELD bShowMarker:1;
+    BITFIELD bShowCaption:1;
+    BITFIELD bDrawPercentSign:1;
+    BITFIELD bReadOnly:1;
+    BITFIELD bShowValueTooltip:1;
+    class UMaterial* FillImage;
+    FStringNoInit BarStyleName;
+    class UGUIStyles* BarStyle;
+    FScriptDelegate __OnPreDrawCaption__Delegate;
+#else
     FLOAT MinValue GCC_PACK(4);
     FLOAT MaxValue;
     FLOAT Value;
@@ -2987,6 +3591,7 @@ public:
     class UGUIStyles* BarStyle;
     FScriptDelegate __OnPreDrawCaption__Delegate;
     FScriptDelegate __OnDrawCaption__Delegate;
+#endif
     FLOAT eventGetMarkerPosition()
     {
         UGUISlider_eventGetMarkerPosition_Parms Parms;
@@ -3044,6 +3649,25 @@ public:
 class XINTERFACE_API UGUILabel : public UGUIComponent
 {
 public:
+#if UE_SHREK2
+    FStringNoInit Caption;
+    BYTE TextAlign;
+    FColor TextColor;
+    FColor FocusedTextColor;
+    BYTE TextStyle;
+    FStringNoInit TextFont;
+    BITFIELD bTransparent:1 GCC_PACK(4);
+    BITFIELD bMultiLine:1;
+    FColor BackColor GCC_PACK(4);
+    BITFIELD bVerticalAllignment:1 GCC_PACK(4);
+    BYTE VertAlign;
+    FColor ShadowColor;
+    FLOAT ShadowOffsetX;
+    FLOAT ShadowOffsetY;
+    FColor HilightColor;
+    FLOAT HilightOffsetX;
+    FLOAT HilightOffsetY;
+#else
     FStringNoInit Caption GCC_PACK(4);
     BYTE TextAlign;
     FColor TextColor GCC_PACK(4);
@@ -3060,6 +3684,7 @@ public:
     FColor HilightColor;
     FLOAT HilightOffsetX;
     FLOAT HilightOffsetY;
+#endif
     DECLARE_CLASS(UGUILabel,UGUIComponent,0,XInterface)
         void Draw(UCanvas* Canvas);
 };
@@ -3101,6 +3726,45 @@ struct UGUIListBase_eventOnScrollBy_Parms
 class XINTERFACE_API UGUIListBase : public UGUIComponent
 {
 public:
+#if UE_SHREK2
+    BITFIELD bSorted:1 GCC_PACK(4);
+    FColor SelectedBKColor GCC_PACK(4);
+    class UMaterial* SelectedImage;
+    INT Top;
+    INT Index;
+    INT ItemsPerPage;
+    FLOAT ItemHeight;
+    FLOAT ItemWidth;
+    INT ItemCount;
+    BITFIELD bHotTrack:1 GCC_PACK(4);
+    BITFIELD bVisibleWhenEmpty:1;
+    class UGUIScrollBarBase* MyScrollBar GCC_PACK(4);
+    FScriptDelegate __OnDrawItem__Delegate;
+    FScriptDelegate __OnAdjustTop__Delegate;
+    BITFIELD bHotTrackSound:1;
+    BITFIELD bDrawSelectionBorder:1;
+    BITFIELD bNotify:1;
+    BITFIELD bInitializeList:1;
+    BITFIELD bMultiSelect:1;
+    BITFIELD bAllowEmptyItems:1;
+    FStringNoInit SelectedStyleName;
+    FStringNoInit SectionStyleName;
+    FStringNoInit OutlineStyleName;
+    class UGUIStyles* SelectedStyle;
+    class UGUIStyles* SectionStyle;
+    class UGUIStyles* OutlineStyle;
+    BYTE SectionJustification;
+    TArrayNoInit<INT> SelectedItems;
+    INT LastSelected;
+    INT LastPressX;
+    INT LastPressY;
+    INT DropIndex;
+    INT MightRemove;
+    TArrayNoInit<class UGUIComponent*> LinkedObjects;
+    FScriptDelegate __OnScrollBy__Delegate;
+    FScriptDelegate __OnTrack__Delegate;
+    FScriptDelegate __CheckLinkedObjects__Delegate;
+#else
     BITFIELD bSorted:1 GCC_PACK(4);
     BITFIELD bHotTrack:1;
     BITFIELD bHotTrackSound:1;
@@ -3138,6 +3802,7 @@ public:
     FScriptDelegate __OnAdjustTop__Delegate;
     FScriptDelegate __OnTrack__Delegate;
     FScriptDelegate __CheckLinkedObjects__Delegate;
+#endif
     INT eventCalculateIndex(BITFIELD bRequireValidIndex)
     {
         UGUIListBase_eventCalculateIndex_Parms Parms;
@@ -3199,7 +3864,11 @@ struct UGUIVertList_eventGetItemHeight_Parms
 class XINTERFACE_API UGUIVertList : public UGUIListBase
 {
 public:
+#if UE_SHREK2
+    FScriptDelegate __GetItemHeight__Delegate;
+#else
     FScriptDelegate __GetItemHeight__Delegate GCC_PACK(4);
+#endif
     FLOAT delegateGetItemHeight(class UCanvas* C)
     {
         UGUIVertList_eventGetItemHeight_Parms Parms;
@@ -3259,6 +3928,15 @@ struct UGUIList_eventCompareItem_Parms
 class XINTERFACE_API UGUIList : public UGUIVertList
 {
 public:
+#if UE_SHREK2
+    BYTE TextAlign;
+    TArrayNoInit<FGUIListElem> Elements;
+    FScriptDelegate __CompareItem__Delegate;
+    TArrayNoInit<FGUIListElem> SelectedElements;
+    FColor OfficialColor;
+    FColor Official2004Color;
+    FColor BonusPackColor;
+#else
     BYTE TextAlign GCC_PACK(4);
     TArrayNoInit<FGUIListElem> Elements GCC_PACK(4);
     TArrayNoInit<FGUIListElem> SelectedElements;
@@ -3266,6 +3944,7 @@ public:
     FColor Official2004Color;
     FColor BonusPackColor;
     FScriptDelegate __CompareItem__Delegate;
+#endif
     DECLARE_FUNCTION(execSortList);
     void eventSwap(INT IndexA, INT IndexB)
     {
@@ -3317,6 +3996,29 @@ struct UGUIScrollText_eventOnEndOfLine_Parms
 class XINTERFACE_API UGUIScrollText : public UGUIList
 {
 public:
+#if UE_SHREK2
+    FStringNoInit Content;
+    FStringNoInit Separator;
+    INT VisibleLines;
+    INT VisibleChars;
+    FLOAT oldWidth;
+    BYTE ScrollState;
+    BITFIELD bNewContent:1 GCC_PACK(4);
+    BITFIELD bStopped:1;
+    INT MaxHistory GCC_PACK(4);
+    FStringNoInit NewText;
+    FStringNoInit ClickedString;
+    BITFIELD bRepeat:1 GCC_PACK(4);
+    BITFIELD bNoTeletype:1;
+    BITFIELD bClickText:1;
+    FLOAT InitialDelay GCC_PACK(4);
+    FLOAT CharDelay;
+    FLOAT EOLDelay;
+    FLOAT RepeatDelay;
+    FScriptDelegate __OnEndOfLine__Delegate;
+    BITFIELD bReceivedNewContent:1;
+    TArrayNoInit<FString> StringElements;
+#else
     INT MaxHistory GCC_PACK(4);
     FStringNoInit NewText;
     FStringNoInit ClickedString;
@@ -3338,6 +4040,7 @@ public:
     FLOAT RepeatDelay;
     TArrayNoInit<FString> StringElements;
     FScriptDelegate __OnEndOfLine__Delegate;
+#endif
     DECLARE_FUNCTION(execGetWordUnderCursor);
     void delegateOnEndOfLine()
     {
@@ -3354,8 +4057,13 @@ public:
 
 struct XINTERFACE_API FMultiColumnSortData
 {
+#if UE_SHREK2
+    FString SortString;
+    INT SortItem;
+#else
     FString SortString GCC_PACK(4);
     INT SortItem;
+#endif
 
 	FMultiColumnSortData( INT InSortItem = INDEX_NONE, const TCHAR* InString = TEXT("") );
 
@@ -3381,6 +4089,22 @@ struct UGUIMultiColumnList_eventOnColumnSized_Parms
 class XINTERFACE_API UGUIMultiColumnList : public UGUIVertList
 {
 public:
+#if UE_SHREK2
+    TArrayNoInit<FMultiColumnSortData> SortData;
+    TArrayNoInit<INT> InvSortData;
+    FString ColumnHeadings[8];
+    TArrayNoInit<FLOAT> ColumnWidths;
+    TArrayNoInit<FLOAT> InitColumnPerc;
+    FLOAT CellSpacing;
+    INT SortColumn;
+    BITFIELD SortDescending:1 GCC_PACK(4);
+    BITFIELD ExpandLastColumn:1;
+    BITFIELD bInitialised:1;
+    BITFIELD NeedsSorting:1;
+    TArrayNoInit<FString> ColumnHeadingHints;
+    FScriptDelegate __OnColumnSized__Delegate;
+    FScriptDelegate __GetSortString__Delegate;
+#else
     TArrayNoInit<FString> ColumnHeadings GCC_PACK(4);
     TArrayNoInit<FLOAT> InitColumnPerc;
     TArrayNoInit<FString> ColumnHeadingHints;
@@ -3394,6 +4118,7 @@ public:
     BITFIELD ExpandLastColumn:1;
     FScriptDelegate __OnColumnSized__Delegate GCC_PACK(4);
     FScriptDelegate __GetSortString__Delegate;
+#endif
     DECLARE_FUNCTION(execAddedItem);
     DECLARE_FUNCTION(execRemovedItem);
     DECLARE_FUNCTION(execUpdatedItem);
@@ -3625,12 +4350,21 @@ public:
 class XINTERFACE_API UGUICircularList : public UGUIListBase
 {
 public:
+#if UE_SHREK2
+    BITFIELD bCenterInBounds:1 GCC_PACK(4);
+    BITFIELD bFillBounds:1;
+    BITFIELD bIgnoreBackClick:1;
+    BITFIELD bAllowSelectEmpty:1;
+    INT FixedItemsPerPage GCC_PACK(4);
+    BITFIELD bWrapItems:1;
+#else
     BITFIELD bCenterInBounds:1 GCC_PACK(4);
     BITFIELD bFillBounds:1;
     BITFIELD bIgnoreBackClick:1;
     BITFIELD bAllowSelectEmpty:1;
     INT FixedItemsPerPage GCC_PACK(4);
     BITFIELD bWrapItems:1 GCC_PACK(4);
+#endif
     DECLARE_CLASS(UGUICircularList,UGUIListBase,0,XInterface)
 	void Draw(UCanvas* Canvas);
 };
@@ -3686,11 +4420,19 @@ public:
 class XINTERFACE_API UGUIMultiColumnListHeader : public UGUIComponent
 {
 public:
+#if UE_SHREK2
+    class UGUIMultiColumnList* MyList;
+    INT SizingCol;
+    INT ClickingCol;
+    class UGUIStyles* BarStyle;
+    FStringNoInit BarStyleName;
+#else
     class UGUIMultiColumnList* MyList GCC_PACK(4);
     INT SizingCol;
     INT ClickingCol;
     class UGUIStyles* BarStyle;
     FStringNoInit BarStyleName;
+#endif
     DECLARE_CLASS(UGUIMultiColumnListHeader,UGUIComponent,0,XInterface)
 	UBOOL MousePressed(UBOOL IsRepeat);
 	UBOOL MouseReleased();
@@ -3730,6 +4472,25 @@ struct UGUIStyles_eventOnDraw_Parms
 class XINTERFACE_API UGUIStyles : public UGUI
 {
 public:
+#if UE_SHREK2
+    FStringNoInit KeyName;
+    BYTE RStyles[5];
+    class UMaterial* Images[5];
+    BYTE ImgStyle[5];
+    FColor FontColors[5];
+    FColor ImgColors[5];
+    class UGUIFont* Fonts[15];
+    INT BorderOffsets[4];
+    FStringNoInit FontNames[15];
+    BITFIELD bRegistered:1 GCC_PACK(4);
+    FScriptDelegate __OnDraw__Delegate GCC_PACK(4);
+    FScriptDelegate __OnDrawText__Delegate;
+    FStringNoInit AlternateKeyName[2];
+    FColor FontBKColors[5];
+    FLOAT ImgWidths[5];
+    FLOAT ImgHeights[5];
+    BITFIELD bTemporary:1;
+#else
     FStringNoInit KeyName GCC_PACK(4);
     FStringNoInit AlternateKeyName[2];
     FStringNoInit FontNames[15];
@@ -3746,6 +4507,7 @@ public:
     BITFIELD bTemporary:1 GCC_PACK(4);
     FScriptDelegate __OnDraw__Delegate GCC_PACK(4);
     FScriptDelegate __OnDrawText__Delegate;
+#endif
     DECLARE_FUNCTION(execTextSize);
     DECLARE_FUNCTION(execDrawText);
     DECLARE_FUNCTION(execDraw);
@@ -3797,6 +4559,16 @@ struct UGUIFont_eventGetFont_Parms
 class XINTERFACE_API UGUIFont : public UGUI
 {
 public:
+#if UE_SHREK2
+    FStringNoInit KeyName;
+    BITFIELD bFixedSize:1 GCC_PACK(4);
+    TArrayNoInit<FString> FontArrayNames GCC_PACK(4);
+    TArrayNoInit<class UFont*> FontArrayFonts;
+    TArray<INT> FontArrayResolutions;
+    BITFIELD bScaled:1;
+    INT NormalXRes;
+    INT FallBackRes;
+#else
     FStringNoInit KeyName GCC_PACK(4);
     BITFIELD bFixedSize:1 GCC_PACK(4);
     BITFIELD bScaled:1;
@@ -3804,6 +4576,7 @@ public:
     INT FallBackRes;
     TArrayNoInit<FString> FontArrayNames;
     TArrayNoInit<class UFont*> FontArrayFonts;
+#endif
     DECLARE_FUNCTION(execGetFont);
     class UFont* eventGetFont(INT XRes)
     {

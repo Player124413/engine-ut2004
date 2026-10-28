@@ -337,11 +337,13 @@ FArchive& operator<<(FArchive& Ar,FStaticMeshTriangle& T)
 void UStaticMesh::Serialize(FArchive& Ar)
 {
 	guard(UStaticMesh::Serialize);
+	const INT StartPos = Ar.Tell();
 
 	if(Ar.Ver() < 85)
 		UObject::Serialize(Ar);
 	else
 		Super::Serialize(Ar);
+	debugf(TEXT("SHREKDBG STM %s start=%i rel %i after Super ver=%i lic=%i"), GetFullName(), StartPos, Ar.Tell()-StartPos, Ar.Ver(), Ar.LicenseeVer());
 
 	if(Ar.Ver() < 92)
 	{
@@ -351,6 +353,7 @@ void UStaticMesh::Serialize(FArchive& Ar)
 
 	Ar	<< Sections
 		<< BoundingBox;
+	debugf(TEXT("SHREKDBG STM rel %i Sections=%i"), Ar.Tell()-StartPos, Sections.Num());
 
 	if(Ar.Ver() < 74)
 	{
@@ -386,14 +389,49 @@ void UStaticMesh::Serialize(FArchive& Ar)
 
 	if(Ar.Ver() >= 112)
 	{
-		Ar	<< VertexStream
-			<< ColorStream
-			<< AlphaStream
-			<< UVStreams
-			<< IndexBuffer
-			<< WireframeIndexBuffer
-			<< CollisionModel;
+		Ar	<< VertexStream;
+		debugf(TEXT("SHREKDBG STM rel %i after VertexStream verts=%i"), Ar.Tell()-StartPos, VertexStream.Vertices.Num());
+		Ar	<< ColorStream;
+		debugf(TEXT("SHREKDBG STM rel %i after ColorStream colors=%i"), Ar.Tell()-StartPos, ColorStream.Colors.Num());
+		Ar	<< AlphaStream;
+		debugf(TEXT("SHREKDBG STM rel %i after AlphaStream colors=%i"), Ar.Tell()-StartPos, AlphaStream.Colors.Num());
+		Ar	<< UVStreams;
+		debugf(TEXT("SHREKDBG STM rel %i after UVStreams n=%i"), Ar.Tell()-StartPos, UVStreams.Num());
+		Ar	<< IndexBuffer;
+		debugf(TEXT("SHREKDBG STM rel %i after IndexBuffer idx=%i"), Ar.Tell()-StartPos, IndexBuffer.Indices.Num());
+		Ar	<< WireframeIndexBuffer;
+		debugf(TEXT("SHREKDBG STM rel %i after WireIdx idx=%i"), Ar.Tell()-StartPos, WireframeIndexBuffer.Indices.Num());
+		Ar	<< CollisionModel;
+		debugf(TEXT("SHREKDBG STM rel %i after CollisionModel CM=%i"), Ar.Tell()-StartPos, CollisionModel?1:0);
 
+#if UE_SHREK2
+		if( Ar.LicenseeVer()==0 )
+		{
+			// Mainline stores packed collision triangles plus a quantized BSP; rebuild a kDOP tree from the triangles.
+			INT NumColTris=0, NumColNodes=0;
+			TArray<FkDOPBuildCollisionTriangle> BuildTris;
+			Ar << AR_INDEX(NumColTris);
+			for(INT TriIndex=0;TriIndex<NumColTris;TriIndex++)
+			{
+				_WORD V0=0,V1=0,V2=0; BYTE MatIndex=0;
+				Ar << V0 << V1 << V2 << MatIndex;
+				if( V0<VertexStream.Vertices.Num() && V1<VertexStream.Vertices.Num() && V2<VertexStream.Vertices.Num() )
+				{
+					FStaticMeshTriangle Tri;
+					Tri.Vertices[0] = VertexStream.Vertices(V0).Position;
+					Tri.Vertices[1] = VertexStream.Vertices(V1).Position;
+					Tri.Vertices[2] = VertexStream.Vertices(V2).Position;
+					Tri.MaterialIndex = MatIndex;
+					new(BuildTris) FkDOPBuildCollisionTriangle(V0,V1,V2,&Tri);
+				}
+			}
+			Ar << AR_INDEX(NumColNodes);
+			Ar.Seek( Ar.Tell() + NumColNodes*20 + sizeof(FVector) );
+			if( BuildTris.Num() )
+				kDOPTree.Build( VertexStream.Vertices, BuildTris );
+		}
+		else
+#endif
 		if( Ar.Ver() < 126 )
 		{
 			TArray<FStaticMeshCollisionTriangle>	CollisionTriangles;
@@ -450,9 +488,11 @@ void UStaticMesh::Serialize(FArchive& Ar)
 		check( Ar.IsLoading() )
 		InternalVersion = INDEX_NONE;
     }
-	else if( Ar.IsLoading() )
+    else if( Ar.IsLoading() )
     {
+		debugf(TEXT("SHREKDBG STM rel %i before InternalVersion RawTris=%i"), Ar.Tell()-StartPos, RawTriangles.Num());
 		Ar << InternalVersion;
+		debugf(TEXT("SHREKDBG STM rel %i InternalVersion=%i"), Ar.Tell()-StartPos, InternalVersion);
 	}
     else if( Ar.IsSaving() )
     {
