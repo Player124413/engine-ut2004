@@ -49,6 +49,9 @@ public class GameActivity extends SDLActivity {
     static final String MODE_INTERNAL = "internal";
     static final String MODE_EXTERNAL = "external";
 
+    /** Physical path of a picked external game folder, supplied by the launcher when it maps to a file path. */
+    static final String EXTRA_GAME_ROOT = "com.ut2004.android.GAME_ROOT";
+
     /**
      * Extra engine command line, whitespace-separated, placed before CPUSPEED: the Android
      * equivalent of the desktop command line (a travel URL such as
@@ -199,7 +202,7 @@ public class GameActivity extends SDLActivity {
      * ({@link #EXTRA_STORAGE_MODE}, read before super.onCreate):
      *   - {@code internal} -> app-private {@link #internalRoot} if it holds a game tree, else fall
      *     through to the external auto-detect (graceful: an empty internal copy still boots off the card).
-     *   - {@code external} -> {@link #resolveExternalRoot} (the complete, slow FUSE tree).
+     *   - {@code external} -> the launcher's picked folder path when supplied, else {@link #resolveExternalRoot}.
      *   - no extra (a cold recents relaunch) -> prefer a populated internal copy, else auto-detect.
      * A folder outside the app's own needs All files access, which MainActivity asks for before
      * starting the game from there.
@@ -216,6 +219,13 @@ public class GameActivity extends SDLActivity {
             return resolveExternalRoot(this);
         }
         if (MODE_EXTERNAL.equals(mode)) {
+            String pickedPath = getIntent() != null ? getIntent().getStringExtra(EXTRA_GAME_ROOT) : null;
+            File picked = pickedPath == null || pickedPath.isEmpty() ? null : new File(pickedPath);
+            if (hasGameTree(picked)) {
+                Log.i(TAG, "data root (picked external): " + picked);
+                return picked;
+            }
+            if (picked != null) Log.w(TAG, "picked external root is unavailable: " + picked);
             return resolveExternalRoot(this);
         }
         // No extra (cold recents launch of the game process): prefer a populated internal copy.

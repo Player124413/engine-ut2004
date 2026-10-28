@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.StatFs;
 import android.provider.DocumentsContract;
 import android.provider.DocumentsContract.Document;
@@ -190,6 +191,27 @@ final class Storage {
     static Doc child(ContentResolver cr, Uri tree, String parentId, String name) throws IOException {
         for (Doc d : children(cr, tree, parentId)) if (d.name.equalsIgnoreCase(name)) return d;
         return null;
+    }
+
+    /** The filesystem folder behind a picked device-storage tree, or null when it has no path the engine can open. */
+    static File treeFile(Uri tree) {
+        if (tree == null) return null;
+        try {
+            String id = DocumentsContract.getTreeDocumentId(tree);
+            if (id.startsWith("raw:")) return new File(id.substring(4));
+            if (!"com.android.externalstorage.documents".equals(tree.getAuthority())) return null;
+            int colon = id.indexOf(':');
+            if (colon < 0) return null;
+            String volume = id.substring(0, colon);
+            String relative = id.substring(colon + 1);
+            while (relative.startsWith("/")) relative = relative.substring(1);
+            File root = "primary".equals(volume) ? Environment.getExternalStorageDirectory()
+                    : "home".equals(volume) ? Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+                    : new File("/storage", volume);
+            return relative.isEmpty() ? root : new File(root, relative);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     /** A picked folder is the game folder when its System holds the engine's first package. */

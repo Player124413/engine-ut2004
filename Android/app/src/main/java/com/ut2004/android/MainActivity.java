@@ -154,7 +154,7 @@ public class MainActivity extends Activity {
         scroll.addView(col);
 
         TextView title = new TextView(this);
-        title.setText("UNREAL TOURNAMENT 2004");
+        title.setText(BuildConfig.APP_TITLE.toUpperCase(Locale.US));
         title.setTextColor(0xFFE8B34A);
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f);
         title.setGravity(Gravity.CENTER);
@@ -444,25 +444,36 @@ public class MainActivity extends Activity {
         return super.dispatchKeyEvent(ev);
     }
 
+    /** The folder an in-place start uses: the picked folder when Android exposes it as a path, else auto-detect. */
+    private File externalRootForLaunch() {
+        File picked = Storage.treeFile(chosenFolder());
+        return picked != null ? picked : GameActivity.resolveExternalRoot(this);
+    }
+
     private void launchGame() {
         if (opRunning || gameLaunched) return; // don't launch mid-copy, and never twice (countdown+tap race)
         String mode = storageSwitch.isChecked() ? GameActivity.MODE_EXTERNAL : GameActivity.MODE_INTERNAL;
+        File externalRoot = null;
         if (GameActivity.MODE_INTERNAL.equals(mode)) {
-            // Internal selected but no local copy: tell the user rather than silently booting the UT2004
+            // Internal selected but no local copy: tell the user rather than silently booting the game
             // folder (resolveDataRoot still has that fallback as a defensive net for a cold recents relaunch).
             if (!GameActivity.hasGameTree(GameActivity.internalRoot(this))) {
                 cancelCountdown(true);
-                showMessage("There's no game in internal storage yet. Copy it from the UT2004 folder first.");
+                showMessage("There's no game in internal storage yet. Copy it from the game folder first.");
                 return;
             }
         } else {
-            File root = GameActivity.resolveExternalRoot(this);
+            File root = externalRootForLaunch();
             if (!GameActivity.hasGameTree(root)) {
                 cancelCountdown(true);
+                Uri tree = chosenFolder();
                 if (!hasAllFilesAccess()) askAllFilesAccess();
+                else if (tree != null && Storage.treeFile(tree) == null)
+                    showMessage("That folder can't be run in place. Copy it to internal storage.");
                 else showMessage("No game folder at " + root + " (it needs System/Core.u).");
                 return;
             }
+            externalRoot = root;
         }
         gameLaunched = true;
         cancelCountdown(false);
@@ -470,6 +481,7 @@ public class MainActivity extends Activity {
         Log.i(TAG, "launching game, storage=" + mode + ", move stick " + fullTilt + "/" + deadZone + " dp");
         Intent i = new Intent(this, GameActivity.class);
         i.putExtra(GameActivity.EXTRA_STORAGE_MODE, mode);
+        if (externalRoot != null) i.putExtra(GameActivity.EXTRA_GAME_ROOT, externalRoot.getAbsolutePath());
         i.putExtra(GameActivity.EXTRA_MOVE_FULL_TILT_DP, fullTilt);
         i.putExtra(GameActivity.EXTRA_MOVE_DEAD_ZONE_DP, deadZone);
         // Forward an extra engine command line (a travel URL) if this launcher was itself started
@@ -503,8 +515,8 @@ public class MainActivity extends Activity {
     private void askAllFilesAccess() {
         new AlertDialog.Builder(this)
                 .setTitle("Allow access to all files?")
-                .setMessage("To play from the UT2004 folder, UT2004 needs access to all files. Or copy the game to "
-                        + "internal storage — no access needed.")
+                .setMessage("To play from the game folder, " + BuildConfig.APP_TITLE + " needs access to all files. "
+                        + "Or copy the game to internal storage — no access needed.")
                 .setNeutralButton("Copy to internal storage", new DialogInterface.OnClickListener() {
                     @Override public void onClick(DialogInterface d, int w) { doCopyToInternal(); }
                 })
@@ -555,10 +567,11 @@ public class MainActivity extends Activity {
         Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
         i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-        // Opens at /sdcard/UT2004 when it exists.
+        // Opens at the default game folder when it exists.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             i.putExtra(DocumentsContract.EXTRA_INITIAL_URI,
-                    DocumentsContract.buildDocumentUri("com.android.externalstorage.documents", "primary:UT2004"));
+                    DocumentsContract.buildDocumentUri("com.android.externalstorage.documents",
+                            "primary:" + BuildConfig.GAME_FOLDER));
         }
         try {
             startActivityForResult(i, REQ_PICK_FOLDER);
@@ -588,9 +601,9 @@ public class MainActivity extends Activity {
             @Override public void run() {
                 final boolean ok = Storage.isGameTree(getContentResolver(), tree);
                 ui.post(new Runnable() { @Override public void run() {
-                    if (!ok) showMessage("That folder doesn't contain the game (no System/Core.u). Choose the UT2004 folder.");
+                    if (!ok) showMessage("That folder doesn't contain the game (no System/Core.u). Choose the game folder.");
                     else if (copy) doCopyToInternal();
-                    else showMessage("UT2004 folder chosen: " + folderName(tree));
+                    else showMessage("Game folder chosen: " + folderName(tree));
                     refreshStatusAsync();
                 } });
             }
@@ -628,7 +641,7 @@ public class MainActivity extends Activity {
                 if (tree != null) {
                     err = Storage.isGameTree(getContentResolver(), tree)
                             ? Storage.syncFromTree(getContentResolver(), tree, dst, throttledListener())
-                            : "UT2004 can't read the chosen folder anymore. Choose the UT2004 folder again.";
+                            : BuildConfig.APP_TITLE + " can't read the chosen folder anymore. Choose the game folder again.";
                 } else {
                     err = Storage.syncTree(src, dst, throttledListener());
                 }
@@ -678,7 +691,7 @@ public class MainActivity extends Activity {
             return;
         }
         if (tree == null && !GameActivity.hasGameTree(external)) {
-            showMessage("Choose the UT2004 folder first.");
+            showMessage("Choose the game folder first.");
             return;
         }
         startOp("Copying settings and saves…");
@@ -764,19 +777,22 @@ public class MainActivity extends Activity {
         new Thread(new Runnable() {
             @Override public void run() {
                 File internal = GameActivity.internalRoot(MainActivity.this);
-                File external = GameActivity.resolveExternalRoot(MainActivity.this);
+                File picked = Storage.treeFile(tree);
+                File external = picked != null ? picked : GameActivity.resolveExternalRoot(MainActivity.this);
                 long free = Storage.freeBytes(getFilesDir());
                 boolean intReady = GameActivity.hasGameTree(internal);
                 boolean extReady = GameActivity.hasGameTree(external);
+                boolean chosenReady = tree != null && Storage.isGameTree(getContentResolver(), tree);
                 String chosen = tree == null ? "none" : folderName(tree)
-                        + (Storage.isGameTree(getContentResolver(), tree) ? "" : "  (no System/Core.u, or no access)");
+                        + (chosenReady ? "" : "  (no System/Core.u, or no access)");
                 String inPlace = extReady ? Storage.human(Storage.dirSize(external)) + "  " + external
+                        : chosenReady && picked == null ? "copy it to internal storage to run it"
                         : hasAllFilesAccess() ? "no game folder at " + external
                         : "needs access to all files";
                 final String s = "Internal storage free: " + Storage.human(free) + '\n'
                         + "Internal copy: " + (intReady ? Storage.human(Storage.dirSize(internal)) + "  " + internal : "none") + '\n'
-                        + "Chosen UT2004 folder: " + chosen + '\n'
-                        + "UT2004 folder, in place: " + inPlace;
+                        + "Chosen game folder: " + chosen + '\n'
+                        + "Game folder, in place: " + inPlace;
                 ui.post(new Runnable() { @Override public void run() { statusText.setText(s); } });
             }
         }, "ut2004-status").start();
