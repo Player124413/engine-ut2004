@@ -98,16 +98,6 @@ AActor* ULevel::SpawnActor
 	Actor->XLevel	= this;
 
 	// Set network role.
-	{
-		INT ScriptRoleOff = -1, ScriptOwnerOff = -1, NumProps = 0;
-		for( TFieldIterator<UProperty> It(Class); It; ++It )
-		{
-			NumProps++;
-			if( appStricmp(It->GetName(), TEXT("Role"))==0 ) ScriptRoleOff = It->Offset;
-			if( appStricmp(It->GetName(), TEXT("Owner"))==0 ) ScriptOwnerOff = It->Offset;
-		}
-		debugf(TEXT("SHREKDBG Spawn %s NumProps=%i Size=%i Role=%i scriptRoleOff=%i cppRoleOff=%i byteAtScript=%i scriptOwnerOff=%i Children=%i Super=%s"), Class->GetPathName(), NumProps, Class->GetPropertiesSize(), (INT)Actor->Role, ScriptRoleOff, (BYTE*)&Actor->Role-(BYTE*)Actor, ScriptRoleOff>=0 ? (INT)*((BYTE*)Actor+ScriptRoleOff) : -1, ScriptOwnerOff, Class->Children ? 1 : 0, Class->GetSuperClass() ? Class->GetSuperClass()->GetPathName() : TEXT("NULL") );
-	}
 	check(Actor->Role==ROLE_Authority);
 	if( bRemoteOwned )
 		Exchange( Actor->Role, Actor->RemoteRole );

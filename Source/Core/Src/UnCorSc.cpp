@@ -337,17 +337,6 @@ void UObject::execUndefined( FFrame& Stack, RESULT_DECL  )
 {
 	guardSlow(UObject::execUndefined);
 
-#if UE_SHREK2
-	if( Stack.Node && Stack.Code )
-	{
-		INT Off = (INT)(Stack.Code - &Stack.Node->Script(0)) - 1;
-		BYTE* Base = &Stack.Node->Script(0);
-		debugf(TEXT("SHREKDBG BADTOK node=%s obj=%s off=%i scriptsize=%i prev=[%02X %02X %02X %02X %02X %02X %02X %02X] here=[%02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X]"),
-			Stack.Node->GetFullName(), Stack.Object ? Stack.Object->GetFullName() : TEXT("None"), Off, Stack.Node->Script.Num(),
-			Off>=8?Base[Off-8]:0, Off>=7?Base[Off-7]:0, Off>=6?Base[Off-6]:0, Off>=5?Base[Off-5]:0, Off>=4?Base[Off-4]:0, Off>=3?Base[Off-3]:0, Off>=2?Base[Off-2]:0, Off>=1?Base[Off-1]:0,
-			Base[Off],Base[Off+1],Base[Off+2],Base[Off+3],Base[Off+4],Base[Off+5],Base[Off+6],Base[Off+7],Base[Off+8],Base[Off+9],Base[Off+10],Base[Off+11]);
-	}
-#endif
 	ExecutingBadStateCode(Stack);
 	unguardexecSlow;
 }

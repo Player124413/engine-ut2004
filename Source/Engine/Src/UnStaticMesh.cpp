@@ -337,13 +337,11 @@ FArchive& operator<<(FArchive& Ar,FStaticMeshTriangle& T)
 void UStaticMesh::Serialize(FArchive& Ar)
 {
 	guard(UStaticMesh::Serialize);
-	const INT StartPos = Ar.Tell();
 
 	if(Ar.Ver() < 85)
 		UObject::Serialize(Ar);
 	else
 		Super::Serialize(Ar);
-	debugf(TEXT("SHREKDBG STM %s start=%i rel %i after Super ver=%i lic=%i"), GetFullName(), StartPos, Ar.Tell()-StartPos, Ar.Ver(), Ar.LicenseeVer());
 
 	if(Ar.Ver() < 92)
 	{
@@ -353,7 +351,6 @@ void UStaticMesh::Serialize(FArchive& Ar)
 
 	Ar	<< Sections
 		<< BoundingBox;
-	debugf(TEXT("SHREKDBG STM rel %i Sections=%i"), Ar.Tell()-StartPos, Sections.Num());
 
 	if(Ar.Ver() < 74)
 	{
@@ -390,19 +387,12 @@ void UStaticMesh::Serialize(FArchive& Ar)
 	if(Ar.Ver() >= 112)
 	{
 		Ar	<< VertexStream;
-		debugf(TEXT("SHREKDBG STM rel %i after VertexStream verts=%i"), Ar.Tell()-StartPos, VertexStream.Vertices.Num());
 		Ar	<< ColorStream;
-		debugf(TEXT("SHREKDBG STM rel %i after ColorStream colors=%i"), Ar.Tell()-StartPos, ColorStream.Colors.Num());
 		Ar	<< AlphaStream;
-		debugf(TEXT("SHREKDBG STM rel %i after AlphaStream colors=%i"), Ar.Tell()-StartPos, AlphaStream.Colors.Num());
 		Ar	<< UVStreams;
-		debugf(TEXT("SHREKDBG STM rel %i after UVStreams n=%i"), Ar.Tell()-StartPos, UVStreams.Num());
 		Ar	<< IndexBuffer;
-		debugf(TEXT("SHREKDBG STM rel %i after IndexBuffer idx=%i"), Ar.Tell()-StartPos, IndexBuffer.Indices.Num());
 		Ar	<< WireframeIndexBuffer;
-		debugf(TEXT("SHREKDBG STM rel %i after WireIdx idx=%i"), Ar.Tell()-StartPos, WireframeIndexBuffer.Indices.Num());
 		Ar	<< CollisionModel;
-		debugf(TEXT("SHREKDBG STM rel %i after CollisionModel CM=%i"), Ar.Tell()-StartPos, CollisionModel?1:0);
 
 #if UE_SHREK2
 		if( Ar.LicenseeVer()==0 )
@@ -490,9 +480,7 @@ void UStaticMesh::Serialize(FArchive& Ar)
     }
     else if( Ar.IsLoading() )
     {
-		debugf(TEXT("SHREKDBG STM rel %i before InternalVersion RawTris=%i"), Ar.Tell()-StartPos, RawTriangles.Num());
 		Ar << InternalVersion;
-		debugf(TEXT("SHREKDBG STM rel %i InternalVersion=%i"), Ar.Tell()-StartPos, InternalVersion);
 	}
     else if( Ar.IsSaving() )
     {
