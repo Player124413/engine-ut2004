@@ -44,13 +44,17 @@ jobs:
         working-directory: Android
 
       # All three ABIs must be in there. A silent drop to one ABI is the failure mode worth catching:
-      # the APK still installs, and only fails on the device you did not test.
-      - name: Assert every ABI is packaged
+      # the APK still installs, and only fails on the device you did not test. The game inis are asserted
+      # the same way: without them the engine has no Default.ini to derive Game.ini from on a first run.
+      - name: Assert every ABI and the game inis are packaged
         run: |
           set -euo pipefail
           apk=Android/app/build/outputs/apk/debug/app-debug.apk
           for abi in armeabi-v7a arm64-v8a; do
             unzip -l "$apk" | grep -q "lib/$abi/libUT2004.so" || { echo "::error::missing $abi"; exit 1; }
+          done
+          for ini in Default.ini DefUser.ini; do
+            unzip -l "$apk" | grep -q "assets/system/$ini" || { echo "::error::missing assets/system/$ini"; exit 1; }
           done
 
       - uses: actions/upload-artifact@v4

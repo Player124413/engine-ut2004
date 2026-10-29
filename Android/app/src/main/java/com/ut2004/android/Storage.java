@@ -352,26 +352,39 @@ final class Storage {
     /**
      * Installs the APK's System files (assets/system: the Android Default.ini and DefUser.ini) into the folder's
      * System, each only where it differs, so a folder without User.ini and UT2004.ini derives them from these.
-     * Returns how many files were written.
+     * Returns how many files were written. Each file is tried on its own, and a failed .part rename (which
+     * deletes the destination first) falls back to a plain write, so a failed install never loses an ini.
      */
     static int installSystemFiles(Context ctx, File root) {
         File system = new File(root, "System");
         AssetManager assets = ctx.getAssets();
         int written = 0;
+        String[] names;
         try {
-            String[] names = assets.list("system");
-            if (names == null) return 0;
-            for (String name : names) {
+            names = assets.list("system");
+        } catch (IOException e) {
+            Log.e("UT2004", "could not list the APK's System files", e);
+            return 0;
+        }
+        if (names == null) return 0;
+        for (String name : names) {
+            File dst = new File(system, name);
+            try {
                 byte[] data = readAll(assets.open("system/" + name));
-                File dst = new File(system, name);
                 if (dst.isFile() && dst.length() == data.length && Arrays.equals(readAll(new FileInputStream(dst)), data))
                     continue;
-                copyStream(new ByteArrayInputStream(data), dst);
+                try {
+                    copyStream(new ByteArrayInputStream(data), dst);
+                } catch (IOException e) {
+                    if (!system.isDirectory() && !system.mkdirs()) throw e;
+                    OutputStream out = new FileOutputStream(dst);
+                    try { out.write(data); } finally { out.close(); }
+                }
                 written++;
                 Log.i("UT2004", "installed " + dst + " from the APK");
+            } catch (IOException e) {
+                Log.e("UT2004", "could not install " + dst + " from the APK", e);
             }
-        } catch (IOException e) {
-            Log.e("UT2004", "could not install the APK's System files into " + system, e);
         }
         return written;
     }
