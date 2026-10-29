@@ -65,8 +65,8 @@ import java.util.Locale;
  * All files access (Android 11 and later; the storage permission before that): starting from there
  * without it asks to allow it or to copy the game to internal storage instead. "Clear internal storage"
  * deletes the internal copy; "Copy settings and saves" writes the internal copy's inis and saves back to
- * the chosen folder. "Copy last log" puts the newest game log on the clipboard for a bug report
- * (a long press shares it as text instead).
+ * the chosen folder. "Copy last log" puts the newest game log (with this app's logcat behind it)
+ * on the clipboard for a bug report (a long press shares it as text instead).
  *
  * The storage choice is conveyed to the separate ":game" process via an Intent extra
  * ({@link GameActivity#EXTRA_STORAGE_MODE}); default-mode SharedPreferences would not be multi-process
@@ -90,6 +90,7 @@ public class MainActivity extends Activity {
     private static final String[] SETTINGS_AND_SAVES = { "System/" + BuildConfig.GAME_INI, "System/User.ini", BuildConfig.SAVE_FOLDER };
     // How much of the game log Copy last log carries: enough for a crash tail, small enough for the clipboard.
     private static final int LOG_TAIL_BYTES = 192 * 1024;
+    private static final int LOGCAT_TAIL_BYTES = 96 * 1024;
 
     private boolean launcherShown = false;
     private boolean opRunning = false;
@@ -789,9 +790,9 @@ public class MainActivity extends Activity {
         return new LoadedLog(file.getAbsolutePath(), total, file.lastModified(), data);
     }
 
-    /** The same read from a stream (a picked folder), keeping only the tail in memory. */
-    private static LoadedLog readLogTail(InputStream in, String source) throws IOException {
-        byte[] ring = new byte[LOG_TAIL_BYTES];
+    /** The last {@code maxBytes} of a stream, read through a ring so the whole stream is never held. */
+    private static byte[] readStreamTail(InputStream in, int maxBytes, long[] totalOut) throws IOException {
+        byte[] ring = new byte[maxBytes];
         byte[] buf = new byte[16 * 1024];
         long total = 0L;
         int write = 0;
@@ -806,13 +807,50 @@ public class MainActivity extends Activity {
                 offset += count;
             }
         }
+        if (totalOut != null) totalOut[0] = total;
         int len = (int) Math.min(total, ring.length);
         byte[] data = new byte[len];
         int start = total > ring.length ? write : 0;
         int first = Math.min(len, ring.length - start);
         System.arraycopy(ring, start, data, 0, first);
         if (len > first) System.arraycopy(ring, 0, data, first, len - first);
-        return new LoadedLog(source, total, 0L, data);
+        return data;
+    }
+
+    /** The same read from a stream (a picked folder), keeping only the tail in memory. */
+    private static LoadedLog readLogTail(InputStream in, String source) throws IOException {
+        long[] total = new long[1];
+        byte[] data = readStreamTail(in, LOG_TAIL_BYTES, total);
+        return new LoadedLog(source, total[0], 0L, data);
+    }
+
+    /**
+     * This app's recent logcat: the launcher's and the game process's lines share one UID, which is
+     * all an unprivileged app may read. It carries what the game log can miss (a fatal error's text
+     * goes to stdout in debug builds). Empty where the device refuses it.
+     */
+    private static String readLogcatTail() {
+        try {
+            Process p = new ProcessBuilder("logcat", "-d", "-v", "threadtime", "-t", "800")
+                    .redirectErrorStream(true).start();
+            long[] total = new long[1];
+            byte[] data;
+            InputStream in = p.getInputStream();
+            try {
+                data = readStreamTail(in, LOGCAT_TAIL_BYTES, total);
+            } finally {
+                try { in.close(); } catch (IOException ignored) {}
+            }
+            p.waitFor();
+            String s = new String(data, StandardCharsets.UTF_8).trim();
+            if (total[0] > data.length) {
+                int firstLine = s.indexOf('\n');
+                if (firstLine >= 0 && firstLine + 1 < s.length()) s = s.substring(firstLine + 1);
+            }
+            return s;
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     /** The log tail from the picked folder's System, or null when it holds no log. */
@@ -884,8 +922,8 @@ public class MainActivity extends Activity {
         return null;
     }
 
-    /** The log as it goes out: a short header (app, device, source) over the log text. */
-    private String formatLogForSending(LoadedLog log) {
+    /** The log as it goes out: a short header (app, device, source) over the game log and the app logcat. */
+    private String formatLogForSending(LoadedLog log, String logcat) {
         String version = "?";
         try {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
@@ -897,13 +935,22 @@ public class MainActivity extends Activity {
         b.append("App version: ").append(version).append('\n');
         b.append("Device: ").append(Build.MANUFACTURER).append(' ').append(Build.MODEL)
                 .append(" (Android ").append(Build.VERSION.RELEASE).append(", ").append(abi).append(")\n");
-        b.append("Log: ").append(log.source).append(" (").append(Storage.human(log.totalBytes));
-        if (log.modifiedMs > 0)
-            b.append(", ").append(android.text.format.DateFormat.format("yyyy-MM-dd HH:mm:ss", new Date(log.modifiedMs)));
-        if (log.truncated) b.append(", copied the last ").append(Storage.human(LOG_TAIL_BYTES));
-        b.append(")\n\n");
-        b.append(log.text);
-        if (!log.text.endsWith("\n")) b.append('\n');
+        if (log != null) {
+            b.append("Log: ").append(log.source).append(" (").append(Storage.human(log.totalBytes));
+            if (log.modifiedMs > 0)
+                b.append(", ").append(android.text.format.DateFormat.format("yyyy-MM-dd HH:mm:ss", new Date(log.modifiedMs)));
+            if (log.truncated) b.append(", copied the last ").append(Storage.human(LOG_TAIL_BYTES));
+            b.append(")\n\n");
+            b.append(log.text);
+            if (!log.text.endsWith("\n")) b.append('\n');
+        } else {
+            b.append("Log: no game log found (System/").append(gameLogName()).append(")\n");
+        }
+        if (!logcat.isEmpty()) {
+            b.append("\n--- logcat (this app) ---\n");
+            b.append(logcat);
+            if (!logcat.endsWith("\n")) b.append('\n');
+        }
         return b.toString();
     }
 
@@ -924,15 +971,17 @@ public class MainActivity extends Activity {
                 }
                 final LoadedLog result = loaded;
                 final String err = error;
+                final String logcat = readLogcatTail();
                 ui.post(new Runnable() { @Override public void run() {
-                    if (result == null) {
+                    if (result == null && logcat.isEmpty()) {
                         finishOp(err != null ? "Could not read the game log (" + err + ")."
                                 : "No game log yet (System/" + gameLogName() + "). Start the game once, then copy it before starting again.");
                         return;
                     }
-                    String text = formatLogForSending(result);
+                    String text = formatLogForSending(result, logcat);
                     if (share) {
-                        finishOp("Sharing the last log: " + result.source);
+                        finishOp(result != null ? "Sharing the last log: " + result.source
+                                : "No game log; sharing the app logcat instead.");
                         Intent send = new Intent(Intent.ACTION_SEND);
                         send.setType("text/plain");
                         send.putExtra(Intent.EXTRA_SUBJECT, BuildConfig.APP_TITLE + " Android log");
@@ -955,9 +1004,12 @@ public class MainActivity extends Activity {
                         finishOp("Could not copy the log. Long-press Copy last log to share it instead.");
                         return;
                     }
-                    finishOp("Last log copied: " + result.source
-                            + (result.truncated ? " (the last " + Storage.human(LOG_TAIL_BYTES) + ")" : "")
-                            + ". Paste it into a message; long-press Copy last log to share it.");
+                    finishOp(result != null
+                            ? "Last log copied: " + result.source
+                                + (result.truncated ? " (the last " + Storage.human(LOG_TAIL_BYTES) + ")" : "")
+                                + (logcat.isEmpty() ? "" : ", with this app's logcat")
+                                + ". Paste it into a message; long-press Copy last log to share it."
+                            : "No game log; copied this app's logcat instead. Paste it into a message.");
                 } });
             }
         }, "ut2004-log").start();

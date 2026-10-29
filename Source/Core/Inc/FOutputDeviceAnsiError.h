@@ -37,7 +37,10 @@ public:
 		}
 		else
 		{
-			// Display the error and exit.
+			// Display the error and exit. Into the log file too, not just stdout: where stdout
+			// is a pipe (Android), the log is all that survives a crash.
+  			debugf( NAME_Critical, TEXT("appError called:") );
+			debugf( NAME_Critical, Msg );
   			LocalPrint( TEXT("\nappError called: \n") );
 			LocalPrint( Msg );
   			LocalPrint( TEXT("\n") );
