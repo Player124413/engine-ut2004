@@ -90,6 +90,7 @@ public class MainActivity extends Activity {
     private static final String[] SETTINGS_AND_SAVES = { "System/" + BuildConfig.GAME_INI, "System/User.ini", BuildConfig.SAVE_FOLDER };
     // How much of the game log Copy last log carries: enough for a crash tail, small enough for the clipboard.
     private static final int LOG_TAIL_BYTES = 192 * 1024;
+    private static final int LIFECYCLE_TAIL_BYTES = 64 * 1024;
     private static final int LOGCAT_TAIL_BYTES = 96 * 1024;
 
     private boolean launcherShown = false;
@@ -752,15 +753,22 @@ public class MainActivity extends Activity {
         return base + ".log";
     }
 
-    /** One loaded log tail: where it came from, the file's full size and the tail's text. */
+    /** One loaded game-log tail and, when present, the Android lifecycle log beside it. */
     private static final class LoadedLog {
         final String source;
         final long totalBytes;
         final long modifiedMs;
         final boolean truncated;
         final String text;
+        final String lifecycleSource;
+        final String lifecycleText;
 
         LoadedLog(String source, long totalBytes, long modifiedMs, byte[] data) {
+            this(source, totalBytes, modifiedMs, data, "", new byte[0], 0L);
+        }
+
+        LoadedLog(String source, long totalBytes, long modifiedMs, byte[] data,
+                String lifecycleSource, byte[] lifecycleData, long lifecycleTotalBytes) {
             this.source = source;
             this.totalBytes = totalBytes;
             this.modifiedMs = modifiedMs;
@@ -772,13 +780,23 @@ public class MainActivity extends Activity {
                 if (firstLine >= 0 && firstLine + 1 < decoded.length()) decoded = decoded.substring(firstLine + 1);
             }
             this.text = decoded;
+            this.lifecycleSource = lifecycleSource == null ? "" : lifecycleSource;
+            byte[] lifecycleBytes = lifecycleData == null ? new byte[0] : lifecycleData;
+            String lifecycleDecoded = new String(lifecycleBytes, StandardCharsets.UTF_8);
+            if (lifecycleTotalBytes > lifecycleBytes.length) {
+                int firstLine = lifecycleDecoded.indexOf('\n');
+                if (firstLine >= 0 && firstLine + 1 < lifecycleDecoded.length())
+                    lifecycleDecoded = lifecycleDecoded.substring(firstLine + 1);
+            }
+            this.lifecycleText = lifecycleDecoded;
         }
     }
 
-    /** Reads the last {@link #LOG_TAIL_BYTES} of a log at a file path. */
-    private static LoadedLog readLogTail(File file) throws IOException {
+    /** Reads the last {@code maxBytes} of a file and reports its full size. */
+    private static byte[] readFileTail(File file, int maxBytes, long[] totalOut) throws IOException {
         long total = file.length();
-        int len = (int) Math.min(total, LOG_TAIL_BYTES);
+        if (totalOut != null) totalOut[0] = total;
+        int len = (int) Math.min(total, maxBytes);
         byte[] data = new byte[len];
         RandomAccessFile raf = new RandomAccessFile(file, "r");
         try {
@@ -787,7 +805,26 @@ public class MainActivity extends Activity {
         } finally {
             raf.close();
         }
-        return new LoadedLog(file.getAbsolutePath(), total, file.lastModified(), data);
+        return data;
+    }
+
+    /** Reads the last {@link #LOG_TAIL_BYTES} of a game log and the lifecycle log beside it. */
+    private static LoadedLog readLogTail(File file) throws IOException {
+        String lifecycleSource = "";
+        byte[] lifecycleData = new byte[0];
+        long[] lifecycleTotal = new long[1];
+        File parent = file.getParentFile();
+        File lifecycle = parent == null ? null : new File(parent, GameActivity.LIFECYCLE_LOG_NAME);
+        if (lifecycle != null && lifecycle.isFile()) {
+            try {
+                lifecycleData = readFileTail(lifecycle, LIFECYCLE_TAIL_BYTES, lifecycleTotal);
+                lifecycleSource = lifecycle.getAbsolutePath();
+            } catch (IOException ignored) {}
+        }
+        long[] total = new long[1];
+        byte[] data = readFileTail(file, LOG_TAIL_BYTES, total);
+        return new LoadedLog(file.getAbsolutePath(), total[0], file.lastModified(), data,
+                lifecycleSource, lifecycleData, lifecycleTotal[0]);
     }
 
     /** The last {@code maxBytes} of a stream, read through a ring so the whole stream is never held. */
@@ -819,9 +856,14 @@ public class MainActivity extends Activity {
 
     /** The same read from a stream (a picked folder), keeping only the tail in memory. */
     private static LoadedLog readLogTail(InputStream in, String source) throws IOException {
+        return readLogTail(in, source, "", new byte[0], 0L);
+    }
+
+    private static LoadedLog readLogTail(InputStream in, String source,
+            String lifecycleSource, byte[] lifecycleData, long lifecycleTotalBytes) throws IOException {
         long[] total = new long[1];
         byte[] data = readStreamTail(in, LOG_TAIL_BYTES, total);
-        return new LoadedLog(source, total[0], 0L, data);
+        return new LoadedLog(source, total[0], 0L, data, lifecycleSource, lifecycleData, lifecycleTotalBytes);
     }
 
     /**
@@ -860,11 +902,30 @@ public class MainActivity extends Activity {
         if (system == null || !system.dir) return null;
         Storage.Doc log = Storage.child(getContentResolver(), tree, system.id, gameLogName());
         if (log == null || log.dir) return null;
+        String lifecycleSource = "";
+        byte[] lifecycleData = new byte[0];
+        long[] lifecycleTotal = new long[1];
+        try {
+            Storage.Doc lifecycle = Storage.child(getContentResolver(), tree, system.id, GameActivity.LIFECYCLE_LOG_NAME);
+            if (lifecycle != null && !lifecycle.dir) {
+                InputStream lifecycleIn = getContentResolver().openInputStream(
+                        DocumentsContract.buildDocumentUriUsingTree(tree, lifecycle.id));
+                if (lifecycleIn != null) {
+                    try {
+                        lifecycleData = readStreamTail(lifecycleIn, LIFECYCLE_TAIL_BYTES, lifecycleTotal);
+                        lifecycleSource = folderName(tree) + " / System/" + lifecycle.name;
+                    } finally {
+                        try { lifecycleIn.close(); } catch (IOException ignored) {}
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
         InputStream in = getContentResolver().openInputStream(
                 DocumentsContract.buildDocumentUriUsingTree(tree, log.id));
         if (in == null) throw new IOException("cannot read System/" + log.name);
         try {
-            return readLogTail(in, folderName(tree) + " / System/" + log.name);
+            return readLogTail(in, folderName(tree) + " / System/" + log.name,
+                    lifecycleSource, lifecycleData, lifecycleTotal[0]);
         } finally {
             try { in.close(); } catch (IOException ignored) {}
         }
@@ -922,7 +983,7 @@ public class MainActivity extends Activity {
         return null;
     }
 
-    /** The log as it goes out: a short header (app, device, source) over the game log and the app logcat. */
+    /** The log as it goes out: a short header over the game log, lifecycle log and app logcat. */
     private String formatLogForSending(LoadedLog log, String logcat) {
         String version = "?";
         try {
@@ -945,6 +1006,13 @@ public class MainActivity extends Activity {
             if (!log.text.endsWith("\n")) b.append('\n');
         } else {
             b.append("Log: no game log found (System/").append(gameLogName()).append(")\n");
+        }
+        if (log != null && !log.lifecycleText.isEmpty()) {
+            b.append("\n--- Android lifecycle");
+            if (!log.lifecycleSource.isEmpty()) b.append(" (").append(log.lifecycleSource).append(')');
+            b.append(" ---\n");
+            b.append(log.lifecycleText);
+            if (!log.lifecycleText.endsWith("\n")) b.append('\n');
         }
         if (!logcat.isEmpty()) {
             b.append("\n--- logcat (this app) ---\n");
@@ -1007,6 +1075,7 @@ public class MainActivity extends Activity {
                     finishOp(result != null
                             ? "Last log copied: " + result.source
                                 + (result.truncated ? " (the last " + Storage.human(LOG_TAIL_BYTES) + ")" : "")
+                                + (result.lifecycleText.isEmpty() ? "" : ", with the Android lifecycle log")
                                 + (logcat.isEmpty() ? "" : ", with this app's logcat")
                                 + ". Paste it into a message; long-press Copy last log to share it."
                             : "No game log; copied this app's logcat instead. Paste it into a message.");

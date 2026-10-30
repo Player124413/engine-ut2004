@@ -706,6 +706,7 @@ static void MainLoop( UEngine* Engine )
 	{
 		theLoop->RunLoop();
 	}
+	debugf( NAME_Log, TEXT("Main loop finished: GIsRunning=%i GIsRequestingExit=%i GExitSignal=%i"), GIsRunning, GIsRequestingExit, GExitSignal );
 	
 	delete theLoop;
 

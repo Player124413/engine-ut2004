@@ -1745,12 +1745,14 @@ static void HandleSignal( int Signal )
 		case SIGHUP:
 			sig_text = "Signal: SIGHUP [hangup]";
 			SignalExit++;
+			if( !GExitSignal ) GExitSignal = Signal;
 			break;
 #endif
 #ifndef _WIN32	// not defined by MinGW's <signal.h>: no such signal on Windows.
 		case SIGQUIT:
 			sig_text = "Signal: SIGQUIT [quit]";
 			SignalExit++;
+			if( !GExitSignal ) GExitSignal = Signal;
 			break;
 #endif
 		case SIGILL:
@@ -1786,6 +1788,7 @@ static void HandleSignal( int Signal )
 		case SIGTERM:
 			sig_text = "Signal: SIGTERM [terminate]";
 			SignalExit++;
+			if( !GExitSignal ) GExitSignal = Signal;
 			break;
 		case SIGINT:  // must have gone through HandleInterrupt previously.
 			sig_text = "Signal: SIGINT [interrupt]";
@@ -1886,6 +1889,7 @@ static void HandleInterrupt( int Signal )
             // Async-signal-safe, as in HandleSignal.
             static const char Pressed[] = "CTRL-C has been pressed.\n";
             write( 1, Pressed, sizeof(Pressed)-1 );
+            if( !GExitSignal ) GExitSignal = Signal;
             GIsRequestingExit = 1;
         }
 
@@ -3311,6 +3315,8 @@ void appPlatformInit()
 
 void appPlatformPreExit()
 {
+	if( GExitSignal )
+		debugf( NAME_Log, TEXT("Clean exit was requested by signal %i"), GExitSignal );
 }
 
 

@@ -2,6 +2,7 @@ package com.ut2004.android;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -11,6 +12,7 @@ import android.graphics.RectF;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Process;
 import android.os.SystemClock;
 import android.util.Log;
 import android.util.SparseArray;
@@ -21,7 +23,11 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 import org.libsdl.app.SDLActivity;
@@ -40,6 +46,10 @@ import org.libsdl.app.SDLActivity;
 public class GameActivity extends SDLActivity {
     private static final String TAG = "UT2004";
     private static boolean bridgeLoaded = false;
+
+    static final String LIFECYCLE_LOG_NAME = "AndroidLifecycle.log";
+    private static final Object LIFECYCLE_LOCK = new Object();
+    private File lifecycleLogFile;
 
     // Storage-mode selection. MainActivity's launcher puts one of these on the launch Intent;
     // resolveDataRoot() reads it (before super.onCreate) to pick which tree to boot.
@@ -96,6 +106,38 @@ public class GameActivity extends SDLActivity {
         return root != null && new File(new File(root, "System"), "Core.u").isFile();
     }
 
+    /** Appends one Activity lifecycle transition to the file beside the game log. */
+    private void logLifecycle(String event) {
+        String line = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US).format(new Date())
+                + " pid=" + Process.myPid()
+                + " activity=" + Integer.toHexString(System.identityHashCode(this))
+                + " task=" + getTaskId()
+                + " uptimeMs=" + SystemClock.uptimeMillis()
+                + " " + event
+                + " finishing=" + isFinishing()
+                + " changingConfigurations=" + isChangingConfigurations()
+                + " destroyed=" + isDestroyed()
+                + "\n";
+        Log.i(TAG, "lifecycle: " + line.trim());
+        File file = lifecycleLogFile;
+        if (file == null) return;
+        synchronized (LIFECYCLE_LOCK) {
+            try {
+                File parent = file.getParentFile();
+                if (parent != null) parent.mkdirs();
+                FileOutputStream out = new FileOutputStream(file, true);
+                try {
+                    out.write(line.getBytes(StandardCharsets.UTF_8));
+                    out.flush();
+                } finally {
+                    out.close();
+                }
+            } catch (Throwable t) {
+                Log.e(TAG, "could not append to " + file, t);
+            }
+        }
+    }
+
     static {
         // Load the tiny process-prep bridge in a static block (independent of SDL's own loader)
         // so nativePrepareProcess is resolvable the moment onCreate runs.
@@ -128,6 +170,12 @@ public class GameActivity extends SDLActivity {
         // Must run before super.onCreate(): super.onCreate() spins up the SDL thread that calls
         // SDL_main, and the engine's appBaseDir()/appInit() read the env + cwd set here.
         File dataRoot = resolveDataRoot();
+        lifecycleLogFile = new File(new File(dataRoot, "System"), LIFECYCLE_LOG_NAME);
+        logLifecycle("onCreate(savedInstanceState=" + (savedInstanceState != null)
+                + ", dataRoot=" + dataRoot
+                + ", intent=" + getIntent()
+                + ", requestedOrientation=" + getRequestedOrientation()
+                + ", config=" + getResources().getConfiguration() + ")");
         Storage.installSystemFiles(this, dataRoot);
         File homeDir = new File(getFilesDir(), "home");
         if (bridgeLoaded) {
@@ -137,6 +185,8 @@ public class GameActivity extends SDLActivity {
             Log.e(TAG, "bridge not loaded; the engine will not find its data at " + dataRoot);
         }
         super.onCreate(savedInstanceState);
+        logLifecycle("onCreate after SDLActivity.onCreate(requestedOrientation=" + getRequestedOrientation()
+                + ", config=" + getResources().getConfiguration() + ")");
 
         // Keep the screen awake during play: a match can run for long stretches with no touch input
         // (spectating, watching bots). FLAG_KEEP_SCREEN_ON while this activity is foreground; cleared
@@ -162,6 +212,103 @@ public class GameActivity extends SDLActivity {
         } catch (Throwable t) {
             Log.e(TAG, "touch overlay install failed", t);
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        logLifecycle("onNewIntent(" + intent + ")");
+        super.onNewIntent(intent);
+    }
+
+    @Override
+    protected void onRestart() {
+        logLifecycle("onRestart()");
+        super.onRestart();
+    }
+
+    @Override
+    protected void onStart() {
+        logLifecycle("onStart()");
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        logLifecycle("onResume()");
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        logLifecycle("onPause()");
+        super.onPause();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        logLifecycle("onSaveInstanceState()");
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onStop() {
+        logLifecycle("onStop()");
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        logLifecycle("onDestroy() begin");
+        super.onDestroy();
+        logLifecycle("onDestroy() end");
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        logLifecycle("onConfigurationChanged(" + newConfig + ")");
+        super.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        logLifecycle("onWindowFocusChanged(" + hasFocus + ")");
+        super.onWindowFocusChanged(hasFocus);
+    }
+
+    @Override
+    protected void onUserLeaveHint() {
+        logLifecycle("onUserLeaveHint()");
+        super.onUserLeaveHint();
+    }
+
+    @Override
+    public void onBackPressed() {
+        logLifecycle("onBackPressed()");
+        super.onBackPressed();
+    }
+
+    @Override
+    public void onLowMemory() {
+        logLifecycle("onLowMemory()");
+        super.onLowMemory();
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        logLifecycle("onTrimMemory(" + level + ")");
+        super.onTrimMemory(level);
+    }
+
+    @Override
+    public void onMultiWindowModeChanged(boolean isInMultiWindowMode, Configuration newConfig) {
+        logLifecycle("onMultiWindowModeChanged(" + isInMultiWindowMode + ", " + newConfig + ")");
+        super.onMultiWindowModeChanged(isInMultiWindowMode, newConfig);
+    }
+
+    @Override
+    public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
+        logLifecycle("onPictureInPictureModeChanged(" + isInPictureInPictureMode + ", " + newConfig + ")");
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
     }
 
     // A real pad's input hides the touch controls (Ut2004TouchOverlayView.onRealPadInput); SDL still gets every event.

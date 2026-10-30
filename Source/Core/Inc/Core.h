@@ -675,6 +675,7 @@ CORE_API extern UBOOL					GIsGarbageCollecting;
 CORE_API extern UBOOL					GIsSlowTask;
 CORE_API extern UBOOL					GIsGuarded;
 CORE_API extern UBOOL					GIsRequestingExit;
+CORE_API extern volatile INT			GExitSignal;
 CORE_API extern UBOOL					GIsStrict;
 CORE_API extern UBOOL					GUfrontLog; // -UFRONTLOG: the port's diagnostic and repeated log lines are written too.
 CORE_API extern UBOOL                   GScriptEntryTag;

@@ -45,6 +45,6 @@
             android:launchMode="singleTask"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:screenOrientation="landscape"
-            android:configChanges="orientation|screenSize|keyboardHidden|keyboard|navigation|smallestScreenSize|screenLayout" />
+            android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|density|fontScale|layoutDirection|colorMode|fontWeightAdjustment|grammaticalGender" />
     </application>
 </manifest>

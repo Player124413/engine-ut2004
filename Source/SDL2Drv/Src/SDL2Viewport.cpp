@@ -1386,10 +1386,40 @@ void USDL2Viewport::UpdateInput( UBOOL Reset, FLOAT DeltaSeconds )
         switch( Ev.type )
         {
         case SDL_QUIT:
+        {
+            const INT Now = (INT)SDL_GetTicks();
+            debugf( NAME_Log, TEXT("SDL2: SDL_QUIT (event timestamp %i ms, now %i ms, queued %i ms); requesting exit"), (INT)Ev.quit.timestamp, Now, Now - (INT)Ev.quit.timestamp );
             GIsRequestingExit = 1;
             break;
+        }
+
+        case SDL_APP_TERMINATING:
+        case SDL_APP_LOWMEMORY:
+        case SDL_APP_WILLENTERBACKGROUND:
+        case SDL_APP_DIDENTERBACKGROUND:
+        case SDL_APP_WILLENTERFOREGROUND:
+        case SDL_APP_DIDENTERFOREGROUND:
+        {
+            const TCHAR* AppEvent =
+                Ev.type == SDL_APP_TERMINATING ? TEXT("SDL_APP_TERMINATING") :
+                Ev.type == SDL_APP_LOWMEMORY ? TEXT("SDL_APP_LOWMEMORY") :
+                Ev.type == SDL_APP_WILLENTERBACKGROUND ? TEXT("SDL_APP_WILLENTERBACKGROUND") :
+                Ev.type == SDL_APP_DIDENTERBACKGROUND ? TEXT("SDL_APP_DIDENTERBACKGROUND") :
+                Ev.type == SDL_APP_WILLENTERFOREGROUND ? TEXT("SDL_APP_WILLENTERFOREGROUND") :
+                TEXT("SDL_APP_DIDENTERFOREGROUND");
+            const INT Now = (INT)SDL_GetTicks();
+            debugf( NAME_Log, TEXT("SDL2: %s (event timestamp %i ms, now %i ms)"), AppEvent, (INT)Ev.common.timestamp, Now );
+            break;
+        }
 
         case SDL_WINDOWEVENT:
+#if defined(__ANDROID__)
+            if( Ev.window.event != SDL_WINDOWEVENT_RESIZED && Ev.window.event != SDL_WINDOWEVENT_MOVED && Ev.window.event != SDL_WINDOWEVENT_ENTER && Ev.window.event != SDL_WINDOWEVENT_LEAVE )
+            {
+                const INT Now = (INT)SDL_GetTicks();
+                debugf( NAME_Log, TEXT("SDL2: window event %i (%i, %i; event timestamp %i ms, now %i ms)"), (INT)Ev.window.event, Ev.window.data1, Ev.window.data2, (INT)Ev.window.timestamp, Now );
+            }
+#endif
             switch( Ev.window.event )
             {
             case SDL_WINDOWEVENT_RESIZED:
