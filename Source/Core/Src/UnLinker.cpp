@@ -806,7 +806,16 @@ void ULinkerLoad::Preload( UObject* Object )
 
 			// Make sure we serialized the right amount of stuff.
 			if( Tell()-Export.SerialOffset != Export.SerialSize )
+			{
+#if UE_SHREK2
+				// KnowWonder exports can carry a trailing block this serializer does not read; the loader
+				// position is restored below either way, so an underrun only loses that tail.
+				if( Tell()-Export.SerialOffset < Export.SerialSize )
+					debugf( NAME_Warning, TEXT("%s: serial size %i, serialized %i; skipping the unread tail"), Object->GetFullName(), Export.SerialSize, Tell()-Export.SerialOffset );
+				else
+#endif
 				appErrorf( LocalizeError(TEXT("SerialSize"),TEXT("Core")), Object->GetFullName(), Tell()-Export.SerialOffset, Export.SerialSize );
+			}
 			Loader->Seek( SavedPos );
 			unguardf(( TEXT("(%s %i==%i/%i %i %i)"), Object->GetFullName(), Loader->Tell(), Loader->Tell(), Loader->TotalSize(), ExportMap( Object->_LinkerIndex ).SerialOffset, ExportMap( Object->_LinkerIndex ).SerialSize ));
 		}
